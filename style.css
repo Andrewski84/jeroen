@@ -3,19 +3,19 @@
 
 /* Kleuren & Stijl Variabelen */
 :root {
-    --background: #FAFAFA;
-    --text-dark: #111111;
-    --text-light: #555555;
-    --primary: #111111;
-    --accent: #111111;
-    --surface: #FFFFFF;
-    --border: #E5E5E5;
-    --surface-rgb: 255, 255, 255;
+    --background: #0B0B0C; /* near-black */
+    --surface: #141416; /* elevated surfaces */
+    --surface-rgb: 20, 20, 22;
+    --border: #26262A;
+    --text-dark: #E5E7EB; /* main text on dark */
+    --text-light: #A1A1AA; /* secondary text */
+    --primary: #FFFFFF; /* primary accents */
+    --accent: #FFFFFF; /* links & focus */
     --font-heading: 'Playfair Display', serif;
     --font-body: 'Poppins', sans-serif;
     --radius: 0.5rem;
     --radius-lg: 0.75rem;
-    --shadow: 0 4px 25px rgba(0,0,0,0.07);
+    --shadow: 0 6px 30px rgba(0,0,0,0.35);
     --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     --header-height: 5rem; /* matches h-24 */
 }
@@ -32,18 +32,18 @@ body {
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: 500; }
 p { color: var(--text-light); margin-bottom: 1rem; }
 a { color: var(--accent); transition: var(--transition); }
-a:hover { filter: brightness(1.1); }
+a:hover { opacity: 0.85; }
 
 /* Header */
 header#header {
-    background-color: rgba(var(--surface-rgb), 0.8);
+    background-color: rgba(var(--surface-rgb), 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     transition: var(--transition);
     border-bottom: 1px solid transparent;
 }
 header#header.scrolled {
-    background-color: rgba(var(--surface-rgb), 0.95);
+    background-color: rgba(var(--surface-rgb), 0.9);
     border-bottom: 1px solid var(--border);
 }
 .nav-link {
@@ -52,7 +52,7 @@ header#header.scrolled {
 }
 .nav-link::after {
     content: ''; position: absolute; bottom: 0; left: 0;
-    width: 0; height: 1px; background-color: var(--accent);
+    width: 0; height: 1px; background-color: var(--primary);
     transition: var(--transition);
 }
 .nav-link:hover::after, .nav-link.active::after { width: 100%; }
@@ -67,7 +67,7 @@ header#header.scrolled {
     top: 100%; /* no gap so hover doesn't break */
     left: 0;
     min-width: 12rem;
-    background: var(--surface);
+    background: rgba(var(--surface-rgb), 0.98);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -83,14 +83,14 @@ header#header.scrolled {
     border-radius: .5rem;
     color: var(--text-dark);
 }
-.dropdown-item:hover { background: #f6f6f6; color: var(--text-dark); }
+.dropdown-item:hover { background: rgba(255,255,255,0.06); color: var(--text-dark); }
 
 /* Mobile menu panel (not fullscreen) */
 .mobile-menu-panel {
-    background: var(--surface);
+    background: rgba(var(--surface-rgb), 0.98);
     border: 1px solid var(--border);
     border-radius: 1rem;
-    box-shadow: 0 12px 40px rgba(0,0,0,.12);
+    box-shadow: var(--shadow);
     max-height: 70vh;
     overflow: auto;
 }
@@ -113,7 +113,7 @@ header#header.scrolled {
     border-radius: var(--radius);
 }
 .social-link:hover {
-    background-color: #f9f9f9;
+    background-color: rgba(255,255,255,0.06);
 }
 .social-link svg {
     transition: transform 0.3s ease;
@@ -138,13 +138,19 @@ header#header.scrolled {
     color: var(--text-light);
 }
 .filter-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--primary);
+    color: var(--text-dark);
 }
 .filter-btn.active {
-    background-color: var(--accent);
-    color: white;
-    border-color: var(--accent);
+    background-color: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+}
+/* Also support aria-pressed semantics for accessibility */
+.filter-btn[aria-pressed="true"] {
+    background-color: var(--primary);
+    color: #000;
+    border-color: var(--primary);
 }
 
 /* Selected filter tag should not look clickable */
@@ -188,13 +194,19 @@ header#header.scrolled {
     left: 0; right: 0; bottom: 0;
     padding: 1rem;
     color: #fff;
-    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 70%);
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 70%);
 }
 .slide-title {
     font-family: var(--font-heading);
     font-size: 1.25rem;
     font-weight: 500;
 }
+
+/* Index Lightbox subtle fade/zoom */
+#index-lightbox { opacity: 0; transition: opacity .25s ease; }
+#index-lightbox.show { opacity: 1; }
+#index-lightbox .index-lightbox-inner { transform: scale(0.98); opacity: 0; transition: transform .25s ease, opacity .25s ease; }
+#index-lightbox.show .index-lightbox-inner { transform: scale(1); opacity: 1; }
 
 /* Masonry-like grid for portfolio */
 .portfolio-grid-modern {
@@ -249,7 +261,7 @@ header#header.scrolled {
 }
 
 /* Generic layout helpers for index sections */
-section { padding: 4rem 0; }
+section { padding: 5rem 0; }
 #home { padding: 0; }
 #featured-work, #bio { background-color: var(--background); }
 #featured-work { padding-top: 4rem; padding-bottom: 4rem; }
@@ -268,19 +280,24 @@ section { padding: 4rem 0; }
     font-weight: 500;
     transition: var(--transition);
 }
-.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary { background: var(--accent); color: #000; }
 .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
 .btn-secondary { background: var(--surface); color: var(--text-dark); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
-/* Simple reveal animation placeholders (non-blocking if JS absent) */
-.reveal { opacity: 1; transform: translateY(0); transition: opacity .5s ease, transform .5s ease; }
-.stagger-container .reveal { transition-delay: .05s; }
+/* Reveal on scroll (works with main.js IntersectionObserver) */
+.stagger-container .reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+.stagger-container.is-visible .reveal { opacity: 1; transform: translateY(0); }
+.stagger-container .reveal:nth-child(1) { transition-delay: 0.04s; }
+.stagger-container .reveal:nth-child(2) { transition-delay: 0.08s; }
+.stagger-container .reveal:nth-child(3) { transition-delay: 0.12s; }
+.stagger-container .reveal:nth-child(4) { transition-delay: 0.16s; }
+.stagger-container .reveal:nth-child(5) { transition-delay: 0.20s; }
 
 /* Mobile hero scaling adjustment */
 @media (max-width: 767px) {
     #home {
-        height: 70vh; /* Shorter hero on mobile to prevent excessive zoom */
+        height: 70vh; /* Shorter hero on mobile */
         min-height: 450px;
         background-attachment: scroll; /* 'fixed' is often buggy on mobile */
     }
@@ -288,15 +305,11 @@ section { padding: 4rem 0; }
 
 /* Hero heading styling */
 #home h1 {
-    font-size: clamp(1.2rem, 6.5vw, 4.5rem); /* Adjusted for better mobile scaling */
-    white-space: nowrap;
-    display: inline-block; /* Fix for letter clipping */
-    
-    color: var(--background); /* Use background color for text */
-    /* A more subtle, modern shadow */
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    
-    line-height: 1.2;
+    font-size: clamp(1.6rem, 6.5vw, 4.5rem);
+    display: inline-block;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    line-height: 1.15;
     letter-spacing: 0.01em;
 }
 
@@ -305,7 +318,7 @@ section { padding: 4rem 0; }
 
 /* Contact form card + inputs */
 #contact form {
-    background: var(--background); /* Consistent background color */
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -318,7 +331,7 @@ section { padding: 4rem 0; }
     width: 100%;
     border: 1px solid var(--border);
     border-radius: 0.625rem; /* 10px */
-    background: #fff;
+    background: #0F0F10;
     color: var(--text-dark);
     padding: 0.75rem 0.9rem;
     outline: none;
@@ -327,7 +340,7 @@ section { padding: 4rem 0; }
 #contact input[type="email"] {
     -webkit-appearance: none;
     appearance: none;
-    background-color: #fff; /* fix inconsistent placeholder highlight */
+    background-color: #0F0F10;
     line-height: 1.5;
 }
 #contact input::placeholder, #contact textarea::placeholder { color: var(--text-light); opacity: 1; }
@@ -335,6 +348,6 @@ section { padding: 4rem 0; }
 #contact input:focus,
 #contact textarea:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.15);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
 

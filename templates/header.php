@@ -68,11 +68,11 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
 <div id="mobile-menu" class="hidden md:hidden fixed top-24 left-0 right-0 z-40">
     <div class="mobile-menu-panel mx-4">
         <nav class="p-4 flex flex-col gap-2">
-            <a href="<?php echo $bioLink; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-[#f6f6f6]">Over Mij</a>
+            <a href="<?php echo $bioLink; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Over Mij</a>
             <div class="w-full">
                 <div class="flex items-center gap-2">
-                    <a href="portfolio.php" class="mobile-nav-link flex-1 block text-lg px-4 py-3 rounded-lg hover:bg-[#f6f6f6]">Portfolio</a>
-                    <button id="mobile-portfolio-toggle" class="p-3 rounded-lg hover:bg-[#f6f6f6]" aria-controls="mobile-portfolio-menu" aria-expanded="false">
+                    <a href="portfolio.php" class="mobile-nav-link flex-1 block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Portfolio</a>
+                    <button id="mobile-portfolio-toggle" class="p-3 rounded-lg hover:bg-white/10" aria-controls="mobile-portfolio-menu" aria-expanded="false">
                         <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
                     </button>
                 </div>
@@ -89,10 +89,10 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
             <?php if ($clientGallery): ?>
             <div id="mobile-client-block" class="w-full">
                 <div class="flex items-center gap-2">
-                    <a href="proof.php?gallery=<?php echo htmlspecialchars($clientGallery['slug']); ?>" class="mobile-nav-link flex-1 block text-lg px-4 py-3 rounded-lg hover:bg-[#f6f6f6]">
+                    <a href="proof.php?gallery=<?php echo htmlspecialchars($clientGallery['slug']); ?>" class="mobile-nav-link flex-1 block text-lg px-4 py-3 rounded-lg hover:bg-white/10">
                         <?php echo htmlspecialchars($clientGallery['title'] ?? 'Mijn galerij'); ?>
                     </a>
-                    <button id="mobile-client-toggle" class="p-3 rounded-lg hover:bg-[#f6f6f6]" aria-controls="mobile-client-menu" aria-expanded="false">
+                    <button id="mobile-client-toggle" class="p-3 rounded-lg hover:bg-white/10" aria-controls="mobile-client-menu" aria-expanded="false">
                         <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
                     </button>
                 </div>
@@ -108,9 +108,9 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
                 </div>
             </div>
             <?php endif; ?>
-            <a href="<?php echo $contactLink; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-[#f6f6f6]">Contact</a>
+            <a href="<?php echo $contactLink; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Contact</a>
             <?php if (!empty($_SESSION['loggedin'])): ?>
-            <a href="admin.php" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-[#f6f6f6]">Admin</a>
+            <a href="admin.php" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Admin</a>
             <?php endif; ?>
         </nav>
     </div>

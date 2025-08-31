@@ -25,24 +25,24 @@ function renderErrorPage($title, $message) {
     echo '<title>' . htmlspecialchars($title) . ' - Andrew</title>';
     echo '<script src="https://cdn.tailwindcss.com"></script>';
     echo '<link rel="stylesheet" href="style.css?v=' . @filemtime('style.css') . '">';
-    echo '</head><body class="flex flex-col min-h-screen bg-gray-50 text-gray-800">';
+    echo '</head><body class="flex flex-col min-h-screen">';
 
     // Header
-    echo '<header class="sticky top-0 w-full z-50 shadow-md bg-white">';
+    echo '<header class="sticky top-0 w-full z-50 shadow-md" style="background: rgba(var(--surface-rgb), 0.9);">';
     echo '<nav class="container mx-auto px-6 flex justify-between items-center h-20">';
     echo '<a href="index.php" class="text-2xl font-serif font-bold">Andrew</a>';
     echo '</nav></header>';
 
     // Hoofdinhoud met de foutmelding
     echo '<main class="flex-grow flex items-center justify-center container mx-auto px-6 py-12">';
-    echo '<div class="text-center p-10 rounded-lg shadow-xl max-w-xl bg-white">';
+    echo '<div class="text-center p-10 rounded-lg shadow-xl max-w-xl" style="background: var(--surface); border: 1px solid var(--border);">';
     echo '<h1 class="text-4xl font-serif font-bold mb-4">' . htmlspecialchars($title) . '</h1>';
     echo '<p class="text-lg mb-8">' . htmlspecialchars($message) . '</p>';
     echo '<a href="index.php" class="btn btn-primary">Terug naar homepage</a>';
     echo '</div></main>';
 
     // Footer
-    echo '<footer class="py-6 bg-white"><div class="container mx-auto px-6 text-center"><p>&copy; ' . date('Y') . ' Andrew Smeets Fotografie. Alle rechten voorbehouden.</p></div></footer>';
+    echo '<footer class="py-6" style="background: var(--surface);"><div class="container mx-auto px-6 text-center"><p>&copy; ' . date('Y') . ' Andrew Smeets Fotografie. Alle rechten voorbehouden.</p></div></footer>';
     echo '</body></html>';
     exit;
 }
@@ -104,7 +104,7 @@ function e($str) { return htmlspecialchars($str, ENT_QUOTES, 'UTF-8'); }
         #toast-popup { transition: opacity 0.3s ease, transform 0.3s ease; z-index: 1000; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50">
+<body class="min-h-screen flex flex-col">
     <?php
         // Load site content for footer (instagram etc.)
         $siteContent = file_exists(CONTENT_FILE) ? json_decode(file_get_contents(CONTENT_FILE), true) : [];

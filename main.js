@@ -1,4 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Homepage: initialize featured Swiper if present
+    try {
+        if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-container')) {
+            new Swiper('.swiper-container', {
+                effect: 'coverflow',
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: 'auto',
+                preventClicks: true,
+                preventClicksPropagation: true,
+                threshold: 5,
+                coverflowEffect: {
+                    rotate: 50,
+                    stretch: 0,
+                    depth: 100,
+                    modifier: 1,
+                    slideShadows: true,
+                },
+                pagination: { el: '.swiper-pagination', clickable: true },
+                loop: true,
+                on: {
+                    click: function (swiper, event) {
+                        if (!swiper.allowClick) return;
+                        const a = event.target.closest('a');
+                        if (!a) return;
+                        const idxAttr = a.getAttribute('data-idx');
+                        const indexLightbox = document.getElementById('index-lightbox');
+                        if (indexLightbox && idxAttr !== null && typeof window.openIndexLightbox === 'function') {
+                            event.preventDefault();
+                            const i = parseInt(idxAttr, 10) || 0;
+                            window.openIndexLightbox(i);
+                        } else {
+                            window.location.href = a.href;
+                        }
+                    }
+                }
+            });
+        }
+    } catch (e) {}
     /**
      * Header scroll effect: voegt een 'scrolled' class toe aan de header
      * wanneer de gebruiker naar beneden scrollt.

@@ -1,3 +1,152 @@
 {
-    "themes": []
+    "themes": {
+        "Artist workshop": {
+            "images": [
+                {
+                    "path": "assets\/portfolio\/Artist workshop\/img_68b4b7c5e140b5.18283685.jpg",
+                    "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7c5e140b5.18283685.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Artist workshop\/img_68b4b7c6e6e4a6.51875601.jpg",
+                    "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7c6e6e4a6.51875601.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Artist workshop\/img_68b4b7ca0fe182.45963690.jpg",
+                    "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7ca0fe182.45963690.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Artist workshop\/img_68b4b7c7f02e53.57341890.jpg",
+                    "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7c7f02e53.57341890.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Artist workshop\/img_68b4b7caa53643.14235407.jpg",
+                    "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7caa53643.14235407.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Artist workshop\/img_68b4b7c8c87c10.41587282.jpg",
+                    "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7c8c87c10.41587282.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                }
+            ]
+        },
+        "Communie": {
+            "images": [
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b93a8b9671.99688394.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b93a8b9671.99688394.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b983db2622.95327571.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b983db2622.95327571.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b94297ad65.43591080.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b94297ad65.43591080.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b976e284f7.97942280.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b976e284f7.97942280.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b97f007918.41425657.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b97f007918.41425657.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b990ebb9c1.68971628.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b990ebb9c1.68971628.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b99cd25450.48159280.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b99cd25450.48159280.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Communie\/img_68b4b99df03767.58082578.jpg",
+                    "webp": "assets\/portfolio\/Communie\/img_68b4b99df03767.58082578.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                }
+            ]
+        },
+        "Sfeer": {
+            "images": [
+                {
+                    "path": "assets\/portfolio\/Sfeer\/img_68b4bb28472e20.45194969.jpg",
+                    "webp": "assets\/portfolio\/Sfeer\/img_68b4bb28472e20.45194969.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": false,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Sfeer\/img_68b4bb34259f09.00859455.jpg",
+                    "webp": "assets\/portfolio\/Sfeer\/img_68b4bb34259f09.00859455.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                },
+                {
+                    "path": "assets\/portfolio\/Sfeer\/img_68b4bb4a0cae08.34716764.jpg",
+                    "webp": "assets\/portfolio\/Sfeer\/img_68b4bb4a0cae08.34716764.webp",
+                    "title": "",
+                    "description": "",
+                    "featured": true,
+                    "alt": ""
+                }
+            ]
+        }
+    }
 }

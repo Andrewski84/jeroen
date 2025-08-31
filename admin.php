@@ -45,7 +45,7 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Andrew</title>
+    <title>Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,7 +57,7 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
 
     <div class="admin-container">
         <header class="admin-header">
-            <h1 class="text-2xl font-bold text-slate-800">Andrew Admin</h1>
+            <h1 class="text-2xl font-bold text-slate-800">Admin</h1>
             <div class="flex items-center gap-2">
                 <a href="index.php" class="btn btn-secondary">
                     <span>Homepage</span>

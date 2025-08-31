@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'config.php';
 require_once 'helpers.php';
@@ -26,7 +26,7 @@ require_once 'helpers.php';
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="antialiased">
+<body id="index-page" class="antialiased">
 <div class="w-full overflow-x-hidden">
     <?php
         function loadContent($file) {
@@ -42,7 +42,6 @@ require_once 'helpers.php';
             foreach ($portfolioData['themes'] as $themeName => $theme) {
                 foreach ($theme['images'] as $image) {
                     if (!empty($image['featured'])) {
-                        // Normalize any accidentally stored absolute paths
                         foreach (['path','webp'] as $k) {
                             if (!empty($image[$k])) {
                                 $image[$k] = toPublicPath($image[$k]);
@@ -67,11 +66,11 @@ require_once 'helpers.php';
 
     <section id="bio">
         <div class="container mx-auto px-6 stagger-container">
-            <div class="flex flex-col md:flex-row items-center gap-12 md:gap-20">
-                <div class="md:w-5/12 reveal">
+            <div class="flex flex-col md:flex-row-reverse items-center gap-12 md:gap-20">
+                <div class="md:w-4/12 reveal">
                     <img src="<?php echo htmlspecialchars($content['bio']['image'] ?? ''); ?>" alt="Foto van Andrew" class="w-full">
                 </div>
-                <div class="md:w-7/12 text-center md:text-left reveal">
+                <div class="md:w-8/12 text-center md:text-left reveal">
                     <h2 class="text-4xl md:text-5xl mb-4"><?php echo htmlspecialchars($content['bio']['title'] ?? ''); ?></h2>
                     <p class="text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($content['bio']['text'] ?? '')); ?></p>
                     <a href="portfolio.php" class="btn btn-primary mt-6">Ontdek mijn werk</a>
@@ -86,9 +85,9 @@ require_once 'helpers.php';
             <?php if (!empty($featuredImages)): ?>
             <div class="swiper-container reveal">
                 <div class="swiper-wrapper">
-                    <?php foreach ($featuredImages as $image): ?>
+                    <?php foreach ($featuredImages as $i => $image): ?>
                     <div class="swiper-slide" style="background-image: url('<?php echo htmlspecialchars($image['path']); ?>')">
-                        <a href="portfolio.php?theme=<?php echo urlencode($image['theme']); ?>&highlight=<?php echo urlencode($image['path']); ?>" class="absolute inset-0">
+                        <a href="portfolio.php?theme=<?php echo urlencode($image['theme']); ?>&highlight=<?php echo urlencode($image['path']); ?>" class="absolute inset-0 slide-link" data-idx="<?php echo (int)$i; ?>">
                             <div class="slide-content">
                                 <h3 class="slide-title"><?php echo htmlspecialchars($image['title'] ?? 'Bekijk project'); ?></h3>
                                 <p class="text-sm"><?php echo htmlspecialchars($image['description'] ?? ''); ?></p>
@@ -103,15 +102,29 @@ require_once 'helpers.php';
         </div>
     </section>
 
+    <!-- Index lightbox -->
+    <div id="index-lightbox" class="fixed inset-0 z-[200] hidden items-center justify-center">
+        <div class="absolute inset-0 bg-black/70"></div>
+        <button id="index-lightbox-close" class="absolute top-4 right-6 text-white text-4xl">&times;</button>
+        <button id="index-lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-4xl">&lt;</button>
+        <button id="index-lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl">&gt;</button>
+        <div class="relative max-w-5xl w-11/12 flex flex-col items-center index-lightbox-inner">
+            <img id="index-lightbox-img" src="" alt="" class="w-auto h-auto max-h-[70vh] object-contain rounded-md shadow-2xl">
+            <div id="index-lightbox-caption" class="mt-4 text-center text-white/90">
+                <h3 id="index-lightbox-title" class="text-xl font-serif"></h3>
+                <p id="index-lightbox-description" class="text-sm opacity-80"></p>
+            </div>
+        </div>
+    </div>
+
     <?php
-        // Honeypot / time-trap start marker
         if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
         $_SESSION['form_start'] = time();
     ?>
     <section id="contact" class="stagger-container">
         <div class="container mx-auto px-6">
             <div class="max-w-3xl mx-auto text-center reveal">
-                <h2 class="text-4xl md:text-5xl mb-4">Laten we iets moois creëren</h2>
+                <h2 class="text-4xl md:text-5xl mb-4">Laten we samenwerken</h2>
                 <p class="text-lg mb-10">Heb je een vraag of wil je een shoot boeken? Stuur me een bericht.</p>
             </div>
             <form id="contact_form" action="save.php" method="POST" class="max-w-xl mx-auto space-y-6 reveal">
@@ -130,40 +143,9 @@ require_once 'helpers.php';
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="main.js"></script>
 <script>
+window.indexFeatured = <?php echo json_encode($featuredImages); ?>;
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize Swiper
-    var swiper = new Swiper('.swiper-container', {
-        effect: 'coverflow',
-        grabCursor: true,
-        centeredSlides: true,
-        slidesPerView: 'auto',
-        // Prevent accidental navigation while dragging
-        preventClicks: true,
-        preventClicksPropagation: true,
-        threshold: 5,
-        coverflowEffect: {
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
-            slideShadows: true,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        loop: true,
-        on: {
-            // Ensure links still work on actual click/tap
-            click: function (swiper, event) {
-                if (swiper.allowClick) {
-                    const a = event.target.closest('a');
-                    if (a) { window.location.href = a.href; }
-                }
-            }
-        }
-    });
-    // Show toaster for contact form result (uses same style as others)
+    // Show toaster for contact form result
     <?php if(isset($_GET['sent'])): ?>
     (function(){
         var ok = <?php echo ($_GET['sent']=='1' ? 'true' : 'false'); ?>;
@@ -181,6 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function(){ toast.classList.add('opacity-0','translate-y-4'); }, 2500);
     })();
     <?php endif; ?>
+
     // Preserve scroll position around contact form submission
     (function(){
         var form = document.getElementById('contact_form');
@@ -199,6 +182,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         } catch (e) {}
+    })();
+
+    // Index lightbox handlers
+    (function(){
+        const lf = window.indexFeatured || [];
+        const wrap = document.getElementById('index-lightbox');
+        if (!wrap || !lf.length) return;
+        let idx = 0;
+        const img = document.getElementById('index-lightbox-img');
+        const title = document.getElementById('index-lightbox-title');
+        const desc = document.getElementById('index-lightbox-description');
+        const upd = () => {
+            img.src = lf[idx].path || '';
+            img.alt = lf[idx].alt || '';
+            title.textContent = lf[idx].title || '';
+            desc.textContent = lf[idx].description || '';
+        };
+        window.openIndexLightbox = function(i){ idx = Math.max(0, Math.min(i, lf.length-1)); upd(); wrap.classList.remove('hidden'); wrap.classList.add('flex'); };
+        const close = () => { wrap.classList.add('hidden'); wrap.classList.remove('flex'); };
+        document.getElementById('index-lightbox-close')?.addEventListener('click', close);
+        document.getElementById('index-lightbox-next')?.addEventListener('click', () => { idx = (idx+1)%lf.length; upd(); });
+        document.getElementById('index-lightbox-prev')?.addEventListener('click', () => { idx = (idx-1+lf.length)%lf.length; upd(); });
+        wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+        document.addEventListener('keydown', (e) => { if (wrap.classList.contains('hidden')) return; if (e.key==='Escape') close(); if (e.key==='ArrowRight') { idx=(idx+1)%lf.length; upd(); } if (e.key==='ArrowLeft') { idx=(idx-1+lf.length)%lf.length; upd(); } });
     })();
 });
 </script>
