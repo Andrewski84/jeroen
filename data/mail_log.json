@@ -1,0 +1,55 @@
+[
+    {
+        "type": "password_reset",
+        "to": "support@javanstudio.be",
+        "from": "support@javanstudio.be",
+        "subject": "Wachtwoord resetten",
+        "sent": false,
+        "transport": "mail",
+        "ts": "2025-08-31T17:13:29+02:00"
+    },
+    {
+        "type": "selection_finalized",
+        "gallery_slug": "76526afb3d",
+        "gallery_title": "test",
+        "count": 3,
+        "to": "support@javanstudio.be",
+        "subject": "Keuze bevestigd - test",
+        "sent": false,
+        "transport": "mail",
+        "ts": "2025-08-31T17:13:50+02:00"
+    },
+    {
+        "type": "selection_finalized",
+        "gallery_slug": "76526afb3d",
+        "gallery_title": "test",
+        "count": 3,
+        "to": "support@javanstudio.be",
+        "subject": "Keuze bevestigd - test",
+        "sent": false,
+        "transport": "mail",
+        "ts": "2025-08-31T17:14:18+02:00"
+    },
+    {
+        "type": "selection_finalized",
+        "gallery_slug": "8e73c44437",
+        "gallery_title": "Andrew & David",
+        "count": 15,
+        "to": "support@javanstudio.be",
+        "subject": "Keuze bevestigd - Andrew & David",
+        "sent": false,
+        "transport": "mail",
+        "ts": "2025-08-31T17:21:57+02:00"
+    },
+    {
+        "type": "selection_finalized",
+        "gallery_slug": "8e73c44437",
+        "gallery_title": "Andrew & David",
+        "count": 15,
+        "to": "support@javanstudio.be",
+        "subject": "Keuze bevestigd - Andrew & David",
+        "sent": false,
+        "transport": "mail",
+        "ts": "2025-08-31T17:21:59+02:00"
+    }
+]
