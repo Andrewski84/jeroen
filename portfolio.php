@@ -12,41 +12,7 @@ require_once 'helpers.php';
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* De lightbox is nu donkerder en heeft een blur-effect */
-        #lightbox {
-            background-color: rgba(25, 25, 25, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: opacity 0.3s ease;
-        }
-        .lightbox-img { 
-            max-height: 75vh;
-            max-width: 90vw; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .lightbox-nav { color: white; font-size: 3rem; }
-        @media (max-width: 768px) { #lightbox-prev, #lightbox-next { display: none; } }
 
-        /* Portfolio hero carousel */
-        .portfolio-swiper {
-            width: 100%;
-            padding: 1rem 0 2rem 0;
-        }
-        .portfolio-swiper .swiper-slide {
-            position: relative;
-            width: clamp(240px, 28vw, 420px);
-            aspect-ratio: 3 / 4; /* taller portrait */
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            background: var(--surface);
-            border: 1px solid var(--border);
-        }
-        .portfolio-swiper .swiper-slide img { width: 100%; height: 100%; object-fit: cover; opacity: .9; transition: transform .6s ease, opacity .3s ease; }
-        .portfolio-swiper .swiper-slide:hover img { transform: scale(1.04); opacity: 1; }
-        .portfolio-swiper .slide-overlay { position: absolute; inset: auto 0 0 0; padding: .75rem .9rem; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 80%); color: #fff; }
-    </style>
 </head>
 <body id="portfolio-page" class="antialiased flex flex-col min-h-screen">
     <?php
@@ -59,13 +25,13 @@ require_once 'helpers.php';
         $imagesToShow = [];
 
         if ($currentThemeName && isset($themes[$currentThemeName])) {
-            // Show images for a specific theme and annotate theme name
+            // Toon afbeeldingen voor een specifiek thema
             $imagesToShow = array_map(function($img) use ($currentThemeName) {
                 $img['theme'] = $currentThemeName;
                 return $img;
             }, ($themes[$currentThemeName]['images'] ?? []));
         } else {
-            // Show all images with theme annotation
+            // Toon alle afbeeldingen van alle thema's
             foreach ($themes as $themeName => $themeData) {
                 $annotated = array_map(function($img) use ($themeName) {
                     $img['theme'] = $themeName;
@@ -75,15 +41,21 @@ require_once 'helpers.php';
             }
         }
 
-        // Normalize paths to web-relative in case absolute paths were stored
+        // Filter voor uitgelichte afbeeldingen voor de carrousel, gebaseerd op de huidige selectie
+        $carouselImages = array_filter($imagesToShow, function($img) {
+            return !empty($img['featured']);
+        });
+
+        // Normaliseer paden naar web-relatieve paden
         $imagesToShow = array_map(function($img) {
-            foreach (['path', 'webp'] as $k) {
-                if (!empty($img[$k])) {
-                    $img[$k] = toPublicPath($img[$k]);
-                }
-            }
+            foreach (['path', 'webp'] as $k) { if (!empty($img[$k])) { $img[$k] = toPublicPath($img[$k]); } }
             return $img;
         }, $imagesToShow);
+
+        $carouselImages = array_map(function($img) {
+            foreach (['path', 'webp'] as $k) { if (!empty($img[$k])) { $img[$k] = toPublicPath($img[$k]); } }
+            return $img;
+        }, $carouselImages);
 
         $highlightPath = $_GET['highlight'] ?? null;
         $highlightIndex = null;
@@ -110,12 +82,12 @@ require_once 'helpers.php';
             <p class="max-w-2xl mx-auto text-lg reveal">Een collectie van mijn favoriete werk.</p>
         </div>
 
-        <!-- Hero Carousel -->
-        <?php if (!empty($imagesToShow)): ?>
+        <!-- Carousel sectie, wordt alleen getoond als er uitgelichte foto's zijn -->
+        <?php if (!empty($carouselImages)): ?>
         <section class="stagger-container">
             <div class="portfolio-swiper swiper-container reveal">
                 <div class="swiper-wrapper">
-                    <?php foreach (array_slice($imagesToShow, 0, 12) as $image): ?>
+                    <?php foreach ($carouselImages as $image): ?>
                         <div class="swiper-slide">
                             <a href="portfolio.php?theme=<?php echo urlencode($image['theme']); ?>&highlight=<?php echo urlencode($image['path']); ?>">
                                 <img src="<?php echo htmlspecialchars($image['path']); ?>" alt="<?php echo htmlspecialchars($image['alt'] ?? ''); ?>" loading="lazy">
@@ -136,9 +108,9 @@ require_once 'helpers.php';
         <div id="portfolio-filters" class="stagger-container my-10">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div class="flex flex-wrap items-center gap-3 reveal">
-                    <button type="button" class="filter-btn" data-theme="__all__">Alles</button>
+                    <a href="portfolio.php" class="filter-btn <?php echo !$currentThemeName ? 'active' : ''; ?>">Alles</a>
                     <?php foreach ($themes as $themeName => $themeData): ?>
-                        <button type="button" class="filter-btn" data-theme="<?php echo htmlspecialchars($themeName); ?>"><?php echo htmlspecialchars(ucfirst($themeName)); ?></button>
+                        <a href="portfolio.php?theme=<?php echo urlencode($themeName); ?>" class="filter-btn <?php echo $currentThemeName === $themeName ? 'active' : ''; ?>"><?php echo htmlspecialchars(ucfirst($themeName)); ?></a>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -178,68 +150,25 @@ require_once 'helpers.php';
 <script src="main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      // Init Swiper for hero carousel
       try {
-        new Swiper('.portfolio-swiper', {
-          slidesPerView: 'auto',
-          centeredSlides: true,
-          spaceBetween: 16,
-          loop: true,
-          grabCursor: true,
-          keyboard: { enabled: true },
-          mousewheel: { forceToAxis: true },
-          autoplay: { delay: 3000, disableOnInteraction: false },
-          breakpoints: { 768: { spaceBetween: 22 }, 1280: { spaceBetween: 28 } },
-          pagination: { el: '.swiper-pagination', clickable: true }
-        });
+        const portfolioSwiperEl = document.querySelector('.portfolio-swiper');
+        if (portfolioSwiperEl) {
+            new Swiper(portfolioSwiperEl, {
+              effect: 'slide',
+              slidesPerView: 'auto',
+              spaceBetween: 24,
+              loop: true,
+              grabCursor: true, // Maakt slepen mogelijk met een 'handje' cursor
+              allowTouchMove: true, // Staat slepen/swipen toe
+              autoplay: {
+                delay: 4000,
+                disableOnInteraction: true, // Pauzeert autoplay na interactie
+              },
+              pagination: { el: '.swiper-pagination', clickable: true },
+              breakpoints: { 768: { spaceBetween: 28 }, 1280: { spaceBetween: 32 } },
+            });
+        }
       } catch (e) {}
-
-      // Client-side filtering (multi-select)
-      const grid = document.getElementById('portfolio-grid');
-      const items = grid ? Array.from(grid.querySelectorAll('.gallery-item')) : [];
-      const chips = Array.from(document.querySelectorAll('#portfolio-filters .filter-btn'));
-      const selected = new Set();
-
-      // Initial selection based on server param
-      const initialTheme = <?php echo $currentThemeName ? json_encode($currentThemeName) : 'null'; ?>;
-      if (chips.length) {
-        const allChip = chips.find(c => c.dataset.theme === '__all__');
-        if (!initialTheme) { selected.clear(); allChip?.classList.add('active'); }
-        else { selected.add(initialTheme); chips.forEach(c => { if (c.dataset.theme === initialTheme) c.classList.add('active'); }); }
-      }
-
-      function matchesFilters(el) {
-        const theme = el.dataset.theme || '';
-        const inTheme = selected.size === 0 || selected.has(theme);
-        return inTheme;
-      }
-
-      function applyFilters() {
-        items.forEach(el => {
-          el.style.display = matchesFilters(el) ? '' : 'none';
-        });
-      }
-
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          const theme = chip.dataset.theme;
-          if (theme === '__all__') {
-            selected.clear();
-            chips.forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-          } else {
-            const allChip = chips.find(c => c.dataset.theme === '__all__');
-            allChip?.classList.remove('active');
-            if (chip.classList.contains('active')) { chip.classList.remove('active'); selected.delete(theme); }
-            else { chip.classList.add('active'); selected.add(theme); }
-            // If nothing selected, revert to ALL active
-            if (selected.size === 0) allChip?.classList.add('active');
-          }
-          applyFilters();
-        });
-      });
-      // Initial paint
-      applyFilters();
 
       const portfolioImages = <?php echo json_encode($imagesToShow); ?>;
       const highlightIndex = <?php echo $highlightIndex !== null ? $highlightIndex : 'null'; ?>;
@@ -288,3 +217,4 @@ require_once 'helpers.php';
   </script>
 </body>
 </html>
+

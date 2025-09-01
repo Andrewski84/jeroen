@@ -15,7 +15,7 @@
                     "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7c6e6e4a6.51875601.webp",
                     "title": "",
                     "description": "",
-                    "featured": true,
+                    "featured": false,
                     "alt": ""
                 },
                 {
@@ -31,7 +31,7 @@
                     "webp": "assets\/portfolio\/Artist workshop\/img_68b4b7c7f02e53.57341890.webp",
                     "title": "",
                     "description": "",
-                    "featured": true,
+                    "featured": false,
                     "alt": ""
                 },
                 {
@@ -135,7 +135,7 @@
                     "webp": "assets\/portfolio\/Sfeer\/img_68b4bb34259f09.00859455.webp",
                     "title": "",
                     "description": "",
-                    "featured": true,
+                    "featured": false,
                     "alt": ""
                 },
                 {
@@ -143,7 +143,7 @@
                     "webp": "assets\/portfolio\/Sfeer\/img_68b4bb4a0cae08.34716764.webp",
                     "title": "",
                     "description": "",
-                    "featured": true,
+                    "featured": false,
                     "alt": ""
                 }
             ]

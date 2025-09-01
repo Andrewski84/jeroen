@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Homepage: initialize featured Swiper if present
     try {
-        if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-container')) {
-            new Swiper('.swiper-container', {
+        if (typeof Swiper !== 'undefined' && document.querySelector('.homepage-swiper')) {
+            new Swiper('.homepage-swiper', {
                 effect: 'coverflow',
                 grabCursor: true,
                 centeredSlides: true,
@@ -184,3 +184,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
+

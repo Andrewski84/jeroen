@@ -83,7 +83,7 @@ require_once 'helpers.php';
         <div class="container mx-auto px-6 text-center stagger-container">
             <h2 class="text-4xl md:text-5xl mb-12 reveal">Uitgelicht Werk</h2>
             <?php if (!empty($featuredImages)): ?>
-            <div class="swiper-container reveal">
+            <div class="homepage-swiper swiper-container reveal">
                 <div class="swiper-wrapper">
                     <?php foreach ($featuredImages as $i => $image): ?>
                     <div class="swiper-slide" style="background-image: url('<?php echo htmlspecialchars($image['path']); ?>')">
@@ -211,3 +211,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
+
