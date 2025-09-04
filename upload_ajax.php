@@ -56,7 +56,11 @@ switch ($target) {
         }
         $contentData[$section]['image'] = $paths['path'];
         $contentData[$section]['webp'] = $paths['webp'];
-        saveJsonFile($contentFile, $contentData);
+        $saved = saveJsonFile($contentFile, $contentData);
+        if (!$saved) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+            exit;
+        }
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
         exit;
 
@@ -90,7 +94,11 @@ switch ($target) {
             }
         }
         unset($m);
-        saveJsonFile($teamFile, $data);
+        $saved = saveJsonFile($teamFile, $data);
+        if (!$saved) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+            exit;
+        }
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
         exit;
 
@@ -105,7 +113,11 @@ switch ($target) {
         if (!isset($data['hero'])) $data['hero'] = [];
         $data['hero']['image'] = $paths['path'];
         $data['hero']['webp'] = $paths['webp'];
-        saveJsonFile($linksFile, $data);
+        $saved = saveJsonFile($linksFile, $data);
+        if (!$saved) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+            exit;
+        }
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
         exit;
 
