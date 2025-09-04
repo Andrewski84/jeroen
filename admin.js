@@ -396,7 +396,8 @@ function startUpload(task) {
                             onEnd: () => {
                                 const order = Array.from(practiceTable.querySelectorAll('tr[data-slug]')).map(tr => tr.dataset.slug);
                                 const fd = new FormData(); fd.append('action','reorder_practice_pages'); order.forEach(s => fd.append('order[]', s));
-                                fetch('admin_api.php', { method: 'POST', body: fd });
+                                fd.append('ajax','1');
+                                fetch('save.php', { method: 'POST', body: fd });
                             }
                         });
                     }
@@ -408,7 +409,8 @@ function startUpload(task) {
                             onEnd: () => {
                                 const order = Array.from(pinnedList.children).map(b => b.querySelector('input[name="pinned_id[]"]').value);
                                 const fd = new FormData(); fd.append('action','reorder_pinned'); order.forEach(id => fd.append('order[]', id));
-                                fetch('admin_api.php', { method: 'POST', body: fd });
+                                fd.append('ajax','1');
+                                fetch('save.php', { method: 'POST', body: fd });
                             }
                         });
                     }
@@ -420,7 +422,8 @@ function startUpload(task) {
                             onEnd: () => {
                                 const order = Array.from(linksList.children).map(ch => ch.dataset.id).filter(Boolean);
                                 const fd = new FormData(); fd.append('action','reorder_links'); order.forEach(i => fd.append('order[]', i));
-                                fetch('admin_api.php', { method: 'POST', body: fd });
+                                fd.append('ajax','1');
+                                fetch('save.php', { method: 'POST', body: fd });
                             }
                         });
                     }
@@ -448,7 +451,7 @@ function startUpload(task) {
                 syncRichtext(form);
                 const fd = new FormData(form);
                 fd.append('ajax', '1');
-                fetch('admin_api.php', { method: 'POST', body: fd })
+                fetch('save.php', { method: 'POST', body: fd })
                   .then(r => r.text()).then(txt => { let d=null; try{ d=JSON.parse(txt);}catch(e){} if(!d||d.status!=='success'){ showToast(d&&d.message?d.message:'Opslaan mislukt', false); return; }
                     showToast('Opgeslagen', true);
                     // Post-save UX tweaks for specific actions
@@ -551,7 +554,8 @@ function startUpload(task) {
                 onEnd: () => {
                     const order = Array.from(practiceTable.querySelectorAll('tr[data-slug]')).map(tr => tr.dataset.slug);
                     const fd = new FormData(); fd.append('action','reorder_practice_pages'); order.forEach(s => fd.append('order[]', s));
-                    fetch('admin_api.php', { method: 'POST', body: fd });
+                    fd.append('ajax','1');
+                    fetch('save.php', { method: 'POST', body: fd });
                 }
             });
         }
@@ -563,7 +567,8 @@ function startUpload(task) {
                 onEnd: () => {
                     const order = Array.from(pinnedList.children).map(b => b.querySelector('input[name="pinned_id[]"]').value);
                     const fd = new FormData(); fd.append('action','reorder_pinned'); order.forEach(id => fd.append('order[]', id));
-                    fetch('admin_api.php', { method: 'POST', body: fd });
+                    fd.append('ajax','1');
+                    fetch('save.php', { method: 'POST', body: fd });
                 }
             });
         }
@@ -576,7 +581,8 @@ function startUpload(task) {
                 onEnd: () => {
                     const order = Array.from(linksList.children).map(ch => ch.dataset.id).filter(Boolean);
                     const fd = new FormData(); fd.append('action','reorder_links'); order.forEach(i => fd.append('order[]', i));
-                    fetch('admin_api.php', { method: 'POST', body: fd });
+                    fd.append('ajax','1');
+                    fetch('save.php', { method: 'POST', body: fd });
                 }
             });
         }
