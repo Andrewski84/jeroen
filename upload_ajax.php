@@ -95,6 +95,33 @@ switch ($target) {
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp'], 'index' => $index]);
         exit;
 
+    case 'pricing':
+        // Upload image to pricing assets and create a new pricing item entry
+        $destDir = defined('PRICING_ASSETS_DIR') ? PRICING_ASSETS_DIR : (defined('ASSETS_DIR') ? ASSETS_DIR . '/pricing' : __DIR__ . '/assets/pricing');
+        $result = handleImageUpload($file, $destDir, 1200);
+        if (!$result) {
+            echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']);
+            exit;
+        }
+        $paths = $result;
+        $pricingFile = defined('PRICING_FILE') ? PRICING_FILE : (defined('DATA_DIR') ? DATA_DIR . '/pricing/pricing.json' : __DIR__ . '/data/pricing/pricing.json');
+        $data = loadJsonFile($pricingFile);
+        if (!isset($data['items']) || !is_array($data['items'])) $data['items'] = [];
+        $id = uniqid('price_', true);
+        $data['items'][] = [
+            'id' => $id,
+            'title' => '',
+            'price' => '',
+            'description' => '',
+            'image' => $paths['path'],
+            'image_webp' => $paths['webp']
+        ];
+        // Ensure directory exists
+        if (!is_dir(dirname($pricingFile))) { @mkdir(dirname($pricingFile), 0755, true); }
+        saveJsonFile($pricingFile, $data);
+        echo json_encode(['status' => 'success', 'id' => $id, 'path' => $paths['path'], 'webp' => $paths['webp']]);
+        exit;
+
     case 'hero':
     case 'bio':
         // Both hero and bio images update CONTENT_FILE

@@ -1,0 +1,20 @@
+{
+    "items": [
+        {
+            "id": "price_68b95afac62837.33853692",
+            "title": "Basic",
+            "price": "€ 100",
+            "description": "rezarazerfaze",
+            "image": "assets\/pricing\/img_68b95b10cdf5f3.55434052.jpg",
+            "image_webp": "assets\/pricing\/img_68b95b10cdf5f3.55434052.webp"
+        },
+        {
+            "id": "price_68b95b35996ac7.03032016",
+            "title": "earaez",
+            "price": "€ 200",
+            "description": "",
+            "image": "assets\/pricing\/img_68b95b4c11f054.31330791.jpg",
+            "image_webp": "assets\/pricing\/img_68b95b4c11f054.31330791.webp"
+        }
+    ]
+}

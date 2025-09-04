@@ -14,5 +14,13 @@
         "instagram_url": "https:\/\/www.instagram.com\/javan.photographs\/"
     },
     "meta_title": "Andrew Smeets Fotografie",
-    "meta_description": ""
+    "meta_description": "",
+    "pages": {
+        "portfolio": {
+            "visible": true
+        },
+        "pricing": {
+            "visible": true
+        }
+    }
 }

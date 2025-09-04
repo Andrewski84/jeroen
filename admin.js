@@ -337,12 +337,12 @@ function startUpload(task) {
             if (e.dataTransfer.files) Array.from(e.dataTransfer.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, slug: dz.dataset.slug, theme: dz.dataset.theme }));
         });
         
-        // Make portfolio/gallery dropzones clickable
-        if (dz.dataset.target === 'portfolio' || dz.dataset.target === 'gallery') {
+        // Make portfolio/gallery/pricing dropzones clickable
+        if (dz.dataset.target === 'portfolio' || dz.dataset.target === 'gallery' || dz.dataset.target === 'pricing') {
             dz.addEventListener('click', () => {
                 const input = document.createElement('input');
                 input.type = 'file';
-                input.multiple = true;
+                input.multiple = dz.dataset.target !== 'pricing' ? true : true; // allow multiple uploads
                 input.accept = 'image/*';
                 input.onchange = e => {
                      if (e.target.files) Array.from(e.target.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, slug: dz.dataset.slug, theme: dz.dataset.theme }));

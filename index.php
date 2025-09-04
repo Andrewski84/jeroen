@@ -73,7 +73,10 @@ require_once 'helpers.php';
                 <div class="md:w-8/12 text-center md:text-left reveal">
                     <h2 class="text-4xl md:text-5xl mb-4"><?php echo htmlspecialchars($content['bio']['title'] ?? ''); ?></h2>
                     <p class="text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($content['bio']['text'] ?? '')); ?></p>
+                    <?php $portfolioVisible = !isset($siteContent['pages']['portfolio']['visible']) || $siteContent['pages']['portfolio']['visible']; ?>
+                    <?php if ($portfolioVisible): ?>
                     <a href="portfolio.php" class="btn btn-primary mt-6">Ontdek mijn werk</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -96,8 +99,9 @@ require_once 'helpers.php';
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div class="swiper-pagination"></div>
             </div>
+            <div class="homepage-swiper-pagination"></div>
+            
             <?php endif; ?>
         </div>
     </section>
@@ -211,4 +215,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
-

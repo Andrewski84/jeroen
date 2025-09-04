@@ -7,6 +7,7 @@
 $homeLink = ($page === 'index') ? '#home' : 'index.php';
 $bioLink = ($page === 'index') ? '#bio' : 'index.php#bio';
 $contactLink = ($page === 'index') ? '#contact' : 'index.php#contact';
+$pricingLink = 'pricing.php';
 $headerClass = ($page === 'index') ? 'fixed' : 'sticky';
 
 // Load portfolio themes for dropdown (safe fallback if file missing)
@@ -18,6 +19,14 @@ if (defined('PORTFOLIO_FILE') && file_exists(PORTFOLIO_FILE)) {
     }
 }
 
+// Page visibility config
+$siteCfg = [];
+if (defined('CONTENT_FILE') && file_exists(CONTENT_FILE)) {
+    $siteCfg = json_decode(file_get_contents(CONTENT_FILE), true) ?: [];
+}
+$portfolioVisible = !isset($siteCfg['pages']['portfolio']['visible']) || $siteCfg['pages']['portfolio']['visible'];
+$pricingVisible = !isset($siteCfg['pages']['pricing']['visible']) || $siteCfg['pages']['pricing']['visible'];
+
 // Client gallery session context (set after login on proof.php)
 $clientGallery = $_SESSION['client_gallery'] ?? null;
 ?>
@@ -27,6 +36,7 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
         
         <div class="hidden md:flex items-center space-x-10 absolute left-1/2 -translate-x-1/2">
             <a href="<?php echo $bioLink; ?>" class="nav-link">Over Mij</a>
+            <?php if ($portfolioVisible): ?>
             <div class="relative header-dropdown">
                 <a href="portfolio.php" class="nav-link<?php echo $page === 'portfolio' ? ' active' : ''; ?> flex items-center gap-2" aria-haspopup="true" aria-expanded="false">
                     <span>Portfolio</span>
@@ -40,6 +50,10 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
                 </div>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
+            <?php if ($pricingVisible): ?>
+            <a href="<?php echo $pricingLink; ?>" class="nav-link<?php echo $page === 'pricing' ? ' active' : ''; ?>">Tarieven</a>
+            <?php endif; ?>
             <?php if ($clientGallery): ?>
             <div id="client-menu-desktop" class="relative header-dropdown">
                 <a href="proof.php?gallery=<?php echo htmlspecialchars($clientGallery['slug']); ?>" class="nav-link flex items-center gap-2" aria-haspopup="true" aria-expanded="false">
@@ -73,6 +87,7 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
     <div class="mobile-menu-panel mx-4">
         <nav class="p-4 flex flex-col gap-2">
             <a href="<?php echo $bioLink; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Over Mij</a>
+            <?php if ($portfolioVisible): ?>
             <div class="w-full">
                 <div class="flex items-center gap-2">
                     <a href="portfolio.php" class="mobile-nav-link flex-1 block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Portfolio</a>
@@ -90,6 +105,10 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
                 </div>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
+            <?php if ($pricingVisible): ?>
+            <a href="<?php echo $pricingLink; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Tarieven</a>
+            <?php endif; ?>
             <?php if ($clientGallery): ?>
             <div id="mobile-client-block" class="w-full">
                 <div class="flex items-center gap-2">

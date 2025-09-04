@@ -17,12 +17,15 @@ define('TEMPLATES_DIR', BASE_DIR . '/templates');
 define('GALLERY_ASSETS_DIR', ASSETS_DIR . '/galleries');
 define('GALLERIES_DIR', DATA_DIR . '/galleries');
 define('PORTFOLIO_DIR', DATA_DIR . '/portfolio');
+define('PRICING_DIR', DATA_DIR . '/pricing');
 
 // File Paths
 define('CONTENT_FILE', DATA_DIR . '/content.json');
 define('MESSAGES_FILE', DATA_DIR . '/messages.json');
 define('PORTFOLIO_FILE', PORTFOLIO_DIR . '/portfolio.json');
 define('PORTFOLIO_CONTENT_FILE', PORTFOLIO_DIR . '/content.json');
+define('PRICING_FILE', PRICING_DIR . '/pricing.json');
+define('PRICING_ASSETS_DIR', ASSETS_DIR . '/pricing');
 
 // Email / SMTP (Cloud86 mailbox)
 if (!defined('SMTP_ENABLED')) { define('SMTP_ENABLED', false); } // set to true when ready

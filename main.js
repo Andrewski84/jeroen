@@ -2,10 +2,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Homepage: initialize featured Swiper if present
     try {
         if (typeof Swiper !== 'undefined' && document.querySelector('.homepage-swiper')) {
-            new Swiper('.homepage-swiper', {
+            const el = document.querySelector('.homepage-swiper');
+            const count = el.querySelectorAll('.swiper-slide').length;
+            const shouldLoop = count > 3;
+            const opts = {
                 effect: 'coverflow',
                 grabCursor: true,
                 centeredSlides: true,
+                centeredSlidesBounds: true,
                 slidesPerView: 'auto',
                 preventClicks: true,
                 preventClicksPropagation: true,
@@ -17,8 +21,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     modifier: 1,
                     slideShadows: true,
                 },
-                pagination: { el: '.swiper-pagination', clickable: true },
-                loop: true,
+                loop: shouldLoop,
+                initialSlide: Math.max(0, Math.floor(count / 2)),
+                loopedSlides: Math.min(5, Math.max(3, count)),
+                pagination: shouldLoop ? { el: '.homepage-swiper-pagination', clickable: true } : undefined,
                 on: {
                     click: function (swiper, event) {
                         if (!swiper.allowClick) return;
@@ -35,7 +41,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-            });
+            };
+            const swiper = new Swiper('.homepage-swiper', opts);
+            const pag = document.querySelector('.homepage-swiper-pagination');
+            if (pag) pag.style.display = shouldLoop ? '' : 'none';
+            // ensure update after render for proper centering
+            setTimeout(() => { try { swiper.update(); } catch(e){} }, 50);
         }
     } catch (e) {}
     /**

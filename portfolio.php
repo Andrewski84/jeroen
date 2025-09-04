@@ -18,6 +18,10 @@ require_once 'helpers.php';
     <?php
         function loadContent($file) { if (file_exists($file)) { return json_decode(file_get_contents($file), true); } return []; }
         $siteContent = loadContent(CONTENT_FILE);
+        if (isset($siteContent['pages']['portfolio']['visible']) && !$siteContent['pages']['portfolio']['visible']) {
+            header('Location: index.php');
+            exit;
+        }
         $portfolioData = loadContent(PORTFOLIO_FILE);
         $themes = $portfolioData['themes'] ?? [];
         $currentThemeName = $_GET['theme'] ?? null;
@@ -76,8 +80,8 @@ require_once 'helpers.php';
     ?>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-6 py-16 flex-grow">
-        <div class="stagger-container text-center pt-12">
+    <main class="container mx-auto px-6 pt-8 pb-16 flex-grow">
+        <div class="stagger-container text-center pt-4 md:pt-6">
             <h1 class="text-4xl md:text-6xl font-serif mb-4 reveal">Mijn Portfolio</h1>
             <p class="max-w-2xl mx-auto text-lg reveal">Een collectie van mijn favoriete werk.</p>
         </div>
@@ -114,15 +118,15 @@ require_once 'helpers.php';
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <div class="swiper-pagination"></div>
             </div>
+            <div class="portfolio-swiper-pagination"></div>
         </section>
         <?php endif; ?>
 
         <!-- Optionele begeleidende tekst onder de carousel en boven de fotogalerij -->
         <?php if ($currentThemeName && (!empty($themes[$currentThemeName]['intro_title']) || !empty($themes[$currentThemeName]['intro_text']))): ?>
             <div class="stagger-container">
-                <div class="max-w-3xl mx-auto text-center px-2 reveal mt-8 mb-10 md:my-12">
+                <div class="max-w-3xl mx-auto text-center px-2 reveal my-8 md:my-10">
                     <?php if (!empty($themes[$currentThemeName]['intro_title'])): ?>
                         <h2 class="text-2xl md:text-3xl font-serif mb-3"><?php echo htmlspecialchars($themes[$currentThemeName]['intro_title']); ?></h2>
                     <?php endif; ?>
@@ -133,7 +137,7 @@ require_once 'helpers.php';
             </div>
         <?php elseif (!$currentThemeName && (!empty($portfolioData['intro']['title']) || !empty($portfolioData['intro']['text']))): ?>
             <div class="stagger-container">
-                <div class="max-w-3xl mx-auto text-center px-2 reveal mt-8 mb-10 md:my-12">
+                <div class="max-w-3xl mx-auto text-center px-2 reveal my-8 md:my-10">
                     <?php if (!empty($portfolioData['intro']['title'])): ?>
                         <h2 class="text-2xl md:text-3xl font-serif mb-3"><?php echo htmlspecialchars($portfolioData['intro']['title']); ?></h2>
                     <?php endif; ?>
@@ -181,24 +185,32 @@ require_once 'helpers.php';
         const portfolioSwiperEl = document.querySelector('.portfolio-swiper');
         if (portfolioSwiperEl) {
             const slideCount = portfolioSwiperEl.querySelectorAll('.swiper-slide').length;
-            const shouldLoop = slideCount > 2;
+            const shouldLoop = slideCount > 3; // loop only when there are enough slides
+            if (!shouldLoop) {
+                portfolioSwiperEl.classList.add('is-short');
+            } else {
+                portfolioSwiperEl.classList.remove('is-short');
+            }
             const swiperOptions = {
               effect: 'slide',
               slidesPerView: 'auto',
               spaceBetween: 24,
               loop: shouldLoop,
-              centeredSlides: true,
-              centeredSlidesBounds: true,
-              grabCursor: true, // Maakt slepen mogelijk met een 'handje' cursor
-              allowTouchMove: true, // Staat slepen/swipen toe
+              centeredSlides: !shouldLoop,
+              centeredSlidesBounds: !shouldLoop,
+              grabCursor: true,
+              allowTouchMove: true,
               autoplay: shouldLoop ? {
                 delay: 4000,
-                disableOnInteraction: true, // Pauzeert autoplay na interactie
+                disableOnInteraction: true,
               } : false,
-              pagination: { el: '.swiper-pagination', clickable: true },
+              // pagination only when looping (enough slides)
+              pagination: shouldLoop ? { el: '.portfolio-swiper-pagination', clickable: true } : undefined,
               breakpoints: { 768: { spaceBetween: 28 }, 1280: { spaceBetween: 32 } },
             };
-            new Swiper(portfolioSwiperEl, swiperOptions);
+            const swiper = new Swiper(portfolioSwiperEl, swiperOptions);
+            const pagEl = document.querySelector('.portfolio-swiper-pagination');
+            if (pagEl) pagEl.style.display = shouldLoop ? '' : 'none';
         }
       } catch (e) {}
 

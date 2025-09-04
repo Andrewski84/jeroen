@@ -29,6 +29,8 @@ if (!in_array($action, $publicActions)) {
 $contentFilePath = CONTENT_FILE;
 $portfolioFilePath = PORTFOLIO_FILE;
 $content = loadJsonFile($contentFilePath);
+$pricingFilePath = defined('PRICING_FILE') ? PRICING_FILE : (defined('DATA_DIR') ? DATA_DIR . '/pricing/pricing.json' : __DIR__ . '/data/pricing/pricing.json');
+$pricingData = loadJsonFile($pricingFilePath);
 $portfolioData = loadJsonFile($portfolioFilePath);
 
 /*
@@ -46,6 +48,12 @@ switch ($action) {
         $content['contact']['instagram_url'] = $_POST['instagram_url'] ?? ($content['contact']['instagram_url'] ?? '');
         $content['meta_title'] = $_POST['meta_title'] ?? ($content['meta_title'] ?? '');
         $content['meta_description'] = $_POST['meta_description'] ?? ($content['meta_description'] ?? '');
+        // Page visibility toggles
+        if (!isset($content['pages'])) $content['pages'] = [];
+        if (!isset($content['pages']['portfolio'])) $content['pages']['portfolio'] = [];
+        if (!isset($content['pages']['pricing'])) $content['pages']['pricing'] = [];
+        $content['pages']['portfolio']['visible'] = empty($_POST['hide_portfolio']);
+        $content['pages']['pricing']['visible'] = empty($_POST['hide_pricing']);
         saveJsonFile($contentFilePath, $content);
         break;
 
@@ -171,6 +179,74 @@ switch ($action) {
         ]);
 
         header('Location: index.php?sent=' . ($sent ? '1' : '0'));
+        exit;
+        break;
+
+    case 'contact_form_json':
+        header('Content-Type: application/json');
+        // Honeypot + soft time trap
+        $hp = trim($_POST['address2'] ?? '');
+        if ($hp !== '') { echo json_encode(['status' => 'ok']); exit; }
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $message = trim($_POST['message'] ?? '');
+        $pricingTitle = trim($_POST['pricing_title'] ?? '');
+        if ($name === '' || ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL))) {
+            echo json_encode(['status' => 'error', 'message' => 'Validatie mislukt']);
+            exit;
+        }
+        // Persist to messages.json
+        $messages = file_exists(MESSAGES_FILE) ? (json_decode(file_get_contents(MESSAGES_FILE), true) ?: []) : [];
+        $messages[] = [
+            'ts' => date('c'),
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'ua' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'pricing' => $pricingTitle,
+            'message' => $message
+        ];
+        @file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+
+        // Build mail
+        $subject = 'Nieuw bericht via website';
+        $bodyLines = [
+            'Naam: ' . $name,
+            'Email: ' . $email,
+            'Telefoon: ' . $phone,
+            'IP: ' . ($_SERVER['REMOTE_ADDR'] ?? ''),
+            '---'
+        ];
+        if ($pricingTitle !== '') { $bodyLines[] = 'Tarief: ' . $pricingTitle; }
+        if ($message !== '') { $bodyLines[] = $message; }
+        $body = implode("\n", $bodyLines) . "\n";
+
+        $sent = false;
+        $transport = 'mail';
+        if (defined('SMTP_ENABLED') && SMTP_ENABLED && class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+            try {
+                $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
+                $mailer->isSMTP();
+                $mailer->Host = SMTP_HOST; $mailer->Port = SMTP_PORT; $mailer->SMTPAuth = true;
+                if (defined('SMTP_SECURE') && SMTP_SECURE) { $mailer->SMTPSecure = SMTP_SECURE; }
+                $mailer->Username = SMTP_USERNAME; $mailer->Password = SMTP_PASSWORD; $mailer->CharSet = 'UTF-8';
+                $mailer->setFrom(MAIL_FROM, MAIL_FROM_NAME);
+                $mailer->addAddress(MAIL_TO);
+                if ($email) { $mailer->addReplyTo($email, $name ?: $email); }
+                $mailer->Subject = $subject; $mailer->Body = $body;
+                $sent = $mailer->send(); $transport = 'smtp-phpmailer';
+            } catch (\Throwable $e) { $sent = false; }
+        }
+        if (!$sent) {
+            $headers = "From: " . (defined('MAIL_FROM_NAME') ? MAIL_FROM_NAME : 'Website') . " <" . (defined('MAIL_FROM') ? MAIL_FROM : 'no-reply@localhost') . ">\r\n";
+            if ($email) { $headers .= "Reply-To: {$email}\r\n"; }
+            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+            $sent = @mail(defined('MAIL_TO') ? MAIL_TO : (defined('MAIL_FROM') ? MAIL_FROM : ''), $subject, $body, $headers);
+        }
+        logMailAttempt(['type' => 'contact_form_json', 'sent' => $sent, 'transport' => $transport]);
+        echo json_encode(['status' => $sent ? 'ok' : 'error']);
         exit;
         break;
 
@@ -333,6 +409,66 @@ case 'add_theme':
             $portfolioData['themes'][$themeName]['intro_text'] = $intro;
             $portfolioData['themes'][$themeName]['intro_title'] = $introTitle;
             saveJsonFile($portfolioFilePath, $portfolioData);
+        }
+        break;
+
+    // Pricing management
+    case 'add_pricing_item':
+        $title = trim($_POST['title'] ?? '');
+        $price = trim($_POST['price'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        if ($title !== '') {
+            if (!isset($pricingData['items']) || !is_array($pricingData['items'])) $pricingData['items'] = [];
+            $id = uniqid('price_', true);
+            $item = ['id' => $id, 'title' => $title, 'price' => $price, 'description' => $description];
+            // optional image upload
+            if (!empty($_FILES['image']) && is_uploaded_file($_FILES['image']['tmp_name'])) {
+                $dir = defined('PRICING_ASSETS_DIR') ? PRICING_ASSETS_DIR : (defined('ASSETS_DIR') ? ASSETS_DIR . '/pricing' : __DIR__ . '/assets/pricing');
+                $res = handleImageUpload($_FILES['image'], $dir, 1600);
+                if ($res) { $item['image'] = $res['path']; $item['image_webp'] = $res['webp']; }
+            }
+            $pricingData['items'][] = $item;
+            // ensure dir exists
+            @mkdir(dirname($pricingFilePath), 0755, true);
+            saveJsonFile($pricingFilePath, $pricingData);
+        }
+        break;
+
+    case 'update_pricing_item':
+        $id = $_POST['id'] ?? '';
+        if ($id !== '' && !empty($pricingData['items'])) {
+            foreach ($pricingData['items'] as &$it) {
+                if (($it['id'] ?? '') === $id) {
+                    $it['title'] = trim($_POST['title'] ?? ($it['title'] ?? ''));
+                    $it['price'] = trim($_POST['price'] ?? ($it['price'] ?? ''));
+                    $it['description'] = trim($_POST['description'] ?? ($it['description'] ?? ''));
+                    if (!empty($_FILES['image']) && is_uploaded_file($_FILES['image']['tmp_name'])) {
+                        $dir = defined('PRICING_ASSETS_DIR') ? PRICING_ASSETS_DIR : (defined('ASSETS_DIR') ? ASSETS_DIR . '/pricing' : __DIR__ . '/assets/pricing');
+                        $res = handleImageUpload($_FILES['image'], $dir, 1600);
+                        if ($res) { $it['image'] = $res['path']; $it['image_webp'] = $res['webp']; }
+                    }
+                    break;
+                }
+            }
+            unset($it);
+            @mkdir(dirname($pricingFilePath), 0755, true);
+            saveJsonFile($pricingFilePath, $pricingData);
+        }
+        break;
+
+    case 'delete_pricing_item':
+        $id = $_POST['id'] ?? '';
+        if ($id !== '' && !empty($pricingData['items'])) {
+            foreach ($pricingData['items'] as $i => $it) {
+                if (($it['id'] ?? '') === $id) {
+                    if (!empty($it['image']) && file_exists($it['image'])) @unlink($it['image']);
+                    if (!empty($it['image_webp']) && file_exists($it['image_webp'])) @unlink($it['image_webp']);
+                    array_splice($pricingData['items'], $i, 1);
+                    break;
+                }
+            }
+            @mkdir(dirname($pricingFilePath), 0755, true);
+            saveJsonFile($pricingFilePath, $pricingData);
         }
         break;
 
@@ -638,6 +774,8 @@ if (in_array($action, ['add_theme', 'delete_theme', 'rename_theme', 'update_phot
     if ($slug) {
         $detailParam = '&slug=' . urlencode($slug);
     }
+} elseif (in_array($action, ['add_pricing_item', 'update_pricing_item', 'delete_pricing_item'])) {
+    $hash = '#tab-pricing';
 }
 
 header('Location: admin.php' . $hash . $detailParam);

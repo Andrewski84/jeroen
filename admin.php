@@ -72,6 +72,7 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
         <nav class="admin-tabs">
             <button class="admin-tab-button active" data-tab="tab-homepage"><span>Homepage</span></button>
             <button class="admin-tab-button" data-tab="tab-portfolio"><span>Portfolio</span></button>
+            <button class="admin-tab-button" data-tab="tab-pricing"><span>Tarieven</span></button>
             <button class="admin-tab-button" data-tab="tab-galleries"><span>Klantengalerijen</span></button>
             <button class="admin-tab-button" data-tab="tab-mailbox"><span>Mailbox instellingen</span></button>
             <button class="admin-tab-button" data-tab="tab-security"><span>Beveiliging</span></button>
@@ -140,6 +141,19 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
             </div>
 
             <div id="tab-portfolio" class="admin-tab-panel">
+                <?php $portfolioHidden = isset($content['pages']['portfolio']['visible']) ? !$content['pages']['portfolio']['visible'] : false; ?>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="save.php" method="POST" class="flex items-center gap-4">
+                            <input type="hidden" name="action" value="update_content">
+                            <label class="inline-flex items-center gap-3">
+                                <input type="checkbox" name="hide_portfolio" value="1" <?php echo $portfolioHidden ? 'checked' : ''; ?>>
+                                <span>Verberg Portfolio pagina en navigatie</span>
+                            </label>
+                            <button type="submit" class="btn btn-secondary">Opslaan</button>
+                        </form>
+                    </div>
+                </div>
                  <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Portfolio Beheren</h2>
@@ -178,10 +192,9 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                 </div>
                 
                 <!-- Algemene begeleidende tekst voor Portfolio (getoond wanneer geen filter is gekozen) -->
-                <div class="card mt-6">
-                    <div class="card-header">
-                        <h3 class="card-title text-lg">Algemene begeleidende tekst</h3>
-                    </div>
+                <?php $hasGlobalIntro = !empty($portfolioData['intro']['title']) || !empty($portfolioData['intro']['text']); ?>
+                <details class="card mt-6" <?php echo $hasGlobalIntro ? 'open' : ''; ?>>
+                    <summary class="card-header cursor-pointer"><h3 class="card-title text-lg">Algemene begeleidende tekst</h3></summary>
                     <div class="card-body">
                         <form action="save.php" method="POST" class="space-y-4">
                             <input type="hidden" name="action" value="update_portfolio_intro">
@@ -198,7 +211,7 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                             </div>
                         </form>
                     </div>
-                </div>
+                </details>
 
                 <div id="theme-cards-container" class="mt-6 space-y-6">
                     <?php foreach ($themes as $themeName => $themeData): ?>
@@ -250,6 +263,109 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                             </div>
                         </div>
                     <?php endforeach; ?>
+                </div>
+            </div>
+
+            <div id="tab-pricing" class="admin-tab-panel">
+                <?php $pricingData = []; if (file_exists(PRICING_FILE)) { $pricingData = json_decode(file_get_contents(PRICING_FILE), true) ?: []; } $pricingItems = $pricingData['items'] ?? []; $pricingHidden = isset($content['pages']['pricing']['visible']) ? !$content['pages']['pricing']['visible'] : false; ?>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Tarieven Beheren</h2>
+                    </div>
+                    <div class="card-body space-y-6">
+                        <div>
+                            <form action="save.php" method="POST" class="flex items-center gap-4">
+                                <input type="hidden" name="action" value="update_content">
+                                <label class="inline-flex items-center gap-3">
+                                    <input type="checkbox" name="hide_pricing" value="1" <?php echo $pricingHidden ? 'checked' : ''; ?>>
+                                    <span>Verberg Tarieven pagina en navigatie</span>
+                                </label>
+                                <button type="submit" class="btn btn-secondary">Opslaan</button>
+                            </form>
+                        </div>
+                        <form action="save.php" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <input type="hidden" name="action" value="add_pricing_item">
+                            <div class="md:col-span-2">
+                                <label class="form-label" for="pricing_title">Titel</label>
+                                <input class="form-input" type="text" id="pricing_title" name="title" placeholder="Bijv. Fotoshoot Basic" required>
+                            </div>
+                            <div>
+                                <label class="form-label" for="pricing_price">Prijs</label>
+                                <input class="form-input" type="text" id="pricing_price" name="price" placeholder="€ 199">
+                            </div>
+                            <div>
+                                <label class="form-label" for="pricing_image">Foto (optioneel)</label>
+                                <input class="form-input" type="file" id="pricing_image" name="image" accept="image/*">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="form-label" for="pricing_desc">Beschrijving</label>
+                                <textarea class="form-textarea" id="pricing_desc" name="description" rows="3" placeholder="Korte omschrijving van het pakket..."></textarea>
+                            </div>
+                            <div class="md:col-span-4">
+                                <button type="submit" class="btn btn-primary">Tarief toevoegen</button>
+                            </div>
+                        </form>
+
+                        <div>
+                            <label class="form-label">Snel foto toevoegen (maakt een nieuw tarief met enkel foto)</label>
+                            <div class="dropzone" data-target="pricing"><span>Sleep hier foto('s) of klik</span></div>
+                        </div>
+
+                        <?php if (empty($pricingItems)): ?>
+                            <p class="text-slate-500 text-center py-6">Nog geen tarieven toegevoegd.</p>
+                        <?php else: ?>
+                            <div class="admin-table-container">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="w-20">Foto</th>
+                                            <th>Titel</th>
+                                            <th>Prijs</th>
+                                            <th>Omschrijving</th>
+                                            <th class="w-40">Acties</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($pricingItems as $it): ?>
+                                        <tr>
+                                            <td>
+                                                <?php if (!empty($it['image'])): ?>
+                                                    <img src="<?php echo htmlspecialchars($it['image']); ?>" class="admin-thumb" alt="">
+                                                <?php else: ?>
+                                                    <span class="text-slate-500">Geen</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <form action="save.php" method="POST" enctype="multipart/form-data">
+                                                    <input type="hidden" name="action" value="update_pricing_item">
+                                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($it['id']); ?>">
+                                                    <input class="form-input mb-2" type="text" name="title" value="<?php echo htmlspecialchars($it['title'] ?? ''); ?>">
+                                                    <input class="form-input" type="file" name="image" accept="image/*">
+                                            </td>
+                                            <td>
+                                                    <input class="form-input" type="text" name="price" value="<?php echo htmlspecialchars($it['price'] ?? ''); ?>">
+                                            </td>
+                                            <td>
+                                                    <textarea class="form-textarea" name="description" rows="2"><?php echo htmlspecialchars($it['description'] ?? ''); ?></textarea>
+                                            </td>
+                                            <td class="align-top">
+                                                    <div class="flex gap-2">
+                                                        <button type="submit" class="btn btn-secondary">Opslaan</button>
+                                                    </div>
+                                                </form>
+                                                <form action="save.php" method="POST" class="mt-2">
+                                                    <input type="hidden" name="action" value="delete_pricing_item">
+                                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($it['id']); ?>">
+                                                    <button type="submit" class="btn btn-danger">Verwijder</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
 
