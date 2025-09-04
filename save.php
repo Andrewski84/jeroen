@@ -364,10 +364,11 @@ case 'add_theme':
             $portfolioData['themes'][$themeName]['images'][$photoIndex]['description'] = $_POST['description'] ?? '';
             $portfolioData['themes'][$themeName]['images'][$photoIndex]['featured'] = isset($_POST['featured']);
             $portfolioData['themes'][$themeName]['images'][$photoIndex]['alt'] = $_POST['alt'] ?? '';
-            if (saveJsonFile($portfolioFilePath, $portfolioData)) {
+            $result = saveJsonFile($portfolioFilePath, $portfolioData);
+            if ($result['ok']) {
                 echo json_encode(['status' => 'success', 'message' => 'Foto details opgeslagen.']);
             } else {
-                echo json_encode(['status' => 'error', 'message' => 'Kon data niet opslaan.']);
+                echo json_encode(['status' => 'error', 'message' => 'Kon data niet opslaan.', 'error' => $result['error']]);
             }
             exit;
         }
@@ -491,8 +492,8 @@ case 'add_theme':
             $data['members'][] = ['id' => $id, 'name' => $name, 'role' => $role, 'appointment_url' => $appt, 'image' => '', 'webp' => ''];
             @mkdir(dirname($teamFilePath), 0755, true);
             $saved = saveJsonFile($teamFilePath, $data);
-            if ($saved === false) {
-                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
+            if (!$saved['ok']) {
+                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt','error'=>$saved['error']]); }
                 exit;
             }
             if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','member'=>['id'=>$id,'name'=>$name,'role'=>$role,'appointment_url'=>$appt]]); exit; }
@@ -514,8 +515,8 @@ case 'add_theme':
             }
             unset($m);
             $saved = saveJsonFile($teamFilePath, $data);
-            if ($saved === false) {
-                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
+            if (!$saved['ok']) {
+                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt','error'=>$saved['error']]); }
                 exit;
             }
             if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','id'=>$id]); exit; }
@@ -541,8 +542,8 @@ case 'add_theme':
                     }
                 }
                 $saved = saveJsonFile($teamFilePath, $data);
-                if ($saved === false) {
-                    if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
+                if (!$saved['ok']) {
+                    if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt','error'=>$saved['error']]); }
                     exit;
                 }
                 if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','id'=>$id]); exit; }
@@ -735,10 +736,11 @@ case 'add_theme':
                 }
             }
             $portfolioData['themes'][$themeName]['images'] = $newOrderedImages;
-            if (saveJsonFile($portfolioFilePath, $portfolioData)) {
+            $result = saveJsonFile($portfolioFilePath, $portfolioData);
+            if ($result['ok']) {
                 echo json_encode(['status' => 'success']);
             } else {
-                echo json_encode(['status' => 'error', 'message' => 'Kon volgorde niet opslaan.']);
+                echo json_encode(['status' => 'error', 'message' => 'Kon volgorde niet opslaan.', 'error' => $result['error']]);
             }
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Ongeldige data.']);
@@ -761,10 +763,11 @@ case 'add_theme':
                 }
             }
             $portfolioData['themes'] = $reorderedThemes;
-            if (saveJsonFile($portfolioFilePath, $portfolioData)) {
+            $result = saveJsonFile($portfolioFilePath, $portfolioData);
+            if ($result['ok']) {
                 echo json_encode(['status' => 'success', 'message' => 'Portfolio volgorde opgeslagen.']);
             } else {
-                echo json_encode(['status' => 'error', 'message' => 'Kon volgorde niet opslaan.']);
+                echo json_encode(['status' => 'error', 'message' => 'Kon volgorde niet opslaan.', 'error' => $result['error']]);
             }
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Ongeldige data.']);
@@ -870,10 +873,11 @@ case 'add_theme':
 
             if (count($newOrderedPhotos) === count($originalPhotos)) {
                 $galleryData['photos'] = $newOrderedPhotos;
-                if (saveJsonFile($galleryFile, $galleryData)) {
+                $result = saveJsonFile($galleryFile, $galleryData);
+                if ($result['ok']) {
                     echo json_encode(['status' => 'success']);
                 } else {
-                    echo json_encode(['status' => 'error', 'message' => 'Kon volgorde niet opslaan in bestand.']);
+                    echo json_encode(['status' => 'error', 'message' => 'Kon volgorde niet opslaan in bestand.', 'error' => $result['error']]);
                 }
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'Fout in data, foto-aantallen komen niet overeen.']);

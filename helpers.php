@@ -17,15 +17,23 @@ function loadJsonFile(string $filePath): array {
  * Slaat een array op als een JSON-bestand met een exclusieve lock om corruptie te voorkomen.
  * @param string $filePath Het pad naar het JSON-bestand.
  * @param array $data De data om op te slaan.
- * @return bool True bij succes, false bij een fout.
+ * @return array ['ok' => true] bij succes of ['ok' => false, 'error' => string] bij een fout.
  */
-function saveJsonFile(string $filePath, array $data): bool {
+function saveJsonFile(string $filePath, array $data): array {
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     // Gebruik LOCK_EX om te voorkomen dat meerdere processen tegelijk schrijven.
-    if (file_put_contents($filePath, $json, LOCK_EX) === false) {
-        return false;
+    $lastError = null;
+    set_error_handler(function ($errno, $errstr) use (&$lastError) {
+        $lastError = $errstr;
+        return true;
+    });
+    $result = file_put_contents($filePath, $json, LOCK_EX);
+    restore_error_handler();
+    if ($result === false) {
+        $err = $lastError ?? (error_get_last()['message'] ?? 'Onbekende fout');
+        return ['ok' => false, 'error' => $err];
     }
-    return true;
+    return ['ok' => true];
 }
 
 /**
