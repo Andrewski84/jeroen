@@ -105,10 +105,11 @@ require_once 'helpers.php';
                         <div class="swiper-slide">
                             <a href="portfolio.php?theme=<?php echo urlencode($image['theme']); ?>&highlight=<?php echo urlencode($image['path']); ?>">
                                 <img src="<?php echo htmlspecialchars($image['path']); ?>" alt="<?php echo htmlspecialchars($image['alt'] ?? ''); ?>" loading="lazy">
+                                <?php if (!empty($image['title'])): ?>
                                 <div class="slide-overlay">
-                                    <div class="text-xs uppercase tracking-wide opacity-80"><?php echo htmlspecialchars(ucfirst($image['theme'])); ?></div>
-                                    <div class="font-serif text-lg"><?php echo htmlspecialchars($image['title'] ?? ''); ?></div>
+                                    <div class="font-serif text-lg"><?php echo htmlspecialchars($image['title']); ?></div>
                                 </div>
+                                <?php endif; ?>
                             </a>
                         </div>
                     <?php endforeach; ?>
@@ -119,10 +120,26 @@ require_once 'helpers.php';
         <?php endif; ?>
 
         <!-- Optionele begeleidende tekst onder de carousel en boven de fotogalerij -->
-        <?php if ($currentThemeName && !empty($themes[$currentThemeName]['intro_text'])): ?>
+        <?php if ($currentThemeName && (!empty($themes[$currentThemeName]['intro_title']) || !empty($themes[$currentThemeName]['intro_text']))): ?>
             <div class="stagger-container">
-                <div class="max-w-3xl mx-auto text-center px-2 reveal">
-                    <p class="text-base md:text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($themes[$currentThemeName]['intro_text'])); ?></p>
+                <div class="max-w-3xl mx-auto text-center px-2 reveal mt-8 mb-10 md:my-12">
+                    <?php if (!empty($themes[$currentThemeName]['intro_title'])): ?>
+                        <h2 class="text-2xl md:text-3xl font-serif mb-3"><?php echo htmlspecialchars($themes[$currentThemeName]['intro_title']); ?></h2>
+                    <?php endif; ?>
+                    <?php if (!empty($themes[$currentThemeName]['intro_text'])): ?>
+                        <p class="text-base md:text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($themes[$currentThemeName]['intro_text'])); ?></p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php elseif (!$currentThemeName && (!empty($portfolioData['intro']['title']) || !empty($portfolioData['intro']['text']))): ?>
+            <div class="stagger-container">
+                <div class="max-w-3xl mx-auto text-center px-2 reveal mt-8 mb-10 md:my-12">
+                    <?php if (!empty($portfolioData['intro']['title'])): ?>
+                        <h2 class="text-2xl md:text-3xl font-serif mb-3"><?php echo htmlspecialchars($portfolioData['intro']['title']); ?></h2>
+                    <?php endif; ?>
+                    <?php if (!empty($portfolioData['intro']['text'])): ?>
+                        <p class="text-base md:text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($portfolioData['intro']['text'])); ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endif; ?>
@@ -163,20 +180,25 @@ require_once 'helpers.php';
       try {
         const portfolioSwiperEl = document.querySelector('.portfolio-swiper');
         if (portfolioSwiperEl) {
-            new Swiper(portfolioSwiperEl, {
+            const slideCount = portfolioSwiperEl.querySelectorAll('.swiper-slide').length;
+            const shouldLoop = slideCount > 2;
+            const swiperOptions = {
               effect: 'slide',
               slidesPerView: 'auto',
               spaceBetween: 24,
-              loop: true,
+              loop: shouldLoop,
+              centeredSlides: true,
+              centeredSlidesBounds: true,
               grabCursor: true, // Maakt slepen mogelijk met een 'handje' cursor
               allowTouchMove: true, // Staat slepen/swipen toe
-              autoplay: {
+              autoplay: shouldLoop ? {
                 delay: 4000,
                 disableOnInteraction: true, // Pauzeert autoplay na interactie
-              },
+              } : false,
               pagination: { el: '.swiper-pagination', clickable: true },
               breakpoints: { 768: { spaceBetween: 28 }, 1280: { spaceBetween: 32 } },
-            });
+            };
+            new Swiper(portfolioSwiperEl, swiperOptions);
         }
       } catch (e) {}
 

@@ -51,5 +51,16 @@
         "sent": false,
         "transport": "mail",
         "ts": "2025-08-31T17:21:59+02:00"
+    },
+    {
+        "type": "selection_finalized",
+        "gallery_slug": "25cb19bf19",
+        "gallery_title": "Test",
+        "count": 1,
+        "to": "support@javanstudio.be",
+        "subject": "Keuze bevestigd - Test",
+        "sent": false,
+        "transport": "mail",
+        "ts": "2025-09-01T18:25:55+02:00"
     }
 ]

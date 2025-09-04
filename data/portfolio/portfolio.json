@@ -50,7 +50,9 @@
                     "featured": true,
                     "alt": ""
                 }
-            ]
+            ],
+            "intro_text": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.\r\n\r\n\r\n\r\n",
+            "intro_title": "Lorem ipsum"
         },
         "Communie": {
             "images": [
@@ -148,5 +150,9 @@
                 }
             ]
         }
+    },
+    "intro": {
+        "title": "ipsum",
+        "text": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean "
     }
 }

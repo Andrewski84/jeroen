@@ -22,8 +22,10 @@ if (defined('PORTFOLIO_FILE') && file_exists(PORTFOLIO_FILE)) {
 $clientGallery = $_SESSION['client_gallery'] ?? null;
 ?>
 <header id="header" class="<?php echo $headerClass; ?> top-0 left-0 w-full z-50">
-    <nav class="container mx-auto px-6 flex justify-center items-center h-24">
-        <div class="hidden md:flex items-center space-x-10">
+    <nav class="container mx-auto px-6 flex justify-between items-center h-24">
+        <a href="<?php echo $homeLink; ?>" class="text-2xl font-bold" style="font-family: var(--font-heading);">Andrew</a>
+        
+        <div class="hidden md:flex items-center space-x-10 absolute left-1/2 -translate-x-1/2">
             <a href="<?php echo $bioLink; ?>" class="nav-link">Over Mij</a>
             <div class="relative header-dropdown">
                 <a href="portfolio.php" class="nav-link<?php echo $page === 'portfolio' ? ' active' : ''; ?> flex items-center gap-2" aria-haspopup="true" aria-expanded="false">
@@ -61,7 +63,10 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
               <a href="admin.php" class="nav-link">Admin</a>
             <?php endif; ?>
         </div>
-        <div class="md:hidden flex-grow text-right"><button id="mobile-menu-button" class="focus:outline-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button></div>
+
+        <div class="md:hidden">
+            <button id="mobile-menu-button" class="focus:outline-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button>
+        </div>
     </nav>
 </header>
 <div id="mobile-menu" class="hidden md:hidden fixed top-24 left-0 right-0 z-40">
@@ -126,4 +131,5 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
       <button id="client-confirm-yes" class="btn btn-primary">Ja</button>
     </div>
   </div>
-  </div>
+</div>
+

@@ -328,10 +328,23 @@ case 'add_theme':
     case 'update_theme_intro':
         $themeName = $_POST['theme_name'] ?? '';
         $intro = $_POST['intro_text'] ?? '';
+        $introTitle = $_POST['intro_title'] ?? '';
         if ($themeName !== '' && isset($portfolioData['themes'][$themeName])) {
             $portfolioData['themes'][$themeName]['intro_text'] = $intro;
+            $portfolioData['themes'][$themeName]['intro_title'] = $introTitle;
             saveJsonFile($portfolioFilePath, $portfolioData);
         }
+        break;
+
+    case 'update_portfolio_intro':
+        $introTitle = $_POST['intro_title'] ?? '';
+        $introText = $_POST['intro_text'] ?? '';
+        if (!isset($portfolioData['intro']) || !is_array($portfolioData['intro'])) {
+            $portfolioData['intro'] = [];
+        }
+        $portfolioData['intro']['title'] = $introTitle;
+        $portfolioData['intro']['text']  = $introText;
+        saveJsonFile($portfolioFilePath, $portfolioData);
         break;
 
     case 'update_photo_order':
@@ -610,7 +623,7 @@ case 'add_theme':
 $hash = '#tab-homepage';
 $detailParam = '';
 
-if (in_array($action, ['add_theme', 'delete_theme', 'rename_theme', 'update_photo_details', 'delete_photo', 'update_photo_order', 'update_portfolio_order', 'update_theme_intro'])) {
+if (in_array($action, ['add_theme', 'delete_theme', 'rename_theme', 'update_photo_details', 'delete_photo', 'update_photo_order', 'update_portfolio_order', 'update_theme_intro', 'update_portfolio_intro'])) {
     $hash = '#tab-portfolio';
     $themeName = $_POST['theme_name'] ?? $_POST['theme'] ?? $_POST['old_theme_name'] ?? null;
     if ($action === 'rename_theme') {

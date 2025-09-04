@@ -177,6 +177,29 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                     </div>
                 </div>
                 
+                <!-- Algemene begeleidende tekst voor Portfolio (getoond wanneer geen filter is gekozen) -->
+                <div class="card mt-6">
+                    <div class="card-header">
+                        <h3 class="card-title text-lg">Algemene begeleidende tekst</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="save.php" method="POST" class="space-y-4">
+                            <input type="hidden" name="action" value="update_portfolio_intro">
+                            <div>
+                                <label class="form-label" for="portfolio_intro_title">Titel (optioneel)</label>
+                                <input type="text" id="portfolio_intro_title" name="intro_title" class="form-input" value="<?php echo htmlspecialchars($portfolioData['intro']['title'] ?? ''); ?>" placeholder="Bijv. Welkom in mijn portfolio">
+                            </div>
+                            <div>
+                                <label class="form-label" for="portfolio_intro_text">Begeleidende tekst (optioneel)</label>
+                                <textarea id="portfolio_intro_text" name="intro_text" rows="4" class="form-textarea" placeholder="Algemene uitleg die boven de foto's verschijnt als geen specifiek portfolio gekozen is."><?php echo htmlspecialchars($portfolioData['intro']['text'] ?? ''); ?></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-secondary">Opslaan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <div id="theme-cards-container" class="mt-6 space-y-6">
                     <?php foreach ($themes as $themeName => $themeData): ?>
                         <div class="card theme-card hidden" data-theme="<?php echo htmlspecialchars($themeName); ?>">
@@ -201,6 +224,8 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                                 <form action="save.php" method="POST" class="space-y-2">
                                     <input type="hidden" name="action" value="update_theme_intro">
                                     <input type="hidden" name="theme_name" value="<?php echo htmlspecialchars($themeName); ?>">
+                                    <label class="form-label" for="intro_title_<?php echo htmlspecialchars($themeName); ?>">Titel (optioneel)</label>
+                                    <input type="text" class="form-input" id="intro_title_<?php echo htmlspecialchars($themeName); ?>" name="intro_title" placeholder="Titel voor dit portfolio" value="<?php echo htmlspecialchars($themeData['intro_title'] ?? ''); ?>">
                                     <label class="form-label" for="intro_text_<?php echo htmlspecialchars($themeName); ?>">Begeleidende tekst (optioneel)</label>
                                     <textarea class="form-textarea" rows="4" id="intro_text_<?php echo htmlspecialchars($themeName); ?>" name="intro_text" placeholder="Korte beschrijving of begeleidende tekst voor dit portfolio..."><?php echo htmlspecialchars($themeData['intro_text'] ?? ''); ?></textarea>
                                     <div>

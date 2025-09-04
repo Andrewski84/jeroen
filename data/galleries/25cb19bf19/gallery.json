@@ -4,5 +4,113 @@
     "password_hash": "$2y$10$xnfCPuNKDYJYmYpnpsMsruzl.adcolaS3MVanJLn1X1HWQZQH9mSu",
     "active": true,
     "max_select": 0,
-    "photos": []
+    "photos": [
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8e569d4f2.62042770.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8e569d4f2.62042770.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.29_57f8bc7c.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8e599f4e5.43344378.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8e599f4e5.43344378.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.39_57aac50f.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8e678ce79.56560682.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8e678ce79.56560682.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.31_971a9908.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8e778a5b1.07520941.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8e778a5b1.07520941.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.39_c0e2bed4.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8e8536894.02133029.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8e8536894.02133029.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.39_d126c761.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8e91865e7.27244978.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8e91865e7.27244978.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.40_dbd48873.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8ea06fc71.00128208.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8ea06fc71.00128208.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.41_78adb712.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8ea4e2b03.26051937.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8ea4e2b03.26051937.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-15 om 21.27.41_16069213.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8ead2f134.28161343.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8ead2f134.28161343.webp",
+            "favorite": true,
+            "comment": "",
+            "original_name": "Afbeelding van WhatsApp op 2025-08-31 om 22.56.02_ec5ef803.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8eb013e76.60881274.png",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8eb013e76.60881274.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "bio.png"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8ec59f749.59303081.png",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8ec59f749.59303081.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "event 1.png"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8ee10efb5.24801933.png",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8ee10efb5.24801933.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "event 2.png"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8f0ac22c2.51084446.jpg",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8f0ac22c2.51084446.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "hero.jpg"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8f0f3a186.69269781.png",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8f0f3a186.69269781.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "hero.png"
+        },
+        {
+            "path": "assets\/galleries\/25cb19bf19\/img_68b5c8f29309e8.06815312.png",
+            "webp": "assets\/galleries\/25cb19bf19\/img_68b5c8f29309e8.06815312.webp",
+            "favorite": false,
+            "comment": "",
+            "original_name": "portret 1.png"
+        }
+    ],
+    "last_saved": "2025-09-01 18:25:55",
+    "confirmed": true
 }
