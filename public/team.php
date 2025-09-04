@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'config.php';
-require_once 'helpers.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/helpers.php';
 
 // Resolve file paths with fallbacks
 $teamFile = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');

@@ -3,8 +3,8 @@
 // Endpoint for asynchronous image uploads with progress support.
 
 session_start();
-require_once 'helpers.php';
-require_once 'config.php';
+require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../includes/config.php';
 
 // Only allow logged-in admin to use this endpoint
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {

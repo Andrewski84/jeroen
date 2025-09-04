@@ -80,7 +80,7 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
             <a href="tel:<?php echo htmlspecialchars($phoneNumber); ?>" class="text-lg font-medium">Tel: <?php echo htmlspecialchars($phoneNumber); ?></a>
             <?php endif; ?>
             <?php if (!empty($_SESSION['loggedin'])): ?>
-              <a href="<?php echo (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php'); ?>" class="nav-link">Admin</a>
+              <a href="<?php echo ADMIN_PANEL_FILE; ?>" class="nav-link">Admin</a>
             <?php endif; ?>
         </div>
 
@@ -134,7 +134,7 @@ $clientGallery = $_SESSION['client_gallery'] ?? null;
             <a href="tel:<?php echo htmlspecialchars($phoneNumber); ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Tel: <?php echo htmlspecialchars($phoneNumber); ?></a>
             <?php endif; ?>
             <?php if (!empty($_SESSION['loggedin'])): ?>
-            <a href="<?php echo (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php'); ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Admin</a>
+            <a href="<?php echo ADMIN_PANEL_FILE; ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-white/10">Admin</a>
             <?php endif; ?>
         </nav>
     </div>

@@ -1,7 +1,7 @@
 ﻿<?php
 session_start();
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php'));
+    header('Location: /admin/admin.php');
     exit;
 }
 $error = $_GET['error'] ?? '';
@@ -24,7 +24,7 @@ $error = $_GET['error'] ?? '';
 <body class="bg-gray-100 flex items-center justify-center h-screen">
     <div class="w-full max-w-sm p-8 bg-white rounded-lg shadow-md">
         <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Beheer</h1>
-        <form action="auth.php" method="POST">
+        <form action="/includes/auth.php" method="POST">
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Wachtwoord</label>
                 <input type="password" name="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200" required>
@@ -56,7 +56,7 @@ $error = $_GET['error'] ?? '';
     e.preventDefault();
     status.textContent = 'Bezig met verzenden...';
     status.className = 'text-sm text-gray-600 mt-2';
-    fetch('save.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: 'action=request_password_reset' })
+    fetch('/admin/save.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: 'action=request_password_reset' })
       .then(r => r.json()).then(data => {
         if (data.status === 'success') {
           status.textContent = 'Er werd een resetlink naar de admin gemaild.';

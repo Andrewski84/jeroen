@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config.php';
+require_once __DIR__ . '/../includes/config.php';
 
 $tokensFile = DATA_DIR . '/reset_tokens.json';
 
@@ -35,18 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['token'])) {
         if (($t['hash'] ?? '') === $hash && empty($t['used']) && ($t['expires'] ?? 0) > time()) { $idxFound = $idx; break; }
     }
     if ($idxFound === null) {
-        header('Location: reset.php?invalid=1');
+        header('Location: /reset.php?invalid=1');
         exit;
     }
     $p1 = $_POST['new_password'] ?? '';
     $p2 = $_POST['confirm_password'] ?? '';
     if ($p1 === '' || $p1 !== $p2) {
-        header('Location: reset.php?token='.urlencode($token).'&mismatch=1');
+        header('Location: /reset.php?token='.urlencode($token).'&mismatch=1');
         exit;
     }
     // Update password hash inside config.php
     $newHash = password_hash($p1, PASSWORD_DEFAULT);
-    $configLines = file('config.php');
+    $configPath = __DIR__ . '/../includes/config.php';
+    $configLines = file($configPath);
     $out = '';
     foreach ($configLines as $line) {
         if (strpos($line, "ADMIN_PASSWORD_HASH") !== false) {
@@ -55,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['token'])) {
             $out .= $line;
         }
     }
-    $ok = (file_put_contents('config.php', $out) !== false);
+    $ok = (file_put_contents($configPath, $out) !== false);
     if ($ok) {
         // Mark token as used
         $tokens[$idxFound]['used'] = true; $tokens[$idxFound]['used_at'] = time();
@@ -83,10 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['token'])) {
             $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
             @mail(defined('MAIL_TO') ? MAIL_TO : (defined('MAIL_FROM') ? MAIL_FROM : ''), $subject, $body, $headers);
         }
-        header('Location: login.php?reset=success');
+    header('Location: /login.php?reset=success');
         exit;
     } else {
-        header('Location: reset.php?token='.urlencode($token).'&error=1');
+        header('Location: /reset.php?token='.urlencode($token).'&error=1');
         exit;
     }
 }

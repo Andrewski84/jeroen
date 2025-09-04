@@ -13,8 +13,8 @@
  * - AJAX: endpoints that are called from fetch() return JSON and exit early.
  */
 session_start();
-require_once 'helpers.php';
-require_once 'config.php';
+require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../includes/config.php';
 
 $publicActions = ['contact_form', 'request_password_reset'];
 $isAjax = isset($_POST['ajax']) && $_POST['ajax'] === '1';
@@ -26,7 +26,7 @@ if ($isAjax) {
 
 if (!in_array($action, $publicActions)) {
     if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-        header('Location: login.php');
+        header('Location: /login.php');
         exit;
     }
 }
@@ -70,16 +70,17 @@ switch ($action) {
         $confirm_password = $_POST['confirm_password'] ?? '';
 
         if (!defined('ADMIN_PASSWORD_HASH') || !password_verify($old_password, ADMIN_PASSWORD_HASH)) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_wrong#tab-security');
+            header('Location: ' . ADMIN_PANEL_FILE . '?password_change=error_wrong#tab-security');
             exit;
         }
         if (empty($new_password) || $new_password !== $confirm_password) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_mismatch#tab-security');
+            header('Location: ' . ADMIN_PANEL_FILE . '?password_change=error_mismatch#tab-security');
             exit;
         }
 
         $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
-        $configLines = file('config.php');
+        $configPath = BASE_DIR . '/includes/config.php';
+        $configLines = file($configPath);
         $newConfigContent = '';
         foreach ($configLines as $line) {
             if (strpos($line, 'ADMIN_PASSWORD_HASH') !== false) {
@@ -89,10 +90,10 @@ switch ($action) {
             }
         }
 
-        if (file_put_contents('config.php', $newConfigContent)) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=success#tab-security');
+        if (file_put_contents($configPath, $newConfigContent)) {
+            header('Location: ' . ADMIN_PANEL_FILE . '?password_change=success#tab-security');
         } else {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_file#tab-security');
+            header('Location: ' . ADMIN_PANEL_FILE . '?password_change=error_file#tab-security');
         }
         exit;
 
@@ -914,7 +915,8 @@ case 'add_theme':
         $newEmail = trim($_POST['mail_address'] ?? '');
         $newPass = $_POST['mail_password'] ?? '';
         if ($newEmail === '') { break; }
-        $configLines = file('config.php');
+        $configPath = BASE_DIR . '/includes/config.php';
+        $configLines = file($configPath);
         $output = '';
         foreach ($configLines as $line) {
             if (strpos($line, "define('SMTP_USERNAME'") !== false) {
@@ -929,10 +931,10 @@ case 'add_theme':
                 $output .= $line;
             }
         }
-        if (file_put_contents('config.php', $output) !== false) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?mailbox_update=success#tab-mailbox');
+        if (file_put_contents($configPath, $output) !== false) {
+            header('Location: ' . ADMIN_PANEL_FILE . '?mailbox_update=success#tab-mailbox');
         } else {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?mailbox_update=error_file#tab-mailbox');
+            header('Location: ' . ADMIN_PANEL_FILE . '?mailbox_update=error_file#tab-mailbox');
         }
         exit;
         
@@ -1010,5 +1012,5 @@ if (in_array($action, ['add_team_member', 'update_team_member', 'delete_team_mem
     $hash = '#tab-settings';
 }
 
-header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . $hash . $detailParam);
+header('Location: ' . ADMIN_PANEL_FILE . $hash . $detailParam);
 exit;

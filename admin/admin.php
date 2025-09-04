@@ -13,11 +13,11 @@ if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'admin.php') {
  * so context is preserved across redirects and light reloads.
  */
 session_start();
-require_once 'config.php';
-require_once 'helpers.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/helpers.php';
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header('Location: login.php');
+    header('Location: /login.php');
     exit;
 }
 

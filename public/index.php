@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'config.php';
-require_once 'helpers.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/helpers.php';
 ?>
 <!DOCTYPE html>
 <html lang="nl">

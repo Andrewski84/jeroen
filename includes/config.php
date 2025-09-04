@@ -6,7 +6,8 @@
 define('ADMIN_PASSWORD_HASH', '$2y$10$mmW7cP.n7F8dlff1Z.cQKebXFLFVXUywYpsaLbG0OheA53bx4jrAm');
 
 // Directory Paths
-define('BASE_DIR', __DIR__);
+// BASE_DIR points to the project root (one level up from this includes/ directory)
+define('BASE_DIR', dirname(__DIR__));
 define('ASSETS_DIR', BASE_DIR . '/assets');
 define('DATA_DIR', BASE_DIR . '/data');
 define('TEMPLATES_DIR', BASE_DIR . '/templates');
@@ -35,3 +36,6 @@ if (!defined('MAIL_FROM_NAME')) { define('MAIL_FROM_NAME', 'Andrew Smeets Fotogr
 if (!defined('MAIL_TO')) { define('MAIL_TO', SMTP_USERNAME); }
 // Mail log file
 if (!defined('MAIL_LOG_FILE')) { define('MAIL_LOG_FILE', DATA_DIR . '/mail_log.json'); }
+
+// Admin panel entry point
+if (!defined('ADMIN_PANEL_FILE')) { define('ADMIN_PANEL_FILE', '/admin/admin.php'); }

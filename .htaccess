@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Serve existing files or directories directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route all other requests to the public directory
+RewriteRule ^(.*)$ public/$1 [L]
