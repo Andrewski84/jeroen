@@ -1,10 +1,27 @@
 {
     "pages": {
-        "huis": {
-            "title": "Huisbezoeken",
+        "test-2": {
+            "title": "kaart 1",
             "cards": [
                 {
-                    "html": "<p>Huisbezoeken kunnen enkel telefonisch aangevraagd worden en vóór 11 uur.<\/p><p>Huisbezoeken zijn voor minder mobiele of zwaar zieke patiënten. Aangezien er in de praktijkruimte betere onderzoeks-en behandelmogelijkheden zijn, adviseren wij u indien mogelijk altijd naar de praktijk te komen.<\/p><p>Na 11 uur kunnen er nog enkel dringende huisbezoeken worden aangevraagd. Deze zal worden uitgevoerd door de arts die deze dag van permanentie is.<\/p>"
+                    "html": "<p>te<\/p>"
+                },
+                {
+                    "html": "<p>tes<\/p>"
+                },
+                {
+                    "html": "<p>test<\/p>"
+                }
+            ]
+        },
+        "kaart-2": {
+            "title": "Kaart 2",
+            "cards": [
+                {
+                    "html": "<p>test<\/p>"
+                },
+                {
+                    "html": "<h3>Verlofregeling<\/h3><p>verlof dokter Thys: 29 augustus t\/m 2 september 2025<\/p><p>verlof dokter Schaltin: 11 t\/m 26 september 2025<\/p><p>verlof dokter Jacobs: 17 september t\/m 3 oktober 2025<\/p><p>&nbsp;<\/p>"
                 }
             ]
         }

@@ -352,6 +352,83 @@ function startUpload(task) {
     });
 
     // --- AJAXify forms (subtle save, no full reload) ---
+    function syncRichtext(form){ try { form.querySelectorAll('textarea.richtext').forEach(t => { if (t._ck && typeof t._ck.getData === 'function') { t.value = t._ck.getData(); } }); } catch(e){} }
+    function refreshActiveTab() {
+        const activeBtn = document.querySelector('.admin-tab-button.active');
+        if (!activeBtn) return;
+        const tabId = activeBtn.getAttribute('data-tab');
+        fetch(window.location.href, { method: 'GET', cache: 'no-store' })
+          .then(r => r.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const fresh = doc.getElementById(tabId);
+            const current = document.getElementById(tabId);
+            if (fresh && current) {
+                current.innerHTML = fresh.innerHTML;
+                // Rebind
+                document.querySelectorAll('textarea.richtext').forEach(window.initRichtext);
+                ajaxifyForms();
+                // Rebind dropzones
+                document.querySelectorAll('.dropzone').forEach(dz => {
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => dz.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }));
+                    ['dragenter', 'dragover'].forEach(eName => dz.addEventListener(eName, () => dz.classList.add('is-dragover')));
+                    ['dragleave', 'drop'].forEach(eName => dz.addEventListener(eName, () => dz.classList.remove('is-dragover')));
+                });
+                // Normalize pinned toggle buttons to use the global toggler and label
+                if (tabId === 'tab-pinned') {
+                  document.querySelectorAll('#pinned-list .btn.btn-secondary.btn-sm').forEach(btn => {
+                    const hasInline = btn.getAttribute('onclick');
+                    if (hasInline && hasInline.indexOf('pinned_scope_all') !== -1 || (btn.textContent||'').match(/Selectie wissen/)) {
+                      btn.removeAttribute('onclick');
+                      btn.textContent = "Alle pagina's";
+                      btn.addEventListener('click', () => window.togglePinnedAll(btn));
+                    }
+                  });
+                }
+                // Re-init sortables for the refreshed panel
+                try {
+                    const practiceTable = document.querySelector('#practice-table tbody');
+                    if (practiceTable && typeof Sortable !== 'undefined') {
+                        new Sortable(practiceTable, {
+                            animation: 150,
+                            handle: '.drag-handle',
+                            onEnd: () => {
+                                const order = Array.from(practiceTable.querySelectorAll('tr[data-slug]')).map(tr => tr.dataset.slug);
+                                const fd = new FormData(); fd.append('action','reorder_practice_pages'); order.forEach(s => fd.append('order[]', s));
+                                fetch('admin_api.php', { method: 'POST', body: fd });
+                            }
+                        });
+                    }
+                    const pinnedList = document.getElementById('pinned-list');
+                    if (pinnedList && typeof Sortable !== 'undefined') {
+                        new Sortable(pinnedList, {
+                            animation: 150,
+                            handle: '.drag-handle',
+                            onEnd: () => {
+                                const order = Array.from(pinnedList.children).map(b => b.querySelector('input[name="pinned_id[]"]').value);
+                                const fd = new FormData(); fd.append('action','reorder_pinned'); order.forEach(id => fd.append('order[]', id));
+                                fetch('admin_api.php', { method: 'POST', body: fd });
+                            }
+                        });
+                    }
+                    const linksList = document.getElementById('links-list');
+                    if (linksList && typeof Sortable !== 'undefined') {
+                        new Sortable(linksList, {
+                            animation: 150,
+                            handle: '.drag-handle',
+                            onEnd: () => {
+                                const order = Array.from(linksList.children).map(ch => ch.dataset.id).filter(Boolean);
+                                const fd = new FormData(); fd.append('action','reorder_links'); order.forEach(i => fd.append('order[]', i));
+                                fetch('admin_api.php', { method: 'POST', body: fd });
+                            }
+                        });
+                    }
+                } catch(e){}
+            }
+          }).catch(()=>{});
+    }
+
     function ajaxifyForms() {
         const allowedActions = new Set(['add_team_member','update_team_member','delete_team_member','save_practice_page','delete_practice_page','save_links','save_pinned','save_settings']);
         const forms = document.querySelectorAll('.admin-content form');
@@ -366,10 +443,11 @@ function startUpload(task) {
                 const actionName = actInput ? String(actInput.value || '') : '';
                 if (!allowedActions.has(actionName)) return;
                 e.preventDefault();
+                syncRichtext(form);
                 const fd = new FormData(form);
                 fd.append('ajax', '1');
-                fetch(form.action || 'save.php', { method: form.method || 'POST', body: fd })
-                  .then(r => r.text()).then(txt => { let d=null; try{ d=JSON.parse(txt);}catch(e){} if(!d||d.status!=='success'){ showToast('Opslaan mislukt', false); return; }
+                fetch('admin_api.php', { method: 'POST', body: fd })
+                  .then(r => r.text()).then(txt => { let d=null; try{ d=JSON.parse(txt);}catch(e){} if(!d||d.status!=='success'){ showToast(d&&d.message?d.message:'Opslaan mislukt', false); return; }
                     showToast('Opgeslagen', true);
                     // Post-save UX tweaks for specific actions
                     const action = actionName;
@@ -385,6 +463,7 @@ function startUpload(task) {
                         document.querySelector(`#practice-table tr[data-slug="${d.slug}"]`)?.remove();
                         document.querySelector(`.practice-card-editor[data-slug="${d.slug}"]`)?.remove();
                     }
+                    setTimeout(refreshActiveTab, 300);
                   }).catch(() => showToast('Netwerkfout', false));
             });
             form.dataset.ajaxBound = '1';
@@ -467,7 +546,7 @@ function startUpload(task) {
                 onEnd: () => {
                     const order = Array.from(practiceTable.querySelectorAll('tr[data-slug]')).map(tr => tr.dataset.slug);
                     const fd = new FormData(); fd.append('action','reorder_practice_pages'); order.forEach(s => fd.append('order[]', s));
-                    fetch('save.php', { method: 'POST', body: fd });
+                    fetch('admin_api.php', { method: 'POST', body: fd });
                 }
             });
         }
@@ -479,7 +558,7 @@ function startUpload(task) {
                 onEnd: () => {
                     const order = Array.from(pinnedList.children).map(b => b.querySelector('input[name="pinned_id[]"]').value);
                     const fd = new FormData(); fd.append('action','reorder_pinned'); order.forEach(id => fd.append('order[]', id));
-                    fetch('save.php', { method: 'POST', body: fd });
+                    fetch('admin_api.php', { method: 'POST', body: fd });
                 }
             });
         }
@@ -492,7 +571,7 @@ function startUpload(task) {
                 onEnd: () => {
                     const order = Array.from(linksList.children).map(ch => ch.dataset.id).filter(Boolean);
                     const fd = new FormData(); fd.append('action','reorder_links'); order.forEach(i => fd.append('order[]', i));
-                    fetch('save.php', { method: 'POST', body: fd });
+                    fetch('admin_api.php', { method: 'POST', body: fd });
                 }
             });
         }

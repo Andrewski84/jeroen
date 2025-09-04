@@ -6,16 +6,13 @@
     },
     "items": [
         {
+            "id": "link_68b9dd8544ed80.39529536",
             "label": "Antigifcentrum",
             "url": "https:\/\/www.antigifcentrum.be",
             "tel": "070 24 52 45"
         },
         {
-            "label": "Tropisch instituut\/Info reisvaccinaties",
-            "url": "https:\/\/www.wanda.be",
-            "tel": ""
-        },
-        {
+            "id": "link_68b9dd8544f101.66176982",
             "label": "Medische informatie over bepaalde ziektebeelden",
             "url": "https:\/\/www.gezondheidenwetenschap.be",
             "tel": ""

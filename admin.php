@@ -423,11 +423,15 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
             </div>
 
             <script>
-            // Initialize CKEditor on any .richtext textarea
+            // Initialize CKEditor on any .richtext textarea and keep a reference
             window.initRichtext = function(el){
               if (!window.ClassicEditor || !el) return;
               if (el._ck_inited) return;
-              try { ClassicEditor.create(el, { toolbar: ['heading','bold','italic','link','bulletedList','numberedList','undo','redo'] }); el._ck_inited = true; } catch(e) {}
+              try {
+                ClassicEditor.create(el, { toolbar: ['heading','bold','italic','link','bulletedList','numberedList','undo','redo'] })
+                  .then(editor => { el._ck = editor; el._ck_inited = true; })
+                  .catch(() => {});
+              } catch(e) {}
             };
             document.addEventListener('DOMContentLoaded', function(){
               document.querySelectorAll('textarea.richtext').forEach(window.initRichtext);
@@ -440,6 +444,22 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
               d.innerHTML = '<label class="form-label">Inhoud</label><textarea name="welcome_card_html[]" class="form-textarea richtext" rows="4"></textarea>';
               c.appendChild(d);
               var tx = d.querySelector('textarea.richtext'); if (tx) window.initRichtext(tx);
+            };
+            // Toggle all scopes for a pinned item
+            window.togglePinnedAll = function(btn){
+              var box = btn.closest('.border'); if(!box) return;
+              var id = box.querySelector('input[name="pinned_id[]"]').value;
+              var home = box.querySelector('input[name="pinned_scope_home[]"][value="'+id+'"]');
+              var team = box.querySelector('input[name="pinned_scope_team[]"][value="'+id+'"]');
+              var pr   = box.querySelector('input[name="pinned_scope_practice[]"][value="'+id+'"]');
+              var li   = box.querySelector('input[name="pinned_scope_links[]"][value="'+id+'"]');
+              var all  = box.querySelector('input[name="pinned_scope_all[]"]');
+              var turnOn = !(home?.checked && team?.checked && pr?.checked && li?.checked && all?.value);
+              if (home) home.checked = turnOn;
+              if (team) team.checked = turnOn;
+              if (pr)   pr.checked   = turnOn;
+              if (li)   li.checked   = turnOn;
+              if (all)  all.value    = turnOn ? id : '';
             };
             window.addPracticeCard = function(containerId){
               var c = document.getElementById(containerId); if(!c) return;
