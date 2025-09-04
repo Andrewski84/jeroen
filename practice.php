@@ -27,7 +27,7 @@ $metaDescription = $siteContent['meta_description'] ?? '';
 </head>
 <body class="antialiased">
 <?php $page = 'practice'; include TEMPLATES_DIR . '/header.php'; ?>
-
+<div class="main-content">
 <main class="py-16">
   <div class="container mx-auto px-6">
     <h1 class="text-4xl font-semibold mb-8" style="font-family: var(--font-heading);">
@@ -67,7 +67,7 @@ $metaDescription = $siteContent['meta_description'] ?? '';
           if (in_array('all',$scope) || in_array('practice',$scope)) $pinnedList[] = $pin;
         }
         ?>
-        <aside class="space-y-4">
+        <aside class="space-y-4 lg:col-span-1">
           <?php foreach ($pinnedList as $pin): ?>
           <div class="rounded-xl p-5 pinned-card">
             <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
@@ -78,36 +78,8 @@ $metaDescription = $siteContent['meta_description'] ?? '';
       </div>
     <?php endif; ?>
   </div>
-<?php
-// Load pinned messages for practice
-$pinned = ($siteContent['pinned'] ?? []);
-$pinnedList = [];
-foreach ($pinned as $pin) {
-  $scope = $pin['scope'] ?? [];
-  if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
-  if (in_array('all',$scope) || in_array('practice',$scope)) $pinnedList[] = $pin;
-}
-?>
-<?php if (!empty($pinnedList)): ?>
-<section class="py-10">
-  <div class="container mx-auto px-6">
-    <div class="grid gap-6 lg:grid-cols-3">
-      <div class="lg:col-span-2"></div>
-      <aside class="space-y-4">
-        <?php foreach ($pinnedList as $pin): ?>
-        <div class="rounded-xl p-5 pinned-card">
-          <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
-          <div class="prose max-w-none"><?php echo $pin['text'] ?? ''; ?></div>
-        </div>
-        <?php endforeach; ?>
-      </aside>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
 </main>
-
+</div>
 <?php include TEMPLATES_DIR . '/footer.php'; ?>
 </body>
 </html>

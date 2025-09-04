@@ -29,7 +29,7 @@
         "phone": " 015 61 03 44",
         "address_line_1": "Tervuursesteenweg 752a",
         "address_line_2": "1982 Zemst",
-        "map_embed": "<iframe src=\"https:\/\/www.google.com\/maps\/embed?pb=!1m18!1m12!1m3!1d4266.843437993809!2d4.493676677833053!3d50.96093177169429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3e7196689bb1b%3A0xf468ab954ec2cf86!2sGroepspraktijk%20Elewijt!5e1!3m2!1snl!2sbe!4v1757004216114!5m2!1snl!2sbe\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"><\/iframe>",
+        "map_embed": "<iframe src=\"https:\/\/www.google.com\/maps\/embed?pb=!1m18!1m12!1m3!1d1105.7195302971732!2d4.4963417595750155!3d50.96087428734111!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3e7196689bb1b%3A0xf468ab954ec2cf86!2sGroepspraktijk%20Elewijt!5e1!3m2!1snl!2sbe!4v1757016331611!5m2!1snl!2sbe\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"><\/iframe>",
         "footer_phones": [
             {
                 "label": "Hulpdiensten",
@@ -48,22 +48,25 @@
     "welcome": {
         "title": "Welkom bij de groepspraktijk Elewijt",
         "cards": [],
-        "text": "<p><strong>Welkom op de website van onze groepspraktijk<\/strong><\/p><p>Hier vindt u alle nuttige informatie over onze werking. Als huisartsenpraktijk zijn wij het eerste aanspreekpunt binnen de gezondheidszorg, zowel voor lichamelijke als emotionele klachten. Wij streven ernaar om samen met u te zoeken naar de best mogelijke aanpak en oplossing.<\/p><p>Wij doen dit in teamverband, met vijf vaste artsen, één huisarts in opleiding en een goede samenwerking met andere zorgverleners in de buurt. Op die manier kunnen we een zo volledig mogelijk aanbod voorzien binnen de eerste lijn.<\/p><p>We hechten veel belang aan kwaliteitsvolle zorg en werken volgens wetenschappelijk onderbouwde richtlijnen. Daarvoor volgen wij regelmatig bijscholingen.<\/p><p>&nbsp;<\/p><p><strong>Afspraken en bereikbaarheid<\/strong><\/p><p>Onze praktijk is vlot bereikbaar. Afspraken kunnen de hele dag door eenvoudig online geboekt worden. Als uw eigen huisarts afwezig is of niet beschikbaar, helpt een van de andere artsen u graag verder. Wanneer er online geen vrije afspraken meer zijn, kan u telefonisch contact opnemen voor een dringende afspraak.<\/p><p>Alle artsen in onze groepspraktijk zijn geconventioneerd. Er wordt dus gewerkt volgens de officiële RIZIV-tarieven.<\/p><p>&nbsp;<\/p><p><strong>Nieuwe patiënten<\/strong><\/p><p>Omwille van de toenemende drukte nemen wij momenteel enkel nog nieuwe patiënten aan die in Elewijt wonen.<\/p><p>&nbsp;<\/p><p><strong>Gebruik van een mondmasker<\/strong><\/p><p>Bij verkoudheidsklachten of andere virale symptomen vragen wij vriendelijk om een mondmasker te dragen. Zo helpt u mee om de andere patiënten in de wachtzaal te beschermen.<\/p>"
+        "text": "<p><strong>Welkom op de website van onze groepspraktijk<\/strong><\/p><p>Hier vindt u alle nuttige informatie over onze werking. Als huisartsenpraktijk zijn wij het eerste aanspreekpunt binnen de gezondheidszorg, zowel voor lichamelijke als emotionele klachten. Wij streven ernaar om samen met u te zoeken naar de best mogelijke aanpak en oplossing.<\/p><p>Wij doen dit in teamverband, met vijf vaste artsen, één huisarts in opleiding en een goede samenwerking met andere zorgverleners in de buurt. Op die manier kunnen we een zo volledig mogelijk aanbod voorzien binnen de eerste lijn.<\/p><p>We hechten veel belang aan kwaliteitsvolle zorg en werken volgens wetenschappelijk onderbouwde richtlijnen. Daarvoor volgen wij regelmatig bijscholingen.<\/p><p>&nbsp;<\/p><p><strong>Afspraken en bereikbaarheid<\/strong><\/p><p>Onze praktijk is vlot bereikbaar. Afspraken kunnen de hele dag door eenvoudig online geboekt worden. Als uw eigen huisarts afwezig is of niet beschikbaar, helpt een van de andere artsen u graag verder. Wanneer er online geen vrije afspraken meer zijn, kan u telefonisch contact opnemen voor een dringende afspraak.<\/p><p>Alle artsen in onze groepspraktijk zijn geconventioneerd. Er wordt dus gewerkt volgens de officiële RIZIV-tarieven.<\/p><p>&nbsp;<\/p><p><strong>Nieuwe patiënten<\/strong><\/p><p>Omwille van de toenemende drukte nemen wij momenteel enkel nog nieuwe patiënten aan die in Elewijt wonen.<\/p><p>&nbsp;<\/p>"
     },
     "pinned": [
         {
-            "id": "pin_8km64v7o2y",
-            "title": "Aandachtspunten",
-            "text": "<p>Openingsuren van het secretariaat zijn van 08.00u tot 17.45u (kunnen gewijzigd zijn bij afwezigheden).<br>&nbsp;<\/p><p>Graag 15 minuten voor je afspraak aanwezig zijn met identiteitskaart of kids-ID.<br>&nbsp;<\/p><p>Bent u verhuisd of heeft u een nieuwe ID, laat uw kaart opnieuw inlezen bij het onthaal.<br>&nbsp;<\/p><p>Gelieve bij verkoudheidsklachten en griepklachten een mondmasker te dragen om zo uw medepatiënten te helpen beschermen.<br>&nbsp;<\/p><p>Er worden <strong>geen <\/strong>voorschriften telefonisch verstrekt. Maak daarom tijdig een afspraak bij een arts als u nieuwe voorschriften nodig hebt.<\/p>",
+            "id": "pin_drjagxw8b3",
+            "title": "eztaz",
+            "text": "<p>ezarazer<\/p>",
             "scope": [
-                "home"
+                "home",
+                "links"
             ]
         },
         {
-            "id": "pin_86m9ldqpqe",
-            "title": "Parkeren en bereikbaarheid",
-            "text": "<h2>&nbsp;<\/h2><p>Onze praktijk bevindt zich vlak bij het centrum van Elewijt. U kan ons op volgende manieren bereiken:<\/p><p><strong>Met de fiets<\/strong><\/p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Wij zijn goed bereikbaar met de fiets. Er is een fietspad aanwezig langs de hele Tervuursesteenweg.<\/p><p><strong>Met het openbaar vervoer<\/strong><\/p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Via openbaar vervoer zijn we bereikbaar via de lijnen 280 en 681. De dichtstbijzijnde halte is Elewijt \"Kerk\"<\/p><p><strong>Met de auto&nbsp;&nbsp;&nbsp;<\/strong> <strong>(opgelet, hinder door werken aan de Rubenslaan, brug is niet toegankelijk t.e.m. September 2024, pas dus best uw vertrekuur aan )<\/strong><br>&nbsp;<\/p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parkeren kan bij voorkeur op parkeerplaatsen naast de Tervuursesteenweg, op de parking aan de Dynastiestraat of de parking aan de kerk.<\/p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Wij hebben ook 2 parkeerplaatsen aan onze carport via de Eppegemsesteenweg.<\/p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Indien u zich toch door plaatsgebrek u in de Eppegemsesteenweg zet, vragen wij u attent te zijn voor onze buren, en er op te letten niet voor een oprit te parkeren.<\/p>",
-            "scope": []
+            "id": "pin_0kqjjrl",
+            "title": "bericht",
+            "text": "<p>bericht<\/p>",
+            "scope": [
+                "all"
+            ]
         }
     ]
 }

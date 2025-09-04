@@ -1,22 +1,8 @@
-/*
- * Andrew - Admin Panel Stylesheet
- * -------------------------------------
- * Dit bestand bevat alle stijlen voor het admin-paneel.
- * De structuur is als volgt:
- * 1. Imports & Root Variabelen
- * 2. Globale Stijlen & Hoofdlayout
- * 3. Componenten (knoppen, kaarten, formulieren, etc.)
- * 4. Specifieke Layouts (thema-editor, upload-popup, etc.)
-*/
-
-/* --- 1. Imports & Root Variabelen --- */
-
-/* Inter lettertype import van Google Fonts */
+/* Inter font import from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* :root definieert de CSS-variabelen voor het hele document */
 :root {
-    /* Kleuren */
+    /* Colors */
     --admin-bg: #f1f5f9;
     --card-bg: #ffffff;
     --card-border: #e2e8f0;
@@ -24,38 +10,29 @@
     --admin-text: #334155;
     --admin-text-light: #64748b;
     --input-border: #cbd5e1;
-    --input-focus-ring: var(--ring, #3b82f6);
+    --input-focus-ring: #3b82f6;
 
-    /* Knop-kleuren */
-    --btn-primary-bg: var(--primary, #334155);
-    --btn-primary-hover-bg: var(--accent, #475569);
-    --btn-primary-text: var(--on-primary, #ffffff);
+    /* Button Colors */
+    --btn-primary-bg: #1e293b;
+    --btn-primary-hover-bg: #334155;
+    --btn-primary-text: #ffffff;
     --btn-secondary-bg: #e2e8f0;
     --btn-secondary-hover-bg: #cbd5e1;
     --btn-secondary-text: #475569;
-    --btn-danger-bg: var(--danger, #ef4444);
+    --btn-danger-bg: #ef4444;
     --btn-danger-hover-bg: #dc2626;
     --btn-danger-text: #ffffff;
-    --btn-warning-bg: var(--warning, #f59e0b);
-    --btn-success-bg: var(--success, #22c55e);
+    --btn-success-bg: #22c55e;
 
-    /* Tab-navigatie kleuren */
-    --tab-active-border: var(--primary, #334155);
-    --tab-hover-bg: #e2e8f0;
-
-    /* Schaduwen */
+    /* Shadows & Radius */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-
-    /* Rand-radius (afgeronde hoeken) */
-    --radius-sm: 0.25rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
 }
 
-/* --- 2. Globale Stijlen & Hoofdlayout --- */
-
+/* --- Global & Layout --- */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--admin-bg);
@@ -67,12 +44,7 @@ body {
     margin: 0 auto;
     padding: 1rem;
 }
-
-@media (min-width: 768px) {
-    .admin-container {
-        padding: 2rem;
-    }
-}
+@media (min-width: 768px) { .admin-container { padding: 2rem; } }
 
 .admin-header {
     display: flex;
@@ -83,20 +55,11 @@ body {
     border-bottom: 1px solid var(--card-border);
 }
 
-/* --- 3. Componenten --- */
+/* --- Components --- */
 
-/* Tab Navigatie */
-.admin-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
+/* Tabs */
+.admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
 .admin-tab-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
     padding: 0.625rem 1rem;
     border-radius: var(--radius-md);
     font-weight: 500;
@@ -105,23 +68,17 @@ body {
     border: 2px solid transparent;
     transition: all 0.2s ease-in-out;
 }
-
-.admin-tab-button:hover {
-    background-color: var(--tab-hover-bg);
-    color: var(--admin-text);
-}
-
+.admin-tab-button:hover { background-color: #e2e8f0; color: var(--admin-text); }
 .admin-tab-button.active {
     color: var(--admin-text);
     background-color: var(--card-bg);
     border-color: var(--card-border);
     box-shadow: var(--shadow-sm);
 }
-
 .admin-tab-panel { display: none; }
 .admin-tab-panel.active { display: block; }
 
-/* Kaarten (Cards) */
+/* Cards */
 .card {
     background-color: var(--card-bg);
     border-radius: var(--radius-lg);
@@ -129,193 +86,120 @@ body {
     overflow: hidden;
     border: 1px solid var(--card-border);
 }
-
-.card-header,
-.card-footer {
+.card-header, .card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.5rem;
     background-color: var(--card-header-bg);
 }
-
 .card-header { border-bottom: 1px solid var(--card-border); }
 .card-footer { border-top: 1px solid var(--card-border); }
-
-.card-footer.homepage-footer {
-    background-color: transparent;
-    border-top: none;
-    justify-content: center;
-    padding-top: 0;
-}
-
-.card-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--admin-text);
-}
-
+.card-title { font-size: 1.125rem; font-weight: 600; }
 .card-body { padding: 1.5rem; }
 
-/* Knoppen (Buttons) */
+/* Buttons */
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    font-weight: 500;
-    font-size: 0.875rem;
-    border: 1px solid transparent;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem; padding: 0.5rem 1rem;
+    border-radius: var(--radius-md); font-weight: 500;
+    font-size: 0.875rem; border: 1px solid transparent;
+    transition: all 0.2s ease-in-out; cursor: pointer;
 }
-
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
+.btn-sm { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
 .btn-primary { background-color: var(--btn-primary-bg); color: var(--btn-primary-text); }
 .btn-primary:hover { background-color: var(--btn-primary-hover-bg); }
 .btn-secondary { background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border-color: var(--card-border); }
 .btn-secondary:hover { background-color: var(--btn-secondary-hover-bg); }
 .btn-danger { background-color: var(--btn-danger-bg); color: var(--btn-danger-text); }
 .btn-danger:hover { background-color: var(--btn-danger-hover-bg); }
-.btn-warning { background-color: var(--btn-warning-bg); color: #fff; }
-.btn-success { background-color: var(--btn-success-bg); color: #fff; }
 
-.btn-icon { padding: 0.5rem; background-color: transparent; color: var(--admin-text-light); border-radius: 999px; }
-.btn-icon:hover { background-color: var(--btn-secondary-bg); color: var(--admin-text); }
-.btn-icon-danger { background-color: rgba(239, 68, 68, 0.1); color: var(--btn-danger-bg); }
-.btn-icon-danger:hover { background-color: var(--btn-danger-bg); color: #fff; }
-
-/* Formulieren (Forms) */
-.form-label {
-    display: block;
-    font-weight: 500;
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
-    color: var(--admin-text);
-}
-
-.form-input,
-.form-textarea,
-.form-select {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
+/* Forms */
+.form-label { display: block; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; }
+.form-input, .form-textarea {
+    width: 100%; padding: 0.5rem 0.75rem;
     border: 1px solid var(--input-border);
     border-radius: var(--radius-md);
     background-color: #fff;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-    outline: none;
-    border-color: var(--input-focus-ring);
+.form-input:focus, .form-textarea:focus {
+    outline: none; border-color: var(--input-focus-ring);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--input-focus-ring) 25%, transparent);
 }
 
-.form-checkbox { width: 1rem; height: 1rem; border-radius: var(--radius-sm); border-color: var(--input-border); }
-.form-checkbox:checked { background-color: var(--btn-primary-bg); }
-
-/* Tabellen (Tables) */
+/* Tables */
 .admin-table-container { overflow-x: auto; border: 1px solid var(--card-border); border-radius: var(--radius-md); }
 .admin-table { width: 100%; border-collapse: collapse; }
 .admin-table th, .admin-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--card-border); }
 .admin-table th { background-color: var(--card-header-bg); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--admin-text-light); }
-.admin-table tbody tr { transition: background-color 0.2s; }
 .admin-table tbody tr:last-child td { border-bottom: 0; }
-.admin-table tbody tr.clickable-row:hover { background-color: var(--card-header-bg); cursor: pointer; }
-.admin-table tbody tr.active-row { background-color: color-mix(in srgb, var(--primary, #334155) 8%, transparent); }
+.admin-table tbody tr:hover { background-color: var(--card-header-bg); cursor: pointer; }
+.admin-table tbody tr.active-row { background-color: color-mix(in srgb, var(--input-focus-ring) 8%, transparent); }
 .drag-handle { cursor: grab; }
 .drag-handle:active { cursor: grabbing; }
 
-/* Modals & Popups */
-.modal-overlay { position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
-.modal-content { background-color: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 500px; overflow: hidden; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); }
-.modal-title { font-size: 1.25rem; font-weight: 600; }
-.modal-close-btn { font-size: 1.5rem; color: var(--admin-text-light); }
-.modal-body { padding: 1.5rem; }
-.modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; background-color: var(--card-header-bg); border-top: 1px solid var(--card-border); }
-
-.toast-popup { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); color: #fff; box-shadow: var(--shadow-lg); opacity: 0; transform: translateY(1rem); transition: opacity 0.3s ease, transform 0.3s ease; z-index: 101; }
-.toast-popup.show { opacity: 1; transform: translateY(0); }
-
-/* Utility Classes */
-.status-badge { display: inline-block; padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 999px; }
-.status-active { background-color: #dcfce7; color: #166534; }
-.status-inactive { background-color: #fee2e2; color: #991b1b; }
-
+/* Alerts & Popups */
 .alert { padding: 1rem; margin-bottom: 1rem; border-radius: var(--radius-md); font-weight: 500; }
 .alert-success { background-color: #dcfce7; color: #166534; }
 .alert-danger { background-color: #fee2e2; color: #991b1b; }
 
+.toast-popup { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); color: #fff; box-shadow: var(--shadow-lg); opacity: 0; transform: translateY(1rem); transition: opacity 0.3s ease, transform 0.3s ease; z-index: 101; }
+.toast-popup.show { opacity: 1; transform: translateY(0); }
 
-/* --- 4. Specifieke Layouts --- */
-
-/* Foto & Upload Beheer */
-.dropzone { display: flex; align-items: center; justify-content: center; border: 2px dashed var(--input-border); border-radius: var(--radius-md); padding: 1rem; text-align: center; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
-.dropzone.is-dragover, .dropzone:hover { background-color: var(--card-header-bg); border-color: var(--primary, #334155); }
-.dropzone span { color: var(--admin-text-light); font-size: 0.875rem; }
+/* --- Specific Layouts --- */
+.dropzone {
+    display: flex; align-items: center; justify-content: center;
+    border: 2px dashed var(--input-border); border-radius: var(--radius-md);
+    padding: 1rem; text-align: center; color: var(--admin-text-light);
+    cursor: pointer; transition: background-color 0.2s, border-color 0.2s;
+}
+.dropzone.is-dragover, .dropzone:hover { background-color: var(--card-header-bg); border-color: var(--input-focus-ring); }
 .dropzone.absolute { background-color: rgba(248, 250, 252, 0.8); opacity: 0; }
 .group:hover .dropzone.absolute, .dropzone.absolute.is-dragover { opacity: 1; background-color: rgba(241, 245, 249, 0.9); }
 
-.photo-list,
-.gallery-photo-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.photo-list-item,
-.gallery-photo-list-item {
-    position: relative;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    aspect-ratio: 1 / 1;
-    cursor: grab;
-}
-.photo-list-item:active, .gallery-photo-list-item:active { cursor: grabbing; }
-
-.admin-thumb { width: 100%; height: 100%; object-fit: cover; }
-
-.photo-list-overlay { position: absolute; inset: 0; background-color: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; gap: 0.5rem; opacity: 0; transition: opacity 0.2s; }
-.photo-list-item:hover .photo-list-overlay, .gallery-photo-list-item:hover .photo-list-overlay { opacity: 1; }
-.delete-photo-form { display: inline-block; }
-
-.featured-star { position: absolute; top: 0.5rem; right: 0.5rem; color: var(--warning, #f59e0b); width: 1.25rem; height: 1.25rem; z-index: 10; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3)); }
-.sortable-ghost { opacity: 0.4; background: #e0e7ff; }
-
 /* Upload Progress Popup */
-#upload-progress-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100; width: 320px; max-height: 400px; flex-direction: column; background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; transition: max-height 0.3s ease; }
-/* De :not(.hidden) selector zorgt ervoor dat de display-stijl wordt toegepast wanneer de .hidden-klasse *niet* aanwezig is. Dit lost het CSS-specificiteitsprobleem op. */
-#upload-progress-container:not(.hidden) { display: flex; }
+#upload-progress-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100; width: 320px; max-height: 400px; display: flex; flex-direction: column; background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
 .upload-progress-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: var(--card-header-bg); border-bottom: 1px solid var(--card-border); font-size: 0.75rem; color: var(--admin-text-light); flex-shrink: 0; }
-#upload-minimize-btn { background: none; border: none; cursor: pointer; font-size: 1.5rem; line-height: 1; padding: 0 0.25rem; font-weight: bold; color: var(--admin-text-light); }
-#upload-minimize-btn:hover { color: var(--admin-text); }
-.upload-progress-container.is-minimized { max-height: 42px; }
-.upload-progress-container.is-minimized #upload-progress-list { display: none; }
 #upload-progress-list { flex-grow: 1; overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .upload-item { padding: 0.5rem; border-radius: var(--radius-md); background-color: var(--card-header-bg); }
 .upload-item-name { font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.progress-bar-bg { width: 100%; height: 0.5rem; background-color: var(--card-border); border-radius: 999px; margin-top: 0.25rem; position: relative; overflow: hidden; }
-.progress-bar { position: absolute; left: 0; top: 0; height: 100%; border-radius: 999px; width: 0; transition: width 0.3s, background-color 0.3s; }
-.progress-bar.status-queued { background-color: #94a3b8; } .progress-bar.status-uploading { background-color: #3b82f6; } .progress-bar.status-success { background-color: #22c55e; } .progress-bar.status-error { background-color: #ef4444; }
+.upload-item-status { font-size: 0.75rem; margin-top: 0.25rem; }
+.upload-item-status.status-error { color: var(--btn-danger-bg); }
+.progress-bar-bg { width: 100%; height: 0.5rem; background-color: var(--card-border); border-radius: 999px; margin-top: 0.25rem; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 999px; width: 0; transition: width 0.3s, background-color 0.3s; }
+.progress-bar.status-queued { background-color: #94a3b8; } .progress-bar.status-uploading { background-color: #3b82f6; width: 100%; animation: progress-indeterminate 1s infinite linear; } .progress-bar.status-success { background-color: #22c55e; width: 100%; } .progress-bar.status-error { background-color: #ef4444; width: 100%;}
 
-/*
- * Thema Editor
- *
- * De CSS-regels voor de thema-editor zijn verwijderd omdat het
- * dynamische themabeheer niet meer wordt gebruikt. Wanneer in de
- * toekomst weer een thema-editor wordt geïntroduceerd, kunnen hier
- * opnieuw stijlen voor thema-previewkaarten, kleurpickers en
- * voorbeeldcomponenten worden toegevoegd.
- */
-.status-confirmed { background-color: #ffedd5; color: #9a3412; }
+@keyframes progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.ck-editor__editable { min-height: 150px; }
+
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1rem;
+}
+.modal-overlay.hidden {
+    display: none;
+}
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 2rem;
+    width: 100%;
+    max-width: 24rem;
+}
+

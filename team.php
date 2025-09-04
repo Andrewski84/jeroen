@@ -30,7 +30,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
 </head>
 <body class="antialiased">
 <?php $page = 'team'; include TEMPLATES_DIR . '/header.php'; ?>
-
+<div class="main-content">
 <main class="py-16">
   <div class="container mx-auto px-6">
     <h1 class="text-4xl font-semibold mb-8" style="font-family: var(--font-heading);">Team</h1>
@@ -39,12 +39,12 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
         <?php if (empty($members)): ?>
           <p class="text-slate-600">Er zijn nog geen teamleden toegevoegd.</p>
         <?php else: ?>
-        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
+        <div class="grid gap-8 sm:grid-cols-2">
           <?php foreach ($members as $m): ?>
             <?php $anchor = 'm-' . (!empty($m['id']) ? preg_replace('/[^a-zA-Z0-9_-]/','', $m['id']) : substr(md5(($m['name'] ?? '') . ($m['role'] ?? '')),0,8)); ?>
-            <article id="<?php echo htmlspecialchars($anchor); ?>" class="rounded-xl overflow-hidden shadow-md bg-white">
+            <article id="<?php echo htmlspecialchars($anchor); ?>" class="team-card rounded-xl overflow-hidden shadow-md bg-white">
               <?php if (!empty($m['image'])): ?>
-              <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full h-56 object-cover">
+              <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full">
               <?php endif; ?>
               <div class="p-5">
                 <h2 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h2>
@@ -67,7 +67,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
         if (in_array('all',$scope) || in_array('team',$scope)) $pinnedList[] = $pin;
       }
       ?>
-      <aside class="space-y-4">
+      <aside class="space-y-4 lg:col-span-1">
         <?php foreach ($pinnedList as $pin): ?>
         <div class="rounded-xl p-5 pinned-card">
           <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
@@ -78,7 +78,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
     </div>
   </div>
 </main>
-
+</div>
 <?php include TEMPLATES_DIR . '/footer.php'; ?>
 </body>
 </html>

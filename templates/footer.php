@@ -15,7 +15,7 @@ $phone = $settings['phone'] ?? '';
 $usefulPhones = isset($settings['footer_phones']) && is_array($settings['footer_phones']) ? $settings['footer_phones'] : [];
 $mapEmbed = $settings['map_embed'] ?? '';
 ?>
-<footer class="py-12" style="background-color: var(--surface);">
+<footer class="site-footer">
   <div class="container mx-auto px-6">
     <div class="flex flex-col lg:flex-row gap-10">
       <div class="flex-1">

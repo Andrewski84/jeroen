@@ -26,7 +26,11 @@ require_once 'helpers.php';
     <link rel="stylesheet" href="style.css">
 </head>
 <body id="index-page" class="antialiased">
-<div class="w-full overflow-x-hidden">
+    <?php
+        $page = 'index';
+        include TEMPLATES_DIR . '/header.php';
+    ?>
+<div class="main-content">
     <?php
         function loadContent($file) {
             if (file_exists($file)) { return json_decode(file_get_contents($file), true); }
@@ -37,9 +41,6 @@ require_once 'helpers.php';
         $teamFile = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');
         $teamData = file_exists($teamFile) ? (json_decode(file_get_contents($teamFile), true) ?: []) : [];
         $teamMembers = $teamData['members'] ?? [];
-
-        $page = 'index';
-        include TEMPLATES_DIR . '/header.php';
     ?>
 
     <section id="home" class="h-screen min-h-[600px] bg-cover bg-center bg-fixed flex items-center justify-center stagger-container" style="background-image: url('<?php echo htmlspecialchars($content['hero']['image'] ?? ''); ?>');">
@@ -87,7 +88,7 @@ require_once 'helpers.php';
                   if (in_array('all',$scope) || in_array('home',$scope)) $pinnedList[] = $pin;
                 }
                 ?>
-                <aside class="space-y-4 reveal">
+                <aside class="space-y-4 reveal lg:col-span-1">
                     <?php foreach ($pinnedList as $pin): ?>
                     <div class="rounded-xl p-5 pinned-card">
                         <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
@@ -107,9 +108,9 @@ require_once 'helpers.php';
             <?php if (!empty($teamMembers)): ?>
             <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 <?php foreach ($teamMembers as $m): ?>
-                <article class="rounded-xl overflow-hidden shadow-md bg-white reveal">
+                <article class="team-card rounded-xl overflow-hidden shadow-md bg-white reveal">
                     <?php if (!empty($m['image'])): ?>
-                    <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? ''); ?>" class="w-full h-56 object-cover">
+                    <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? ''); ?>" class="w-full">
                     <?php endif; ?>
                     <div class="p-5">
                         <h3 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h3>
@@ -127,11 +128,8 @@ require_once 'helpers.php';
         </div>
     </section>
 
-
-    <?php include TEMPLATES_DIR . '/footer.php'; ?>
 </div>
+    <?php include TEMPLATES_DIR . '/footer.php'; ?>
 <script src="main.js"></script>
-<script>
-
 </body>
 </html>

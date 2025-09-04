@@ -26,9 +26,9 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
 </head>
 <body class="antialiased">
 <?php $page = 'links'; include TEMPLATES_DIR . '/header.php'; ?>
-
+<div class="main-content">
 <main>
-  <section class="h-64 bg-cover bg-center flex items-center justify-center" style="background-image: url('<?php echo htmlspecialchars($hero['image'] ?? ''); ?>');">
+  <section class="h-80 bg-cover bg-center flex items-center justify-center" style="background-image: url('<?php echo htmlspecialchars($hero['image'] ?? ''); ?>');">
     <h1 class="text-4xl font-semibold text-white drop-shadow" style="font-family: var(--font-heading);">
       <?php echo htmlspecialchars($hero['title'] ?? 'Nuttige links'); ?>
     </h1>
@@ -75,7 +75,7 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
           if (in_array('all',$scope) || in_array('links',$scope)) $pinnedList[] = $pin;
         }
         ?>
-        <aside class="space-y-4">
+        <aside class="space-y-4 lg:col-span-1">
           <?php foreach ($pinnedList as $pin): ?>
           <div class="rounded-xl p-5 pinned-card">
             <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
@@ -87,7 +87,7 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
     </div>
   </section>
 </main>
-
+</div>
 <?php include TEMPLATES_DIR . '/footer.php'; ?>
 </body>
 </html>

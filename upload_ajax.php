@@ -1,6 +1,6 @@
 <?php
 // upload_ajax.php
-// Endpoint for asynchronous image uploads with progress support.
+// Endpoint for asynchronous image uploads.
 
 session_start();
 require_once 'helpers.php';
@@ -15,7 +15,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 header('Content-Type: application/json');
 
-// Determine target type: hero, team, links_hero
 $target = $_POST['target'] ?? '';
 
 // Validate file
@@ -28,94 +27,88 @@ $file = $_FILES['file'];
 
 // Process upload depending on the target
 switch ($target) {
-    
-
     case 'hero':
-    case 'bio':
-        // Both hero and bio images update CONTENT_FILE
-          $contentFile = CONTENT_FILE;
+        $contentFile = CONTENT_FILE;
         $contentData = loadJsonFile($contentFile);
-        $section = ($target === 'hero') ? 'hero' : 'bio';
-        // Upload with default max width (1920)
-          $result = handleImageUpload($file, ASSETS_DIR . '/images');
+        $result = handleImageUpload($file, ASSETS_DIR . '/images');
           if (!$result) {
               echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']);
               exit;
           }
-          $paths = $result;
-        // Delete existing files if present (support relative paths)
-        if (isset($contentData[$section]['image'])) {
-            $oldImg = $contentData[$section]['image'];
-            $oldImgAbs = (strpos($oldImg, ':') !== false || str_starts_with($oldImg, '/')) ? $oldImg : (BASE_DIR . '/' . $oldImg);
-            if (file_exists($oldImgAbs)) { unlink($oldImgAbs); }
+        $paths = $result;
+        
+        // Delete existing files
+        if (isset($contentData['hero']['image'])) {
+            @unlink(BASE_DIR . '/' . $contentData['hero']['image']);
         }
-        if (isset($contentData[$section]['webp'])) {
-            $oldWebp = $contentData[$section]['webp'];
-            $oldWebpAbs = (strpos($oldWebp, ':') !== false || str_starts_with($oldWebp, '/')) ? $oldWebp : (BASE_DIR . '/' . $oldWebp);
-            if (file_exists($oldWebpAbs)) { unlink($oldWebpAbs); }
+        if (isset($contentData['hero']['webp'])) {
+             @unlink(BASE_DIR . '/' . $contentData['hero']['webp']);
         }
-        $contentData[$section]['image'] = $paths['path'];
-        $contentData[$section]['webp'] = $paths['webp'];
-        $saved = saveJsonFile($contentFile, $contentData);
-        if (!$saved) {
-            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+
+        $contentData['hero']['image'] = $paths['path'];
+        $contentData['hero']['webp'] = $paths['webp'];
+        
+        if (!saveJsonFile($contentFile, $contentData)) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan van content.json mislukt']);
             exit;
         }
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
         exit;
 
     case 'team':
-        // Upload team member photo and update team.json
         $memberId = $_POST['member_id'] ?? '';
-        $teamFile = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');
+        $teamFile = TEAM_FILE;
         if ($memberId === '' || !file_exists($teamFile)) {
-            echo json_encode(['status' => 'error', 'message' => 'Teamlid niet gevonden']);
+            echo json_encode(['status' => 'error', 'message' => 'Teamlid niet gevonden of team.json bestaat niet.']);
             exit;
         }
-        $destDir = (defined('ASSETS_DIR') ? ASSETS_DIR : (__DIR__ . '/assets')) . '/team';
+        $destDir = ASSETS_DIR . '/team';
         $result = handleImageUpload($file, $destDir, 1200);
         if (!$result) { echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']); exit; }
+        
         $paths = $result;
         $data = loadJsonFile($teamFile);
         if (!isset($data['members']) || !is_array($data['members'])) $data['members'] = [];
+        
         foreach ($data['members'] as &$m) {
             if (($m['id'] ?? '') === $memberId) {
-                // delete old files if inside project
-                foreach (['image','webp'] as $k) {
-                    if (!empty($m[$k])) {
-                        $p = $m[$k];
-                        $abs = (strpos($p, ':') !== false || str_starts_with($p, '/')) ? $p : (BASE_DIR . '/' . $p);
-                        if (file_exists($abs)) { @unlink($abs); }
-                    }
-                }
+                // delete old files
+                if (!empty($m['image'])) { @unlink(BASE_DIR . '/' . $m['image']); }
+                if (!empty($m['webp'])) { @unlink(BASE_DIR . '/' . $m['webp']); }
+
                 $m['image'] = $paths['path'];
                 $m['webp'] = $paths['webp'];
                 break;
             }
         }
         unset($m);
-        $saved = saveJsonFile($teamFile, $data);
-        if (!$saved) {
-            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+        
+        if (!saveJsonFile($teamFile, $data)) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan van team.json mislukt']);
             exit;
         }
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
         exit;
 
     case 'links_hero':
-        // Upload hero image for Useful Links page
-        $linksFile = defined('LINKS_FILE') ? LINKS_FILE : (defined('DATA_DIR') ? DATA_DIR . '/links/links.json' : __DIR__ . '/data/links/links.json');
-        $destDir = (defined('ASSETS_DIR') ? ASSETS_DIR : (__DIR__ . '/assets')) . '/images';
+        $linksFile = LINKS_FILE;
+        $destDir = ASSETS_DIR . '/images';
         $result = handleImageUpload($file, $destDir, 1920);
         if (!$result) { echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']); exit; }
+
         $paths = $result;
         $data = loadJsonFile($linksFile);
         if (!isset($data['hero'])) $data['hero'] = [];
+        
+        // Delete old files
+        if (!empty($data['hero']['image'])) { @unlink(BASE_DIR . '/' . $data['hero']['image']); }
+        if (!empty($data['hero']['webp'])) { @unlink(BASE_DIR . '/' . $data['hero']['webp']); }
+
         $data['hero']['image'] = $paths['path'];
         $data['hero']['webp'] = $paths['webp'];
-        $saved = saveJsonFile($linksFile, $data);
-        if (!$saved) {
-            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+        
+        if (!saveJsonFile($linksFile, $data)) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan van links.json mislukt']);
             exit;
         }
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
