@@ -431,6 +431,8 @@ function startUpload(task) {
 
     function ajaxifyForms() {
         const allowedActions = new Set(['add_team_member','update_team_member','delete_team_member','save_practice_page','delete_practice_page','save_links','save_pinned','save_settings']);
+        // Some actions already update the DOM (team forms) and do not require a panel refresh
+        const actionsNeedingRefresh = new Set(['save_practice_page','delete_practice_page','save_links','save_pinned','save_settings']);
         const forms = document.querySelectorAll('.admin-content form');
         forms.forEach(form => {
             if (form.dataset.ajaxBound === '1') return;
@@ -463,7 +465,10 @@ function startUpload(task) {
                         document.querySelector(`#practice-table tr[data-slug="${d.slug}"]`)?.remove();
                         document.querySelector(`.practice-card-editor[data-slug="${d.slug}"]`)?.remove();
                     }
-                    setTimeout(refreshActiveTab, 300);
+                    if (actionsNeedingRefresh.has(action)) {
+                        // Only expensive refresh for panels that are not updated inline
+                        setTimeout(refreshActiveTab, 300);
+                    }
                   }).catch(() => showToast('Netwerkfout', false));
             });
             form.dataset.ajaxBound = '1';
