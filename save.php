@@ -20,6 +20,10 @@ $publicActions = ['contact_form', 'request_password_reset'];
 $isAjax = isset($_POST['ajax']) && $_POST['ajax'] === '1';
 $action = $_POST['action'] ?? ($_GET['action'] ?? null);
 
+if ($isAjax) {
+    header('Content-Type: application/json; charset=utf-8');
+}
+
 if (!in_array($action, $publicActions)) {
     if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         header('Location: login.php');
@@ -692,6 +696,7 @@ case 'add_theme':
         }
         $content['settings']['footer_phones'] = $list;
         saveJsonFile($contentFilePath, $content);
+        if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success']); exit; }
         break;
 
     case 'update_portfolio_intro':
