@@ -1,6 +1,20 @@
 <?php
 
 /**
+ * Schrijf een bericht naar het applicatielog.
+ *
+ * @param string $message Het logbericht.
+ */
+function appLog(string $message): void {
+    $logFile = '/data/logs/app.log';
+    $dir = dirname($logFile);
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+    error_log('[' . date('c') . '] ' . $message . PHP_EOL, 3, $logFile);
+}
+
+/**
  * Laadt en decodeert een JSON-bestand.
  * @param string $filePath Het pad naar het JSON-bestand.
  * @return array De gedecodeerde data of een lege array bij een fout.
@@ -23,6 +37,8 @@ function saveJsonFile(string $filePath, array $data): bool {
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     // Gebruik LOCK_EX om te voorkomen dat meerdere processen tegelijk schrijven.
     if (file_put_contents($filePath, $json, LOCK_EX) === false) {
+        $error = error_get_last()['message'] ?? 'Unknown error';
+        appLog("Failed to save JSON file {$filePath}: {$error}");
         return false;
     }
     return true;

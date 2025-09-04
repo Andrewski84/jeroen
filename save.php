@@ -130,7 +130,7 @@ switch ($action) {
             'email' => $email,
             'message' => $message
         ];
-        @file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        saveJsonFile(MESSAGES_FILE, $messages);
 
         // Send email
         $subject = 'Nieuw bericht via website';
@@ -215,7 +215,7 @@ switch ($action) {
             'pricing' => $pricingTitle,
             'message' => $message
         ];
-        @file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        saveJsonFile(MESSAGES_FILE, $messages);
 
         // Build mail
         $subject = 'Nieuw bericht via website';
@@ -268,7 +268,7 @@ switch ($action) {
         // Prune expired
         $tokens = array_values(array_filter($tokens, function($t){ return isset($t['expires']) && $t['expires'] > time() && empty($t['used']); }));
         $tokens[] = ['hash' => $hash, 'expires' => $expires, 'created' => time(), 'used' => false];
-        @file_put_contents($tokensFile, json_encode($tokens, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        saveJsonFile($tokensFile, $tokens);
 
         // Build absolute reset link
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';

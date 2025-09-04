@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'config.php';
+require_once 'helpers.php';
 
 $tokensFile = DATA_DIR . '/reset_tokens.json';
 
@@ -8,7 +9,7 @@ function loadTokens($file) {
     return file_exists($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
 }
 function saveTokens($file, $tokens) {
-    @file_put_contents($file, json_encode($tokens, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+    saveJsonFile($file, $tokens);
 }
 
 $token = $_GET['token'] ?? '';
