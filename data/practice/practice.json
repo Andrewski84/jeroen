@@ -1,0 +1,12 @@
+{
+    "pages": {
+        "huis": {
+            "title": "Huisbezoeken",
+            "cards": [
+                {
+                    "html": "<p>Huisbezoeken kunnen enkel telefonisch aangevraagd worden en vóór 11 uur.<\/p><p>Huisbezoeken zijn voor minder mobiele of zwaar zieke patiënten. Aangezien er in de praktijkruimte betere onderzoeks-en behandelmogelijkheden zijn, adviseren wij u indien mogelijk altijd naar de praktijk te komen.<\/p><p>Na 11 uur kunnen er nog enkel dringende huisbezoeken worden aangevraagd. Deze zal worden uitgevoerd door de arts die deze dag van permanentie is.<\/p>"
+                }
+            ]
+        }
+    }
+}

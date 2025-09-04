@@ -1,7 +1,7 @@
 ﻿<?php
 session_start();
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header('Location: admin.php');
+    header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php'));
     exit;
 }
 $error = $_GET['error'] ?? '';
@@ -23,7 +23,7 @@ $error = $_GET['error'] ?? '';
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
     <div class="w-full max-w-sm p-8 bg-white rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Andrew Admin</h1>
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Beheer</h1>
         <form action="auth.php" method="POST">
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Wachtwoord</label>

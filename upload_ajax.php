@@ -15,7 +15,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 header('Content-Type: application/json');
 
-// Determine target type: portfolio, gallery, hero, bio
+// Determine target type: hero, team, links_hero
 $target = $_POST['target'] ?? '';
 
 // Validate file
@@ -28,99 +28,7 @@ $file = $_FILES['file'];
 
 // Process upload depending on the target
 switch ($target) {
-    case 'portfolio':
-        $theme = $_POST['theme'] ?? '';
-        if ($theme === '') {
-            echo json_encode(['status' => 'error', 'message' => 'Thema ontbreekt']);
-            exit;
-        }
-        // Determine destination directory
-          $destDir = ASSETS_DIR . '/portfolio/' . $theme;
-        // Upload image and resize
-          $result = handleImageUpload($file, $destDir, 1200);
-          if (!$result) {
-              echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']);
-              exit;
-          }
-          $paths = $result;
-        // Update portfolio JSON
-          $portfolioFile = PORTFOLIO_FILE;
-        $portfolioData = loadJsonFile($portfolioFile);
-        if (!isset($portfolioData['themes'][$theme])) {
-            $portfolioData['themes'][$theme] = ['images' => []];
-        }
-        $portfolioData['themes'][$theme]['images'][] = [
-            'path' => $paths['path'],
-            'webp' => $paths['webp'],
-            'title' => '',
-            'description' => '',
-            'featured' => false,
-            'alt' => ''
-        ];
-        saveJsonFile($portfolioFile, $portfolioData);
-        $index = count($portfolioData['themes'][$theme]['images']) - 1;
-        echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp'], 'index' => $index]);
-        exit;
-
-    case 'gallery':
-        $slug = $_POST['slug'] ?? '';
-        if ($slug === '') {
-            echo json_encode(['status' => 'error', 'message' => 'Galerij ontbreekt']);
-            exit;
-        }
-          $galleryDir = GALLERY_ASSETS_DIR . '/' . $slug;
-          $galleryFile = GALLERIES_DIR . '/' . $slug . '/gallery.json';
-        if (!file_exists($galleryFile)) {
-            echo json_encode(['status' => 'error', 'message' => 'Galerij niet gevonden']);
-            exit;
-        }
-        // Upload and resize image
-          $result = handleImageUpload($file, $galleryDir, 1200);
-          if (!$result) {
-              echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']);
-              exit;
-          }
-          $paths = $result;
-        // Update gallery JSON
-        $galleryData = loadJsonFile($galleryFile);
-        $galleryData['photos'][] = [
-            'path' => $paths['path'],
-            'webp' => $paths['webp'],
-            'favorite' => false,
-            'comment' => '',
-            'original_name' => $file['name']
-        ];
-        saveJsonFile($galleryFile, $galleryData);
-        $index = count($galleryData['photos']) - 1;
-        echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp'], 'index' => $index]);
-        exit;
-
-    case 'pricing':
-        // Upload image to pricing assets and create a new pricing item entry
-        $destDir = defined('PRICING_ASSETS_DIR') ? PRICING_ASSETS_DIR : (defined('ASSETS_DIR') ? ASSETS_DIR . '/pricing' : __DIR__ . '/assets/pricing');
-        $result = handleImageUpload($file, $destDir, 1200);
-        if (!$result) {
-            echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']);
-            exit;
-        }
-        $paths = $result;
-        $pricingFile = defined('PRICING_FILE') ? PRICING_FILE : (defined('DATA_DIR') ? DATA_DIR . '/pricing/pricing.json' : __DIR__ . '/data/pricing/pricing.json');
-        $data = loadJsonFile($pricingFile);
-        if (!isset($data['items']) || !is_array($data['items'])) $data['items'] = [];
-        $id = uniqid('price_', true);
-        $data['items'][] = [
-            'id' => $id,
-            'title' => '',
-            'price' => '',
-            'description' => '',
-            'image' => $paths['path'],
-            'image_webp' => $paths['webp']
-        ];
-        // Ensure directory exists
-        if (!is_dir(dirname($pricingFile))) { @mkdir(dirname($pricingFile), 0755, true); }
-        saveJsonFile($pricingFile, $data);
-        echo json_encode(['status' => 'success', 'id' => $id, 'path' => $paths['path'], 'webp' => $paths['webp']]);
-        exit;
+    
 
     case 'hero':
     case 'bio':
@@ -149,6 +57,55 @@ switch ($target) {
         $contentData[$section]['image'] = $paths['path'];
         $contentData[$section]['webp'] = $paths['webp'];
         saveJsonFile($contentFile, $contentData);
+        echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
+        exit;
+
+    case 'team':
+        // Upload team member photo and update team.json
+        $memberId = $_POST['member_id'] ?? '';
+        $teamFile = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');
+        if ($memberId === '' || !file_exists($teamFile)) {
+            echo json_encode(['status' => 'error', 'message' => 'Teamlid niet gevonden']);
+            exit;
+        }
+        $destDir = (defined('ASSETS_DIR') ? ASSETS_DIR : (__DIR__ . '/assets')) . '/team';
+        $result = handleImageUpload($file, $destDir, 1200);
+        if (!$result) { echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']); exit; }
+        $paths = $result;
+        $data = loadJsonFile($teamFile);
+        if (!isset($data['members']) || !is_array($data['members'])) $data['members'] = [];
+        foreach ($data['members'] as &$m) {
+            if (($m['id'] ?? '') === $memberId) {
+                // delete old files if inside project
+                foreach (['image','webp'] as $k) {
+                    if (!empty($m[$k])) {
+                        $p = $m[$k];
+                        $abs = (strpos($p, ':') !== false || str_starts_with($p, '/')) ? $p : (BASE_DIR . '/' . $p);
+                        if (file_exists($abs)) { @unlink($abs); }
+                    }
+                }
+                $m['image'] = $paths['path'];
+                $m['webp'] = $paths['webp'];
+                break;
+            }
+        }
+        unset($m);
+        saveJsonFile($teamFile, $data);
+        echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
+        exit;
+
+    case 'links_hero':
+        // Upload hero image for Useful Links page
+        $linksFile = defined('LINKS_FILE') ? LINKS_FILE : (defined('DATA_DIR') ? DATA_DIR . '/links/links.json' : __DIR__ . '/data/links/links.json');
+        $destDir = (defined('ASSETS_DIR') ? ASSETS_DIR : (__DIR__ . '/assets')) . '/images';
+        $result = handleImageUpload($file, $destDir, 1920);
+        if (!$result) { echo json_encode(['status' => 'error', 'message' => 'Upload mislukt']); exit; }
+        $paths = $result;
+        $data = loadJsonFile($linksFile);
+        if (!isset($data['hero'])) $data['hero'] = [];
+        $data['hero']['image'] = $paths['path'];
+        $data['hero']['webp'] = $paths['webp'];
+        saveJsonFile($linksFile, $data);
         echo json_encode(['status' => 'success', 'path' => $paths['path'], 'webp' => $paths['webp']]);
         exit;
 

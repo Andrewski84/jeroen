@@ -1,17 +1,56 @@
 <?php
 /**
- * Global site footer
- *
- * Expects $instagramUrl variable (optional).
+ * Global site footer for Groepspraktijk Elewijt
  */
+// Load settings from content file
+$cfg = [];
+if (defined('CONTENT_FILE') && file_exists(CONTENT_FILE)) {
+    $cfg = json_decode(file_get_contents(CONTENT_FILE), true) ?: [];
+}
+$settings = $cfg['settings'] ?? [];
+$appointmentUrl = $settings['appointment_url'] ?? '';
+$address1 = $settings['address_line_1'] ?? '';
+$address2 = $settings['address_line_2'] ?? '';
+$phone = $settings['phone'] ?? '';
+$usefulPhones = isset($settings['footer_phones']) && is_array($settings['footer_phones']) ? $settings['footer_phones'] : [];
+$mapEmbed = $settings['map_embed'] ?? '';
 ?>
-<footer class="py-10" style="background-color: var(--surface);">
-    <div class="container mx-auto px-6 text-center text-sm">
-        <?php if (!empty($instagramUrl)): ?>
-        <a href="<?php echo htmlspecialchars($instagramUrl); ?>" target="_blank" class="text-2xl mb-4 inline-block">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-7 h-7"><path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 1.5A4.26 4.26 0 0 0 3.5 7.75v8.5A4.26 4.26 0 0 0 7.75 20.5h8.5a4.26 4.26 0 0 0 4.25-4.25v-8.5A4.26 4.26 0 0 0 16.25 3.5h-8.5z" /><path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM17.5 6.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0z" /></svg>
-        </a>
+<footer class="py-12" style="background-color: var(--surface);">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col lg:flex-row gap-10">
+      <div class="flex-1">
+        <?php if (!empty($appointmentUrl)): ?>
+          <a href="<?php echo htmlspecialchars($appointmentUrl); ?>" target="_blank" class="btn btn-primary mb-6">Maak een afspraak</a>
         <?php endif; ?>
-        <p>&copy; <?php echo date('Y'); ?> Andrew Smeets Fotografie. All rights reserved.</p>
+        <h3 class="text-xl font-semibold mb-2" style="font-family: var(--font-heading);">Groepspraktijk Elewijt</h3>
+        <?php if ($address1): ?><p class="text-slate-700"><?php echo htmlspecialchars($address1); ?></p><?php endif; ?>
+        <?php if ($address2): ?><p class="text-slate-700"><?php echo htmlspecialchars($address2); ?></p><?php endif; ?>
+        <?php if ($phone): ?><p class="mt-2">Tel: <a class="text-blue-600" href="tel:<?php echo htmlspecialchars($phone); ?>"><?php echo htmlspecialchars($phone); ?></a></p><?php endif; ?>
+
+        <?php if (!empty($usefulPhones)): ?>
+        <div class="mt-6">
+          <h4 class="font-semibold mb-2">Nuttige telefoonnummers</h4>
+          <ul class="space-y-1 text-slate-700">
+            <?php foreach ($usefulPhones as $ph): ?>
+              <li>
+                <?php echo htmlspecialchars($ph['label'] ?? ''); ?>:
+                <?php if (!empty($ph['tel'])): ?>
+                  <a href="tel:<?php echo htmlspecialchars($ph['tel']); ?>" class="text-blue-600"><?php echo htmlspecialchars($ph['tel']); ?></a>
+                <?php endif; ?>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+        <?php endif; ?>
+      </div>
+      <div class="flex-1">
+        <?php if (!empty($mapEmbed)): ?>
+          <div class="rounded-xl overflow-hidden shadow bg-white map-embed h-80">
+            <?php echo $mapEmbed; ?>
+          </div>
+        <?php endif; ?>
+      </div>
     </div>
+    <p class="text-center text-sm text-slate-500 mt-8">&copy; <?php echo date('Y'); ?> Groepspraktijk Elewijt</p>
+  </div>
 </footer>

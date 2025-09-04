@@ -8,22 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('upload-progress-container')?.classList.add('hidden');
 
     // --- Expliciete click handlers voor Hero/Bio image pickers ---
-    document.getElementById('hero_image_container').addEventListener('click', () => {
-        document.getElementById('hero_image_input').click();
+    document.getElementById('hero_image_container')?.addEventListener('click', () => {
+        document.getElementById('hero_image_input')?.click();
     });
-    document.getElementById('bio_image_container').addEventListener('click', () => {
-        document.getElementById('bio_image_input').click();
-    });
-
-    document.getElementById('hero_image_input').addEventListener('change', e => {
+    document.getElementById('hero_image_input')?.addEventListener('change', e => {
         if (e.target.files.length > 0) {
             queueFileUpload(e.target.files[0], { target: 'hero' });
-            e.target.value = '';
-        }
-    });
-    document.getElementById('bio_image_input').addEventListener('change', e => {
-         if (e.target.files.length > 0) {
-            queueFileUpload(e.target.files[0], { target: 'bio' });
             e.target.value = '';
         }
     });
@@ -110,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setupDetailView('#portfolio-sortable-list tr', '.theme-card', 'data-theme');
     setupDetailView('.admin-table tbody tr', '.gallery-card', 'data-slug');
+    setupDetailView('#practice-table tbody tr', '.practice-card-editor', 'data-slug');
 
     // --- Upload Queue System ---
     const uploadQueue = [];
@@ -258,6 +249,7 @@ function startUpload(task) {
         formData.append('target', task.meta.target);
         if (task.meta.slug) formData.append('slug', task.meta.slug);
         if (task.meta.theme) formData.append('theme', task.meta.theme);
+        if (task.meta.member_id) formData.append('member_id', task.meta.member_id);
 
         fetch('upload_ajax.php', { method: 'POST', body: formData })
             .then(res => res.json())
@@ -277,6 +269,13 @@ function startUpload(task) {
                     } else if (task.meta.target === 'bio') {
                         const img = document.querySelector('#bio_image_container img');
                         if (img) img.src = res.path;
+                    } else if (task.meta.target === 'team') {
+                        // Refresh the image within the nearest card
+                        const dz = document.querySelector(`.dropzone[data-target="team"][data-member-id="${task.meta.member_id}"]`);
+                        if (dz) { const img = dz.parentElement.querySelector('img'); if (img) img.src = res.path; }
+                    } else if (task.meta.target === 'links_hero') {
+                        const dz = document.querySelector('.dropzone[data-target="links_hero"]');
+                        if (dz) { const img = dz.parentElement.querySelector('img'); if (img) img.src = res.path; }
                     }
                 } else {
                     task.status = 'error';
@@ -334,24 +333,170 @@ function startUpload(task) {
         ['dragenter', 'dragover'].forEach(eName => dz.addEventListener(eName, () => dz.classList.add('is-dragover')));
         ['dragleave', 'drop'].forEach(eName => dz.addEventListener(eName, () => dz.classList.remove('is-dragover')));
         dz.addEventListener('drop', e => {
-            if (e.dataTransfer.files) Array.from(e.dataTransfer.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, slug: dz.dataset.slug, theme: dz.dataset.theme }));
+            if (e.dataTransfer.files) Array.from(e.dataTransfer.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, slug: dz.dataset.slug, theme: dz.dataset.theme, member_id: dz.dataset.memberId }));
         });
         
         // Make portfolio/gallery/pricing dropzones clickable
-        if (dz.dataset.target === 'portfolio' || dz.dataset.target === 'gallery' || dz.dataset.target === 'pricing') {
+        if (dz.dataset.target === 'portfolio' || dz.dataset.target === 'gallery' || dz.dataset.target === 'pricing' || dz.dataset.target === 'team' || dz.dataset.target === 'links_hero') {
             dz.addEventListener('click', () => {
                 const input = document.createElement('input');
                 input.type = 'file';
-                input.multiple = dz.dataset.target !== 'pricing' ? true : true; // allow multiple uploads
+                input.multiple = dz.dataset.target !== 'pricing'; // allow multiple uploads except pricing
                 input.accept = 'image/*';
                 input.onchange = e => {
-                     if (e.target.files) Array.from(e.target.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, slug: dz.dataset.slug, theme: dz.dataset.theme }));
+                     if (e.target.files) Array.from(e.target.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, slug: dz.dataset.slug, theme: dz.dataset.theme, member_id: dz.dataset.memberId }));
                 };
                 input.click();
             });
         }
     });
 
+    // --- AJAXify forms (subtle save, no full reload) ---
+    function ajaxifyForms() {
+        const allowedActions = new Set(['add_team_member','update_team_member','delete_team_member','save_practice_page','delete_practice_page','save_links','save_pinned','save_settings']);
+        const forms = document.querySelectorAll('.admin-content form');
+        forms.forEach(form => {
+            if (form.dataset.ajaxBound === '1') return;
+            // Skip file-uploading forms
+            if (form.querySelector('input[type="file"]')) return;
+            form.addEventListener('submit', (e) => {
+                // Allow normal behavior if explicitly opted-out
+                if (form.classList.contains('no-ajax')) return;
+                const actInput = form.querySelector('input[name="action"]');
+                const actionName = actInput ? String(actInput.value || '') : '';
+                if (!allowedActions.has(actionName)) return;
+                e.preventDefault();
+                const fd = new FormData(form);
+                fd.append('ajax', '1');
+                fetch(form.action || 'save.php', { method: form.method || 'POST', body: fd })
+                  .then(r => r.text()).then(txt => { let d=null; try{ d=JSON.parse(txt);}catch(e){} if(!d||d.status!=='success'){ showToast('Opslaan mislukt', false); return; }
+                    showToast('Opgeslagen', true);
+                    // Post-save UX tweaks for specific actions
+                    const action = actionName;
+                    if (action === 'add_team_member' && d.member) {
+                        appendTeamMemberCard(d.member);
+                        form.reset();
+                    } else if (action === 'delete_team_member' && d.id) {
+                        const card = document.querySelector(`.dropzone[data-target="team"][data-member-id="${d.id}"]`)?.closest('.border');
+                        card?.remove();
+                    } else if (action === 'save_practice_page' && d.slug) {
+                        ensurePracticeRow(d.slug, d.title || d.slug);
+                    } else if (action === 'delete_practice_page' && d.slug) {
+                        document.querySelector(`#practice-table tr[data-slug="${d.slug}"]`)?.remove();
+                        document.querySelector(`.practice-card-editor[data-slug="${d.slug}"]`)?.remove();
+                    }
+                  }).catch(() => showToast('Netwerkfout', false));
+            });
+            form.dataset.ajaxBound = '1';
+        });
+    }
+    ajaxifyForms();
+
+    function ensurePracticeRow(slug, title) {
+        const row = document.querySelector(`#practice-table tr[data-slug="${slug}"]`);
+        if (row) return;
+        const tbody = document.querySelector('#practice-table tbody');
+        if (!tbody) return;
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-slug', slug);
+        tr.innerHTML = `<td></td><td>${title}</td><td>0</td><td><form action="save.php" method="POST" onsubmit="return confirm('Pagina verwijderen?');"><input type="hidden" name="action" value="delete_practice_page"><input type="hidden" name="slug" value="${slug}"><button type="submit" class="btn btn-danger">Verwijder</button></form>`;
+        tbody.appendChild(tr);
+    }
+
+    function appendTeamMemberCard(m) {
+        // Append a simplified card after the add form
+        const container = document.querySelector('#tab-team .card-body');
+        if (!container) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'border border-slate-200 rounded-lg p-4';
+        wrap.innerHTML = `
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                <div>
+                    <div class="relative group w-full aspect-[4/3] bg-slate-100 rounded-md overflow-hidden">
+                        <img src="" alt="" class="w-full h-full object-cover">
+                        <div class="dropzone absolute inset-0" data-target="team" data-member-id="${m.id}"><span>Sleep foto of klik</span></div>
+                    </div>
+                </div>
+                <div class="sm:col-span-2">
+                    <form action="save.php" method="POST" class="space-y-2">
+                        <input type="hidden" name="action" value="update_team_member">
+                        <input type="hidden" name="id" value="${m.id}">
+                        <label class="form-label">Naam</label>
+                        <input type="text" name="name" class="form-input" value="${m.name || ''}">
+                        <label class="form-label">Functie</label>
+                        <input type="text" name="role" class="form-input" value="${m.role || ''}">
+                        <label class="form-label">Afspraak URL</label>
+                        <input type="text" name="appointment_url" class="form-input" value="${m.appointment_url || ''}">
+                        <div class="flex gap-2">
+                            <button type="submit" class="btn btn-secondary">Opslaan</button>
+                            <button type="button" class="btn btn-danger" onclick="(function(f){ if(!confirm('Verwijder dit teamlid?')) return; const fd=new FormData(); fd.append('action','delete_team_member'); fd.append('id','${m.id}'); fd.append('ajax','1'); fetch('save.php',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{ if(d&&d.status==='success'){ f.closest('.border').remove(); showToast('Verwijderd',true);} else { showToast('Verwijderen mislukt',false);} }); })(this)">Verwijder</button>
+                            <form action="save.php" method="POST" class="hidden">
+                                <input type="hidden" name="action" value="delete_team_member">
+                                <input type="hidden" name="id" value="${m.id}">
+                            </form>
+                        </div>
+                    </form>
+                </div>
+            </div>`;
+        container.appendChild(wrap);
+        ajaxifyForms();
+        // Bind minimal dropzone behavior to the new team dropzone
+        const dz = wrap.querySelector('.dropzone[data-target="team"][data-member-id]');
+        if (dz) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eName => dz.addEventListener(eName, e => { e.preventDefault(); e.stopPropagation(); }));
+            ['dragenter', 'dragover'].forEach(eName => dz.addEventListener(eName, () => dz.classList.add('is-dragover')));
+            ['dragleave', 'drop'].forEach(eName => dz.addEventListener(eName, () => dz.classList.remove('is-dragover')));
+            dz.addEventListener('drop', e => {
+                if (e.dataTransfer.files) Array.from(e.dataTransfer.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, member_id: dz.dataset.memberId }));
+            });
+            dz.addEventListener('click', () => {
+                const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+                input.onchange = e => { if (e.target.files) Array.from(e.target.files).forEach(file => queueFileUpload(file, { target: dz.dataset.target, member_id: dz.dataset.memberId })); };
+                input.click();
+            });
+        }
+    }
+
+    // --- Reordering (SortableJS) ---
+    try {
+        const practiceTable = document.querySelector('#practice-table tbody');
+        if (practiceTable && typeof Sortable !== 'undefined') {
+            new Sortable(practiceTable, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: () => {
+                    const order = Array.from(practiceTable.querySelectorAll('tr[data-slug]')).map(tr => tr.dataset.slug);
+                    const fd = new FormData(); fd.append('action','reorder_practice_pages'); order.forEach(s => fd.append('order[]', s));
+                    fetch('save.php', { method: 'POST', body: fd });
+                }
+            });
+        }
+        const pinnedList = document.getElementById('pinned-list');
+        if (pinnedList && typeof Sortable !== 'undefined') {
+            new Sortable(pinnedList, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: () => {
+                    const order = Array.from(pinnedList.children).map(b => b.querySelector('input[name="pinned_id[]"]').value);
+                    const fd = new FormData(); fd.append('action','reorder_pinned'); order.forEach(id => fd.append('order[]', id));
+                    fetch('save.php', { method: 'POST', body: fd });
+                }
+            });
+        }
+        const linksList = document.getElementById('links-list');
+        if (linksList && typeof Sortable !== 'undefined') {
+            // Ensure children have a data-id (provided by server)
+            new Sortable(linksList, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: () => {
+                    const order = Array.from(linksList.children).map(ch => ch.dataset.id).filter(Boolean);
+                    const fd = new FormData(); fd.append('action','reorder_links'); order.forEach(i => fd.append('order[]', i));
+                    fetch('save.php', { method: 'POST', body: fd });
+                }
+            });
+        }
+    } catch (e) {}
     // --- Global Pop-up System ---
     const toastPopup = document.getElementById('toast-popup');
     const confirmModal = document.getElementById('confirm-modal');

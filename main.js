@@ -93,9 +93,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (mobileMenuButton && mobileMenu) {
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
-            // Close any submenus when toggling main menu
-            document.getElementById('mobile-portfolio-menu')?.classList.add('hidden');
-            document.getElementById('mobile-client-menu')?.classList.add('hidden');
+        // Close any submenus when toggling main menu
+        document.getElementById('mobile-portfolio-menu')?.classList.add('hidden');
+        document.getElementById('mobile-client-menu')?.classList.add('hidden');
+        document.getElementById('mobile-team-menu')?.classList.add('hidden');
+        document.getElementById('mobile-practice-menu')?.classList.add('hidden');
         });
         // Close the menu after clicking a link
         document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => mobileMenu.classList.add('hidden')));
@@ -110,6 +112,30 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             mobilePortfolioMenu.classList.toggle('hidden');
             mobilePortfolioToggle.setAttribute('aria-expanded', mobilePortfolioMenu.classList.contains('hidden') ? 'false' : 'true');
+        });
+    }
+
+    // Mobile: toggle team dropdown
+    const mobileTeamToggle = document.getElementById('mobile-team-toggle');
+    const mobileTeamMenu = document.getElementById('mobile-team-menu');
+    if (mobileTeamToggle && mobileTeamMenu) {
+        mobileTeamToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            mobileTeamMenu.classList.toggle('hidden');
+            mobileTeamToggle.setAttribute('aria-expanded', mobileTeamMenu.classList.contains('hidden') ? 'false' : 'true');
+        });
+    }
+
+    // Mobile: toggle practice dropdown
+    const mobilePracticeToggle = document.getElementById('mobile-practice-toggle');
+    const mobilePracticeMenu = document.getElementById('mobile-practice-menu');
+    if (mobilePracticeToggle && mobilePracticeMenu) {
+        mobilePracticeToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            mobilePracticeMenu.classList.toggle('hidden');
+            mobilePracticeToggle.setAttribute('aria-expanded', mobilePracticeMenu.classList.contains('hidden') ? 'false' : 'true');
         });
     }
 

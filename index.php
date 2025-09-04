@@ -23,7 +23,6 @@ require_once 'helpers.php';
     <meta name="description" content="<?php echo htmlspecialchars($metaDescription); ?>">
     <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body id="index-page" class="antialiased">
@@ -34,25 +33,10 @@ require_once 'helpers.php';
             return [];
         }
         $content = $siteContent;
-        $portfolioData = loadContent(PORTFOLIO_FILE);
-        $themes = array_keys($portfolioData['themes'] ?? []);
-
-        $featuredImages = [];
-        if (!empty($portfolioData['themes'])) {
-            foreach ($portfolioData['themes'] as $themeName => $theme) {
-                foreach ($theme['images'] as $image) {
-                    if (!empty($image['featured'])) {
-                        foreach (['path','webp'] as $k) {
-                            if (!empty($image[$k])) {
-                                $image[$k] = toPublicPath($image[$k]);
-                            }
-                        }
-                        $image['theme'] = $themeName;
-                        $featuredImages[] = $image;
-                    }
-                }
-            }
-        }
+        // Load team data for homepage grid
+        $teamFile = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');
+        $teamData = file_exists($teamFile) ? (json_decode(file_get_contents($teamFile), true) ?: []) : [];
+        $teamMembers = $teamData['members'] ?? [];
 
         $page = 'index';
         include TEMPLATES_DIR . '/header.php';
@@ -60,158 +44,94 @@ require_once 'helpers.php';
 
     <section id="home" class="h-screen min-h-[600px] bg-cover bg-center bg-fixed flex items-center justify-center stagger-container" style="background-image: url('<?php echo htmlspecialchars($content['hero']['image'] ?? ''); ?>');">
         <div class="w-full h-full flex items-center justify-center px-4">
-            <h1 class="font-serif reveal max-w-4xl"><?php echo htmlspecialchars($content['hero']['title'] ?? ''); ?></h1>
+            <div class="text-center max-w-4xl reveal">
+              <h1 class="text-4xl md:text-5xl" style="font-family: var(--font-heading);">
+                <?php echo htmlspecialchars($content['hero']['title'] ?? ''); ?>
+              </h1>
+              <?php if (!empty($content['hero']['body'])): ?>
+              <div class="mt-4 leading-relaxed hero-body mx-auto">
+                <?php echo $content['hero']['body']; ?>
+              </div>
+              <?php endif; ?>
+            </div>
         </div>
     </section>
 
-    <section id="bio">
+    <section id="welkom" style="background-color: var(--surface);">
         <div class="container mx-auto px-6 stagger-container">
-            <div class="flex flex-col md:flex-row-reverse items-center gap-12 md:gap-20">
-                <div class="md:w-4/12 reveal">
-                    <img src="<?php echo htmlspecialchars($content['bio']['image'] ?? ''); ?>" alt="Foto van Andrew" class="w-full">
-                </div>
-                <div class="md:w-8/12 text-center md:text-left reveal">
-                    <h2 class="text-4xl md:text-5xl mb-4"><?php echo htmlspecialchars($content['bio']['title'] ?? ''); ?></h2>
-                    <p class="text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($content['bio']['text'] ?? '')); ?></p>
-                    <?php $portfolioVisible = !isset($siteContent['pages']['portfolio']['visible']) || $siteContent['pages']['portfolio']['visible']; ?>
-                    <?php if ($portfolioVisible): ?>
-                    <a href="portfolio.php" class="btn btn-primary mt-6">Ontdek mijn werk</a>
+            <div class="grid gap-8 lg:grid-cols-3 items-start">
+                <div class="lg:col-span-2">
+                    <div class="text-center md:text-left reveal">
+                        <h2 class="text-4xl md:text-5xl mb-6"><?php echo htmlspecialchars($content['welcome']['title'] ?? 'Welkom'); ?></h2>
+                        <?php if (!empty($content['welcome']['text'])): ?>
+                        <div class="prose max-w-none mb-8"><?php echo $content['welcome']['text']; ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <?php $wcards = isset($content['welcome']['cards']) && is_array($content['welcome']['cards']) ? $content['welcome']['cards'] : []; ?>
+                    <?php if (!empty($wcards)): ?>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <?php foreach ($wcards as $card): ?>
+                        <div class="rounded-xl p-6 welcome-card reveal">
+                            <div class="prose max-w-none"><?php echo $card['html'] ?? ''; ?></div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                     <?php endif; ?>
                 </div>
+                <?php
+                $pinned = ($siteContent['pinned'] ?? []);
+                $pinnedList = [];
+                foreach ($pinned as $pin) {
+                  $scope = $pin['scope'] ?? [];
+                  if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
+                  if (in_array('all',$scope) || in_array('home',$scope)) $pinnedList[] = $pin;
+                }
+                ?>
+                <aside class="space-y-4 reveal">
+                    <?php foreach ($pinnedList as $pin): ?>
+                    <div class="rounded-xl p-5 pinned-card">
+                        <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
+                        <div class="prose max-w-none"><?php echo $pin['text'] ?? ''; ?></div>
+                    </div>
+                    <?php endforeach; ?>
+                </aside>
             </div>
         </div>
     </section>
 
-    <section id="featured-work" style="background-color: var(--surface);">
-        <div class="container mx-auto px-6 text-center stagger-container">
-            <h2 class="text-4xl md:text-5xl mb-12 reveal">Uitgelicht Werk</h2>
-            <?php if (!empty($featuredImages)): ?>
-            <div class="homepage-swiper swiper-container reveal">
-                <div class="swiper-wrapper">
-                    <?php foreach ($featuredImages as $i => $image): ?>
-                    <div class="swiper-slide" style="background-image: url('<?php echo htmlspecialchars($image['path']); ?>')">
-                        <a href="portfolio.php?theme=<?php echo urlencode($image['theme']); ?>&highlight=<?php echo urlencode($image['path']); ?>" class="absolute inset-0 slide-link" data-idx="<?php echo (int)$i; ?>">
-                            <div class="slide-content">
-                                <h3 class="slide-title"><?php echo htmlspecialchars($image['title'] ?? 'Bekijk project'); ?></h3>
-                                <p class="text-sm"><?php echo htmlspecialchars($image['description'] ?? ''); ?></p>
-                            </div>
-                        </a>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
+    <section id="team-home" style="background-color: var(--background);">
+        <div class="container mx-auto px-6 stagger-container">
+            <div class="text-center reveal">
+                <h2 class="text-4xl md:text-5xl mb-12">Ons Team</h2>
             </div>
-            <div class="homepage-swiper-pagination"></div>
-            
+            <?php if (!empty($teamMembers)): ?>
+            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                <?php foreach ($teamMembers as $m): ?>
+                <article class="rounded-xl overflow-hidden shadow-md bg-white reveal">
+                    <?php if (!empty($m['image'])): ?>
+                    <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? ''); ?>" class="w-full h-56 object-cover">
+                    <?php endif; ?>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h3>
+                        <p class="text-slate-600 mb-4"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
+                        <?php $url = $m['appointment_url'] ?? ($siteContent['settings']['appointment_url'] ?? ''); if ($url): ?>
+                        <a href="<?php echo htmlspecialchars($url); ?>" target="_blank" class="btn btn-primary">Maak een afspraak</a>
+                        <?php endif; ?>
+                    </div>
+                </article>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+                <p class="text-center text-slate-600 reveal">Team wordt binnenkort toegevoegd.</p>
             <?php endif; ?>
         </div>
     </section>
 
-    <!-- Index lightbox -->
-    <div id="index-lightbox" class="fixed inset-0 z-[200] hidden items-center justify-center">
-        <div class="absolute inset-0 bg-black/70"></div>
-        <button id="index-lightbox-close" class="absolute top-4 right-6 text-white text-4xl">&times;</button>
-        <button id="index-lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-4xl">&lt;</button>
-        <button id="index-lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl">&gt;</button>
-        <div class="relative max-w-5xl w-11/12 flex flex-col items-center index-lightbox-inner">
-            <img id="index-lightbox-img" src="" alt="" class="w-auto h-auto max-h-[70vh] object-contain rounded-md shadow-2xl">
-            <div id="index-lightbox-caption" class="mt-4 text-center text-white/90">
-                <h3 id="index-lightbox-title" class="text-xl font-serif"></h3>
-                <p id="index-lightbox-description" class="text-sm opacity-80"></p>
-            </div>
-        </div>
-    </div>
-
-    <?php
-        if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
-        $_SESSION['form_start'] = time();
-    ?>
-    <section id="contact" class="stagger-container">
-        <div class="container mx-auto px-6">
-            <div class="max-w-3xl mx-auto text-center reveal">
-                <h2 class="text-4xl md:text-5xl mb-4">Laten we samenwerken</h2>
-                <p class="text-lg mb-10">Heb je een vraag of wil je een shoot boeken? Stuur me een bericht.</p>
-            </div>
-            <form id="contact_form" action="save.php" method="POST" class="max-w-xl mx-auto space-y-6 reveal">
-                <input type="hidden" name="action" value="contact_form">
-                <div><input id="contact_name" name="name" type="text" placeholder="Jouw Naam*" required></div>
-                <div><input id="contact_email" name="email" type="email" placeholder="Jouw e-mail*" required></div>
-                <div><textarea id="contact_message" name="message" placeholder="Jouw Bericht*" rows="6" required></textarea></div>
-                <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;"><label for="address2">Adresregel 2</label><input id="address2" name="address2" type="text" value="" autocomplete="off" tabindex="-1"></div>
-                <div class="text-center"><button type="submit" class="btn btn-primary">Verstuur Bericht</button></div>
-            </form>
-        </div>
-    </section>
 
     <?php include TEMPLATES_DIR . '/footer.php'; ?>
 </div>
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="main.js"></script>
 <script>
-window.indexFeatured = <?php echo json_encode($featuredImages); ?>;
-document.addEventListener('DOMContentLoaded', function () {
-    // Show toaster for contact form result
-    <?php if(isset($_GET['sent'])): ?>
-    (function(){
-        var ok = <?php echo ($_GET['sent']=='1' ? 'true' : 'false'); ?>;
-        var msg = ok ? 'Bedankt! Je bericht is verzonden.' : 'Er ging iets mis bij het verzenden. Probeer later opnieuw.';
-        var toast = document.getElementById('toast-popup');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast-popup';
-            toast.className = 'fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg opacity-0 transform translate-y-4 z-[1000]';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = msg;
-        toast.style.backgroundColor = ok ? '#22c55e' : '#ef4444';
-        toast.classList.remove('opacity-0','translate-y-4');
-        setTimeout(function(){ toast.classList.add('opacity-0','translate-y-4'); }, 2500);
-    })();
-    <?php endif; ?>
 
-    // Preserve scroll position around contact form submission
-    (function(){
-        var form = document.getElementById('contact_form');
-        if (form) {
-            form.addEventListener('submit', function(){
-                try { sessionStorage.setItem('contactScrollY', String(window.scrollY || window.pageYOffset || 0)); } catch(e) {}
-            });
-        }
-        try {
-            var url = new URL(window.location.href);
-            if (url.searchParams.has('sent')) {
-                var y = sessionStorage.getItem('contactScrollY');
-                if (y !== null) {
-                    window.scrollTo(0, parseInt(y, 10) || 0);
-                    sessionStorage.removeItem('contactScrollY');
-                }
-            }
-        } catch (e) {}
-    })();
-
-    // Index lightbox handlers
-    (function(){
-        const lf = window.indexFeatured || [];
-        const wrap = document.getElementById('index-lightbox');
-        if (!wrap || !lf.length) return;
-        let idx = 0;
-        const img = document.getElementById('index-lightbox-img');
-        const title = document.getElementById('index-lightbox-title');
-        const desc = document.getElementById('index-lightbox-description');
-        const upd = () => {
-            img.src = lf[idx].path || '';
-            img.alt = lf[idx].alt || '';
-            title.textContent = lf[idx].title || '';
-            desc.textContent = lf[idx].description || '';
-        };
-        window.openIndexLightbox = function(i){ idx = Math.max(0, Math.min(i, lf.length-1)); upd(); wrap.classList.remove('hidden'); wrap.classList.add('flex'); };
-        const close = () => { wrap.classList.add('hidden'); wrap.classList.remove('flex'); };
-        document.getElementById('index-lightbox-close')?.addEventListener('click', close);
-        document.getElementById('index-lightbox-next')?.addEventListener('click', () => { idx = (idx+1)%lf.length; upd(); });
-        document.getElementById('index-lightbox-prev')?.addEventListener('click', () => { idx = (idx-1+lf.length)%lf.length; upd(); });
-        wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
-        document.addEventListener('keydown', (e) => { if (wrap.classList.contains('hidden')) return; if (e.key==='Escape') close(); if (e.key==='ArrowRight') { idx=(idx+1)%lf.length; upd(); } if (e.key==='ArrowLeft') { idx=(idx-1+lf.length)%lf.length; upd(); } });
-    })();
-});
-</script>
 </body>
 </html>

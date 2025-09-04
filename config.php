@@ -1,9 +1,5 @@
 <?php
-/**
- * Configuration for Andrew website
- *
- * This file centralizes all path and security constants.
- */
+
 
 // Password Security
 // Hashed version of admin password. Use admin panel to change.

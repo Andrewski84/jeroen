@@ -143,3 +143,18 @@ function logMailAttempt(array $entry): void {
         @file_put_contents($file, json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
     } catch (\Throwable $e) { /* ignore logging errors */ }
 }
+
+/**
+ * Normalize user-entered URLs. If it starts with 'www.' or lacks a scheme but
+ * looks like a domain, prefix with 'https://'. Preserve tel: links.
+ */
+function safeUrl(string $url): string {
+    $u = trim($url);
+    if ($u === '' ) return '';
+    if (stripos($u, 'tel:') === 0) return $u;
+    if (preg_match('~^https?://~i', $u)) return $u;
+    if (stripos($u, 'www.') === 0) return 'https://' . $u;
+    // If it has a dot and no spaces, assume domain-like
+    if (strpos($u, ' ') === false && strpos($u, '.') !== false) return 'https://' . $u;
+    return $u;
+}

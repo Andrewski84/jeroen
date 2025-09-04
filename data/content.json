@@ -6,14 +6,15 @@
         "webp": "assets\/images\/img_68b4b72538ec69.48602256.webp"
     },
     "hero": {
-        "image": "assets\/images\/img_68b5c9c05f2816.84474978.jpg",
-        "webp": "assets\/images\/img_68b5c9c05f2816.84474978.webp",
-        "title": "Andrew Smeets Fotografie"
+        "image": "assets\/images\/img_68b9bad9a33559.68557513.png",
+        "webp": "assets\/images\/img_68b9bad9a33559.68557513.webp",
+        "title": "Groepspraktijk Elewijt",
+        "body": "<h2><strong>email: gpelewijt@telenet.be<\/strong><\/h2><h2><strong>Tervuursesteenweg 752a<\/strong><br><strong>1982 Zemst<\/strong><\/h2>"
     },
     "contact": {
         "instagram_url": "https:\/\/www.instagram.com\/javan.photographs\/"
     },
-    "meta_title": "Andrew Smeets Fotografie",
+    "meta_title": "",
     "meta_description": "",
     "pages": {
         "portfolio": {
@@ -22,5 +23,53 @@
         "pricing": {
             "visible": true
         }
-    }
+    },
+    "settings": {
+        "appointment_url": "https:\/\/agenda.mya-agenda.be\/e\/tg\/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MrdnpPdGQ2aGZ3dQ%3D%3D",
+        "phone": " 015 61 03 44",
+        "address_line_1": "Tervuursesteenweg 752a",
+        "address_line_2": "1982 Zemst",
+        "map_embed": "<iframe src=\"https:\/\/www.google.com\/maps\/embed?pb=!1m18!1m12!1m3!1d4266.843437993809!2d4.493676677833053!3d50.96093177169429!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3e7196689bb1b%3A0xf468ab954ec2cf86!2sGroepspraktijk%20Elewijt!5e1!3m2!1snl!2sbe!4v1757004216114!5m2!1snl!2sbe\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"><\/iframe>",
+        "footer_phones": [
+            {
+                "label": "Hulpdiensten",
+                "tel": "112"
+            },
+            {
+                "label": "Antigifcentrum",
+                "tel": "070 245 245"
+            },
+            {
+                "label": "Antigifcentrum",
+                "tel": "070 245 245"
+            }
+        ]
+    },
+    "welcome": {
+        "title": "Welkom bij de groepspraktijk Elewijt",
+        "cards": [
+            {
+                "html": "<p>test kaar toevoegen.<\/p>"
+            }
+        ],
+        "text": "<p><strong>Welkom op de website van onze groepspraktijk<\/strong><\/p><p>Hier vindt u alle nuttige informatie over onze werking. Als huisartsenpraktijk zijn wij het eerste aanspreekpunt binnen de gezondheidszorg, zowel voor lichamelijke als emotionele klachten. Wij streven ernaar om samen met u te zoeken naar de best mogelijke aanpak en oplossing.<\/p><p>Wij doen dit in teamverband, met vijf vaste artsen, één huisarts in opleiding en een goede samenwerking met andere zorgverleners in de buurt. Op die manier kunnen we een zo volledig mogelijk aanbod voorzien binnen de eerste lijn.<\/p><p>We hechten veel belang aan kwaliteitsvolle zorg en werken volgens wetenschappelijk onderbouwde richtlijnen. Daarvoor volgen wij regelmatig bijscholingen.<\/p><p>&nbsp;<\/p><p><strong>Afspraken en bereikbaarheid<\/strong><\/p><p>Onze praktijk is vlot bereikbaar. Afspraken kunnen de hele dag door eenvoudig online geboekt worden. Als uw eigen huisarts afwezig is of niet beschikbaar, helpt een van de andere artsen u graag verder. Wanneer er online geen vrije afspraken meer zijn, kan u telefonisch contact opnemen voor een dringende afspraak.<\/p><p>Alle artsen in onze groepspraktijk zijn geconventioneerd. Er wordt dus gewerkt volgens de officiële RIZIV-tarieven.<\/p><p>&nbsp;<\/p><p><strong>Nieuwe patiënten<\/strong><\/p><p>Omwille van de toenemende drukte nemen wij momenteel enkel nog nieuwe patiënten aan die in Elewijt wonen.<\/p><p>&nbsp;<\/p><p><strong>Gebruik van een mondmasker<\/strong><\/p><p>Bij verkoudheidsklachten of andere virale symptomen vragen wij vriendelijk om een mondmasker te dragen. Zo helpt u mee om de andere patiënten in de wachtzaal te beschermen.<\/p>"
+    },
+    "pinned": [
+        {
+            "id": "pin_1vox0l6m54s",
+            "title": "Aandachtspunten",
+            "text": "<p>Openingsuren van het secretariaat zijn van 08.00u tot 17.45u (kunnen gewijzigd zijn bij afwezigheden)<\/p><p>Graag 15 minuten voor je afspraak aanwezig zijn met identiteitskaart of kids-ID.<\/p><p>Bent u verhuisd of heeft u een nieuwe ID, laat uw kaart opnieuw inlezen bij het onthaal.<\/p><p>Gelieve bij verkoudheidsklachten en griepklachten een mondmasker te dragen om zo uw medepatiënten te helpen beschermen.<\/p><p>Er worden geen voorschriften telefonisch verstrekt. Maak daarom tijdig een afspraak bij een arts als u nieuwe voorschriften nodig hebt.<\/p>",
+            "scope": [
+                "team"
+            ]
+        },
+        {
+            "id": "pin_n4s2j632hws",
+            "title": "Verlofregeling",
+            "text": "<p>verlof dokter Thys: 29 augustus t\/m 2 september 2025<\/p><p>verlof dokter Schaltin: 11 t\/m 26 september 2025<\/p><p>verlof dokter Jacobs: 17 september t\/m 3 oktober 2025<\/p><p>&nbsp;<\/p>",
+            "scope": [
+                "all"
+            ]
+        }
+    ]
 }

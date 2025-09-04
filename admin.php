@@ -1,4 +1,10 @@
 <?php
+// Block direct access to /admin.php; use the dedicated entry file instead
+if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'admin.php') {
+    http_response_code(404);
+    echo 'Not Found';
+    exit;
+}
 /**
  * Admin panel
  *
@@ -37,6 +43,23 @@ if (!empty($portfolioData['themes'])) {
     unset($td);
 }
 $themes = $portfolioData['themes'] ?? [];
+
+// Load new data sources for Groepspraktijk Elewijt
+$teamFilePath = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');
+$practiceFilePath = defined('PRACTICE_FILE') ? PRACTICE_FILE : (defined('DATA_DIR') ? DATA_DIR . '/practice/practice.json' : __DIR__ . '/data/practice/practice.json');
+$linksFilePath = defined('LINKS_FILE') ? LINKS_FILE : (defined('DATA_DIR') ? DATA_DIR . '/links/links.json' : __DIR__ . '/data/links/links.json');
+$teamData = file_exists($teamFilePath) ? (json_decode(file_get_contents($teamFilePath), true) ?: []) : [];
+$practiceData = file_exists($practiceFilePath) ? (json_decode(file_get_contents($practiceFilePath), true) ?: []) : [];
+$linksData = file_exists($linksFilePath) ? (json_decode(file_get_contents($linksFilePath), true) ?: []) : [];
+// Normalize team member IDs (ensure every member has a stable id)
+if (!empty($teamData['members']) && is_array($teamData['members'])) {
+    $changed = false;
+    foreach ($teamData['members'] as &$m) {
+        if (empty($m['id'])) { $m['id'] = uniqid('tm_', true); $changed = true; }
+    }
+    unset($m);
+    if ($changed) { @file_put_contents($teamFilePath, json_encode($teamData, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE), LOCK_EX); }
+}
 $pass_status = $_GET['password_change'] ?? '';
 $mailbox_status = $_GET['mailbox_update'] ?? '';
 ?>
@@ -52,6 +75,8 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <?php $adminCssVersion = @filemtime('admin.css'); ?>
     <link rel="stylesheet" href="admin.css?v=<?php echo $adminCssVersion; ?>">
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 </head>
 <body class="bg-slate-100">
 
@@ -71,66 +96,67 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
 
         <nav class="admin-tabs">
             <button class="admin-tab-button active" data-tab="tab-homepage"><span>Homepage</span></button>
-            <button class="admin-tab-button" data-tab="tab-portfolio"><span>Portfolio</span></button>
-            <button class="admin-tab-button" data-tab="tab-pricing"><span>Tarieven</span></button>
-            <button class="admin-tab-button" data-tab="tab-galleries"><span>Klantengalerijen</span></button>
-            <button class="admin-tab-button" data-tab="tab-mailbox"><span>Mailbox instellingen</span></button>
+            <button class="admin-tab-button" data-tab="tab-team"><span>Team</span></button>
+            <button class="admin-tab-button" data-tab="tab-practice"><span>Praktijkinfo</span></button>
+            <button class="admin-tab-button" data-tab="tab-links"><span>Nuttige Links</span></button>
+            <button class="admin-tab-button" data-tab="tab-pinned"><span>Gepinde berichten</span></button>
+            <button class="admin-tab-button" data-tab="tab-settings"><span>Algemene Instellingen</span></button>
             <button class="admin-tab-button" data-tab="tab-security"><span>Beveiliging</span></button>
-
         </nav>
 
         <main class="admin-content">
             <div id="tab-homepage" class="admin-tab-panel active">
                 <div class="card">
-                    <div class="card-header"><h2 class="card-title">Homepage Content</h2></div>
+                    <div class="card-header"><h2 class="card-title">Homepage</h2></div>
                     <form action="save.php" method="POST" enctype="multipart/form-data">
                         <div class="card-body space-y-6">
                             <input type="hidden" name="action" value="update_content">
-                            
                             <div>
                                 <label class="form-label" for="hero_title">Hero Titel (tekst op homepagina foto)</label>
                                 <input class="form-input" type="text" name="hero_title" id="hero_title" value="<?php echo htmlspecialchars($content['hero']['title'] ?? ''); ?>">
                             </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="form-label" for="hero_image_input">Hero Foto</label>
-                                    <div id="hero_image_container" class="relative group w-full aspect-video bg-slate-200 rounded-md cursor-pointer">
-                                        <img src="<?php echo htmlspecialchars($content['hero']['image'] ?? 'https://placehold.co/300x160'); ?>" class="w-full h-full object-cover rounded-md" alt="Huidige hero foto">
-                                        <div class="dropzone absolute inset-0" data-target="hero"><span>Sleep een nieuwe foto hier of klik</span></div>
-                                    </div>
-                                    <input class="hidden" type="file" name="hero_image" id="hero_image_input" accept="image/*">
+                            <div>
+                                <label class="form-label" for="hero_image_input">Hero Foto</label>
+                                <div id="hero_image_container" class="relative group w-full aspect-[16/6] bg-slate-200 rounded-md cursor-pointer overflow-hidden">
+                                    <img src="<?php echo htmlspecialchars($content['hero']['image'] ?? 'https://placehold.co/1200x400'); ?>" class="w-full h-full object-cover" alt="Huidige hero foto">
+                                    <div class="dropzone absolute inset-0" data-target="hero"><span>Sleep een nieuwe foto hier of klik</span></div>
                                 </div>
+                                <input class="hidden" type="file" name="hero_image" id="hero_image_input" accept="image/*">
+                            </div>
+                            <div>
+                                <label class="form-label" for="hero_body">Hero Tekst (onder titel)</label>
+                                <textarea class="form-textarea richtext" name="hero_body" id="hero_body" rows="4"><?php echo htmlspecialchars($content['hero']['body'] ?? ''); ?></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="form-label" for="bio_image_input">Over Mij Foto</label>
-                                    <div id="bio_image_container" class="relative group w-full aspect-video bg-slate-200 rounded-md cursor-pointer">
-                                        <img src="<?php echo htmlspecialchars($content['bio']['image'] ?? 'https://placehold.co/300x160'); ?>" class="w-full h-full object-cover rounded-md" alt="Huidige bio foto">
-                                        <div class="dropzone absolute inset-0" data-target="bio"><span>Sleep een nieuwe foto hier of klik</span></div>
-                                    </div>
-                                    <input class="hidden" type="file" name="bio_image" id="bio_image_input" accept="image/*">
+                                    <label class="form-label">Welkom Titel</label>
+                                    <input type="text" name="welcome_title" class="form-input" value="<?php echo htmlspecialchars($content['welcome']['title'] ?? ''); ?>">
                                 </div>
-                            </div>
-                            <div>
-                                <label class="form-label" for="bio_title">Over Mij Titel</label>
-                                <input class="form-input" type="text" name="bio_title" id="bio_title" value="<?php echo htmlspecialchars($content['bio']['title'] ?? ''); ?>">
-                            </div>
-                            <div>
-                                <label class="form-label" for="bio_text">Over Mij Tekst</label>
-                                <textarea class="form-input" name="bio_text" id="bio_text" rows="6"><?php echo htmlspecialchars($content['bio']['text'] ?? ''); ?></textarea>
-                            </div>
-                            <div>
-                                <label class="form-label" for="instagram_url">Instagram URL</label>
-                                <input class="form-input" type="url" name="instagram_url" id="instagram_url" value="<?php echo htmlspecialchars($content['contact']['instagram_url'] ?? ''); ?>">
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <label class="form-label" for="meta_title">Meta Titel (SEO)</label>
                                     <input class="form-input" type="text" name="meta_title" id="meta_title" value="<?php echo htmlspecialchars($content['meta_title'] ?? ''); ?>">
                                 </div>
-                                <div>
-                                    <label class="form-label" for="meta_description">Meta Omschrijving (SEO)</label>
-                                    <input class="form-input" name="meta_description" id="meta_description" value="<?php echo htmlspecialchars($content['meta_description'] ?? ''); ?>">
+                            </div>
+                            <div>
+                                <label class="form-label">Welkom Tekst</label>
+                                <textarea name="welcome_text" class="form-textarea richtext" rows="5"><?php echo htmlspecialchars($content['welcome']['text'] ?? ''); ?></textarea>
+                            </div>
+                            <div>
+                                <label class="form-label">Welkom Kaarten</label>
+                                <?php $wcards = isset($content['welcome']['cards']) && is_array($content['welcome']['cards']) ? $content['welcome']['cards'] : []; ?>
+                                <div id="welcome-cards" class="space-y-3">
+                                    <?php foreach ($wcards as $c): ?>
+                                    <div class="border border-slate-200 rounded-md p-3">
+                                        <label class="form-label">Inhoud</label>
+                                        <textarea name="welcome_card_html[]" class="form-textarea richtext" rows="4"><?php echo htmlspecialchars($c['html'] ?? ''); ?></textarea>
+                                    </div>
+                                    <?php endforeach; ?>
                                 </div>
+                                <button type="button" class="btn btn-secondary mt-2" onclick="window.addWelcomeCard()">Kaart toevoegen</button>
+                            </div>
+                            <div>
+                                <label class="form-label" for="meta_description">Meta Omschrijving (SEO)</label>
+                                <input class="form-input" name="meta_description" id="meta_description" value="<?php echo htmlspecialchars($content['meta_description'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="card-footer homepage-footer">
@@ -139,6 +165,326 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                     </form>
                 </div>
             </div>
+
+            <div id="tab-team" class="admin-tab-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Team</h2>
+                        <form action="save.php" method="POST" class="flex items-center gap-2">
+                            <input type="hidden" name="action" value="add_team_member">
+                            <input type="text" name="name" class="form-input" placeholder="Naam" required>
+                            <input type="text" name="role" class="form-input" placeholder="Functie" required>
+                            <input type="text" name="appointment_url" class="form-input" placeholder="Afspraak URL (optioneel)">
+                            <button type="submit" class="btn btn-primary">Toevoegen</button>
+                        </form>
+                    </div>
+                    <div class="card-body space-y-6">
+                        <?php $members = isset($teamData['members']) && is_array($teamData['members']) ? $teamData['members'] : []; ?>
+                        <?php if (empty($members)): ?>
+                        <p class="text-slate-500">Nog geen teamleden toegevoegd.</p>
+                        <?php else: foreach ($members as $m): $mid = $m['id'] ?? uniqid('tm_'); ?>
+                        <div class="border border-slate-200 rounded-lg p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                <div>
+                                    <div class="relative group w-full aspect-[4/3] bg-slate-100 rounded-md overflow-hidden">
+                                        <img src="<?php echo htmlspecialchars($m['image'] ?? ''); ?>" alt="" class="w-full h-full object-cover">
+                                        <div class="dropzone absolute inset-0" data-target="team" data-member-id="<?php echo htmlspecialchars($mid); ?>"><span>Sleep foto of klik</span></div>
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <form action="save.php" method="POST" class="space-y-2">
+                                        <input type="hidden" name="action" value="update_team_member">
+                                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($mid); ?>">
+                                        <label class="form-label">Naam</label>
+                                        <input type="text" name="name" class="form-input" value="<?php echo htmlspecialchars($m['name'] ?? ''); ?>">
+                                        <label class="form-label">Functie</label>
+                                        <input type="text" name="role" class="form-input" value="<?php echo htmlspecialchars($m['role'] ?? ''); ?>">
+                                        <label class="form-label">Afspraak URL</label>
+                                        <input type="text" name="appointment_url" class="form-input" value="<?php echo htmlspecialchars($m['appointment_url'] ?? ''); ?>">
+                                        <div class="flex gap-2">
+                                            <button type="submit" class="btn btn-secondary">Opslaan</button>
+                                            <button type="button" class="btn btn-danger" onclick="(function(f){ if(!confirm('Verwijder dit teamlid?')) return; f.submit(); })(this.nextElementSibling)">Verwijder</button>
+                                            <form action="save.php" method="POST" class="hidden">
+                                                <input type="hidden" name="action" value="delete_team_member">
+                                                <input type="hidden" name="id" value="<?php echo htmlspecialchars($mid); ?>">
+                                            </form>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-practice" class="admin-tab-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Praktijkinfo</h2>
+                        <form action="save.php" method="POST" class="flex items-center gap-2">
+                            <input type="hidden" name="action" value="save_practice_page">
+                            <input type="text" class="form-input" name="title" placeholder="Titel" required>
+                            <button type="submit" class="btn btn-primary">Pagina toevoegen</button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <?php $pages = isset($practiceData['pages']) && is_array($practiceData['pages']) ? $practiceData['pages'] : []; ?>
+                        <?php if (empty($pages)): ?>
+                        <p class="text-slate-500">Nog geen praktijkinfo-pagina's.</p>
+                        <?php else: ?>
+                        <div class="admin-table-container">
+                            <table class="admin-table" id="practice-table">
+                                <thead><tr><th class="w-8"></th><th>Titel</th><th>Kaarten</th><th>Acties</th></tr></thead>
+                                <tbody>
+                                    <?php foreach ($pages as $slug => $pd): $cards = isset($pd['cards']) && is_array($pd['cards']) ? $pd['cards'] : []; ?>
+                                    <tr data-slug="<?php echo htmlspecialchars($slug); ?>">
+                                        <td><span class="drag-handle cursor-move" title="Sleep om te verplaatsen">&#9776;</span></td>
+                                        <td><?php echo htmlspecialchars($pd['title'] ?? $slug); ?></td>
+                                        <td><?php echo count($cards); ?></td>
+                                        <td>
+                                            <form action="save.php" method="POST" onsubmit="return confirm('Pagina verwijderen?');">
+                                                <input type="hidden" name="action" value="delete_practice_page">
+                                                <input type="hidden" name="slug" value="<?php echo htmlspecialchars($slug); ?>">
+                                                <button type="submit" class="btn btn-danger">Verwijder</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <?php foreach ($pages as $slug => $pd): $cards = isset($pd['cards']) && is_array($pd['cards']) ? $pd['cards'] : []; ?>
+                        <div class="card practice-card-editor hidden mt-6" data-slug="<?php echo htmlspecialchars($slug); ?>">
+                            <div class="card-header"><h3 class="card-title text-lg">Bewerk '<?php echo htmlspecialchars($pd['title'] ?? $slug); ?>'</h3></div>
+                            <div class="card-body">
+                                <form action="save.php" method="POST" class="space-y-3">
+                                    <input type="hidden" name="action" value="save_practice_page">
+                                    <input type="hidden" name="slug" value="<?php echo htmlspecialchars($slug); ?>">
+                                    <label class="form-label">Titel</label>
+                                    <input type="text" class="form-input" name="title" value="<?php echo htmlspecialchars($pd['title'] ?? ''); ?>">
+                                        <div class="space-y-3" id="cards-<?php echo htmlspecialchars($slug); ?>">
+                                            <?php foreach ($cards as $c): ?>
+                                            <div class="border border-slate-200 rounded-md p-3">
+                                                <div class="flex items-center justify-between">
+                                                    <label class="form-label">Inhoud</label>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('div.border').remove()">Verwijder</button>
+                                                </div>
+                                                <textarea name="card_html[]" class="form-textarea richtext" rows="5"><?php echo htmlspecialchars($c['html'] ?? ''); ?></textarea>
+                                            </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-secondary" onclick="window.addPracticeCard('cards-<?php echo htmlspecialchars($slug); ?>')">Kaart toevoegen</button>
+                                        </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">Pagina opslaan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-links" class="admin-tab-panel">
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title">Nuttige links</h2></div>
+                    <?php $hero = $linksData['hero'] ?? ['title' => '', 'image' => '', 'webp' => '']; $items = $linksData['items'] ?? []; ?>
+                    <div class="card-body space-y-4">
+                        <form action="save.php" method="POST" class="space-y-4">
+                            <input type="hidden" name="action" value="save_links">
+                            <div>
+                                <label class="form-label">Hero Titel</label>
+                                    <input type="text" class="form-input" name="hero_title" value="<?php echo htmlspecialchars($hero['title'] ?? ''); ?>">
+                            </div>
+                            <div>
+                                <label class="form-label">Hero Afbeelding</label>
+                                <div class="relative group w-full aspect-[16/6] bg-slate-100 rounded-md overflow-hidden">
+                                    <img src="<?php echo htmlspecialchars($hero['image'] ?? ''); ?>" alt="" class="w-full h-full object-cover">
+                                    <div class="dropzone absolute inset-0" data-target="links_hero"><span>Sleep foto of klik</span></div>
+                                </div>
+                            </div>
+                            <div id="links-list" class="space-y-2">
+                                <?php foreach ($items as $it): $iid = $it['id'] ?? uniqid('link_', true); ?>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2" data-id="<?php echo htmlspecialchars($iid); ?>">
+                                    <input type="hidden" name="link_id[]" value="<?php echo htmlspecialchars($iid); ?>">
+                                    <div class="flex items-center gap-2">
+                                        <span class="drag-handle cursor-move" title="Sleep om te verplaatsen">&#9776;</span>
+                                        <input type="text" class="form-input flex-1" name="link_label[]" placeholder="Omschrijving" value="<?php echo htmlspecialchars($it['label'] ?? ''); ?>">
+                                    </div>
+                                    <input type="text" class="form-input" name="link_url[]" placeholder="https://... of www..." value="<?php echo htmlspecialchars($it['url'] ?? ''); ?>">
+                                    <div class="flex gap-2 items-center">
+                                        <input type="text" class="form-input flex-1" name="link_tel[]" placeholder="Telefoon (optioneel)" value="<?php echo htmlspecialchars($it['tel'] ?? ''); ?>">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.grid').remove()">Verwijder</button>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" class="btn btn-secondary" onclick="window.addLinkItem()">Link toevoegen</button>
+                                <button type="submit" class="btn btn-primary">Opslaan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-settings" class="admin-tab-panel">
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title">Algemene instellingen</h2></div>
+                    <?php $settings = $content['settings'] ?? []; ?>
+                    <div class="card-body space-y-4">
+                        <form action="save.php" method="POST" class="space-y-4">
+                            <input type="hidden" name="action" value="save_settings">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="form-label">Algemene afspraak URL</label>
+                                    <input type="text" class="form-input" name="appointment_url" value="<?php echo htmlspecialchars($settings['appointment_url'] ?? ''); ?>">
+                                </div>
+                                <div>
+                                    <label class="form-label">Telefoonnummer</label>
+                                    <input type="text" class="form-input" name="phone" value="<?php echo htmlspecialchars($settings['phone'] ?? ''); ?>">
+                                </div>
+                                <div>
+                                    <label class="form-label">Adresregel 1</label>
+                                    <input type="text" class="form-input" name="address_line_1" value="<?php echo htmlspecialchars($settings['address_line_1'] ?? ''); ?>">
+                                </div>
+                                <div>
+                                    <label class="form-label">Adresregel 2</label>
+                                    <input type="text" class="form-input" name="address_line_2" value="<?php echo htmlspecialchars($settings['address_line_2'] ?? ''); ?>">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Kaart embed (HTML)</label>
+                                    <textarea name="map_embed" class="form-textarea" rows="4"><?php echo htmlspecialchars($settings['map_embed'] ?? ''); ?></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold mb-2">Nuttige telefoonnummers</h3>
+                                <?php $phones = isset($settings['footer_phones']) && is_array($settings['footer_phones']) ? $settings['footer_phones'] : []; ?>
+                                <div id="phones-list" class="space-y-2">
+                                    <?php foreach ($phones as $ph): ?>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <input type="text" class="form-input" name="phone_label[]" placeholder="Omschrijving" value="<?php echo htmlspecialchars($ph['label'] ?? ''); ?>">
+                                        <input type="text" class="form-input" name="phone_tel[]" placeholder="Telefoon" value="<?php echo htmlspecialchars($ph['tel'] ?? ''); ?>">
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <button type="button" class="btn btn-secondary mt-2" onclick="window.addPhoneItem()">Nummer toevoegen</button>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Instellingen opslaan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-pinned" class="admin-tab-panel">
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title">Gepinde berichten</h2></div>
+                    <?php $pinned = isset($content['pinned']) && is_array($content['pinned']) ? $content['pinned'] : []; ?>
+                    <div class="card-body">
+                        <form action="save.php" method="POST" class="space-y-4">
+                            <input type="hidden" name="action" value="save_pinned">
+                            <div id="pinned-list" class="space-y-4">
+                                <?php foreach ($pinned as $pin): $pid = $pin['id'] ?? uniqid('pin_', true); ?>
+                                <div class="border border-slate-200 rounded-lg p-4" data-id="<?php echo htmlspecialchars($pid); ?>">
+                                    <input type="hidden" name="pinned_id[]" value="<?php echo htmlspecialchars($pid); ?>">
+                                    <label class="form-label">Titel</label>
+                                    <input type="text" class="form-input" name="pinned_title[]" value="<?php echo htmlspecialchars($pin['title'] ?? ''); ?>">
+                                    <label class="form-label mt-2">Tekst</label>
+                                    <textarea class="form-textarea richtext" name="pinned_text[]" rows="4"><?php echo htmlspecialchars($pin['text'] ?? ''); ?></textarea>
+                                    <?php $scope = $pin['scope'] ?? []; if (!is_array($scope)) { $scope = ($scope==='all') ? ['all'] : []; } ?>
+                                    <div class="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2 items-center">
+                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_home[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('home',$scope)?'checked':''; ?>> Home</label>
+                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_team[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('team',$scope)?'checked':''; ?>> Team</label>
+                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_practice[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('practice',$scope)?'checked':''; ?>> Praktijkinfo</label>
+                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_links[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('links',$scope)?'checked':''; ?>> Nuttige links</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="hidden" name="pinned_scope_all[]" value="<?php echo in_array('all',$scope)?htmlspecialchars($pid):''; ?>">
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="(function(btn){var box=btn.closest('.border');var id=box.querySelector('input[name=\'pinned_id[]\']').value;var home=box.querySelector('input[name=\'pinned_scope_home[]\'][value=\''+id+'\']');var team=box.querySelector('input[name=\'pinned_scope_team[]\'][value=\''+id+'\']');var pr=box.querySelector('input[name=\'pinned_scope_practice[]\'][value=\''+id+'\']');var li=box.querySelector('input[name=\'pinned_scope_links[]\'][value=\''+id+'\']');var all=box.querySelector('input[name=\'pinned_scope_all[]\']');var on=all.value && all.value.length>0; if(!on){ home.checked=team.checked=pr.checked=li.checked=true; all.value=id; btn.textContent='Selectie wissen'; } else { home.checked=team.checked=pr.checked=li.checked=false; all.value=''; btn.textContent="Alle pagina's"; }})(this)"><?php echo in_array('all',$scope)?'Selectie wissen':"Alle pagina's"; ?></button>
+                                            <span class="drag-handle cursor-move" title="Sleep om te verplaatsen">&#9776;</span>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.border').remove()">Verwijder</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" class="btn btn-secondary" onclick="window.addPinnedItem()">Bericht toevoegen</button>
+                                <button type="submit" class="btn btn-primary">Opslaan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            // Initialize CKEditor on any .richtext textarea
+            window.initRichtext = function(el){
+              if (!window.ClassicEditor || !el) return;
+              if (el._ck_inited) return;
+              try { ClassicEditor.create(el, { toolbar: ['heading','bold','italic','link','bulletedList','numberedList','undo','redo'] }); el._ck_inited = true; } catch(e) {}
+            };
+            document.addEventListener('DOMContentLoaded', function(){
+              document.querySelectorAll('textarea.richtext').forEach(window.initRichtext);
+            });
+            // Simple helpers to add dynamic fields without extra dependencies
+            window.addWelcomeCard = function(){
+              var c = document.getElementById('welcome-cards'); if(!c) return;
+              var d = document.createElement('div');
+              d.className = 'border border-slate-200 rounded-md p-3';
+              d.innerHTML = '<label class="form-label">Inhoud</label><textarea name="welcome_card_html[]" class="form-textarea richtext" rows="4"></textarea>';
+              c.appendChild(d);
+              var tx = d.querySelector('textarea.richtext'); if (tx) window.initRichtext(tx);
+            };
+            window.addPracticeCard = function(containerId){
+              var c = document.getElementById(containerId); if(!c) return;
+              var wrap = document.createElement('div');
+              wrap.className = 'border border-slate-200 rounded-md p-3';
+              wrap.innerHTML = '<label class="form-label">Inhoud</label><textarea name="card_html[]" class="form-textarea richtext" rows="5"></textarea>';
+              c.appendChild(wrap);
+              var tx = wrap.querySelector('textarea.richtext'); if (tx) window.initRichtext(tx);
+            };
+            window.addLinkItem = function(){
+              var list = document.getElementById('links-list'); if(!list) return;
+              var row = document.createElement('div');
+              row.className = 'grid grid-cols-1 md:grid-cols-3 gap-2';
+              row.innerHTML = '<input type="text" class="form-input" name="link_label[]" placeholder="Omschrijving">'+
+                              '<input type="url" class="form-input" name="link_url[]" placeholder="https://...">'+
+                              '<input type="text" class="form-input" name="link_tel[]" placeholder="Telefoon (optioneel)">';
+              list.appendChild(row);
+            };
+            window.addPhoneItem = function(){
+              var list = document.getElementById('phones-list'); if(!list) return;
+              var row = document.createElement('div');
+              row.className = 'grid grid-cols-1 md:grid-cols-2 gap-2';
+              row.innerHTML = '<input type="text" class="form-input" name="phone_label[]" placeholder="Omschrijving">'+
+                              '<input type="text" class="form-input" name="phone_tel[]" placeholder="Telefoon">';
+              list.appendChild(row);
+            };
+            window.addPinnedItem = function(){
+              var list = document.getElementById('pinned-list'); if(!list) return;
+              var id = 'pin_' + Math.random().toString(36).slice(2);
+              var box = document.createElement('div');
+              box.className = 'border border-slate-200 rounded-lg p-4';
+              box.innerHTML = '<input type="hidden" name="pinned_id[]" value="'+id+'">'+
+                              '<label class="form-label">Titel</label><input type="text" class="form-input" name="pinned_title[]" value="">'+
+                              '<label class="form-label mt-2">Tekst</label><textarea class="form-textarea richtext" name="pinned_text[]" rows="4"></textarea>'+
+                              '<div class="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">'+
+                              '<label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_home[]" value="'+id+'"> Home</label>'+
+                              '<label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_team[]" value="'+id+'"> Team</label>'+
+                              '<label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_practice[]" value="'+id+'"> Praktijkinfo</label>'+
+                              '<label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_links[]" value="'+id+'"> Nuttige links</label>'+
+                              '<label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_all[]" value="'+id+'"> Alle</label>'+
+                              '</div>';
+              list.appendChild(box);
+              var tx = box.querySelector('textarea.richtext'); if (tx) window.initRichtext(tx);
+            };
+            </script>
 
             <div id="tab-portfolio" class="admin-tab-panel">
                 <?php $portfolioHidden = isset($content['pages']['portfolio']['visible']) ? !$content['pages']['portfolio']['visible'] : false; ?>

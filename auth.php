@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (defined('ADMIN_PASSWORD_HASH') && password_verify($password, ADMIN_PASSWORD_HASH)) {
         // Wachtwoord is correct, zet de sessie variabele
         $_SESSION['loggedin'] = true;
-        header('Location: admin.php');
+        header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php'));
         exit;
     } else {
         // Wachtwoord is incorrect, stuur terug naar login met een foutmelding

@@ -1,0 +1,24 @@
+{
+    "hero": {
+        "title": "test",
+        "image": "assets\/images\/img_68b9cc50177835.99549984.png",
+        "webp": "assets\/images\/img_68b9cc50177835.99549984.webp"
+    },
+    "items": [
+        {
+            "label": "Antigifcentrum",
+            "url": "https:\/\/www.antigifcentrum.be",
+            "tel": "070 24 52 45"
+        },
+        {
+            "label": "Tropisch instituut\/Info reisvaccinaties",
+            "url": "https:\/\/www.wanda.be",
+            "tel": ""
+        },
+        {
+            "label": "Medische informatie over bepaalde ziektebeelden",
+            "url": "https:\/\/www.gezondheidenwetenschap.be",
+            "tel": ""
+        }
+    ]
+}

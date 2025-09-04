@@ -1,23 +1,25 @@
 /* Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@500;700&display=swap');
 
 /* Kleuren & Stijl Variabelen */
 :root {
-    --background: #0B0B0C; /* near-black */
-    --surface: #141416; /* elevated surfaces */
-    --surface-rgb: 20, 20, 22;
-    --border: #26262A;
-    --text-dark: #E5E7EB; /* main text on dark */
-    --text-light: #A1A1AA; /* secondary text */
-    --primary: #FFFFFF; /* primary accents */
-    --accent: #FFFFFF; /* links & focus */
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Poppins', sans-serif;
-    --radius: 0.5rem;
-    --radius-lg: 0.75rem;
-    --shadow: 0 6px 30px rgba(0,0,0,0.35);
-    --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --background: #f8fafc; /* slate-50 */
+    --surface: #ffffff; /* white surfaces */
+    --surface-rgb: 255, 255, 255;
+    --border: #e2e8f0; /* slate-200 */
+    --text-dark: #0f172a; /* slate-900 */
+    --text-light: #475569; /* slate-600 */
+    --primary: #2563eb; /* blue-600 */
+    --accent: #2563eb; /* links & focus */
+    --font-heading: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --radius: 0.75rem;
+    --radius-lg: 1rem;
+    --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    --transition: all 0.25s ease;
     --header-height: 5rem; /* matches h-24 */
+    --pinned-bg: #eef2ff; /* soft blue for pinned cards */
+    --panel-bg: #f1f5f9;  /* subtle panel bg for info cards */
 }
 
 /* Basis & Typografie */
@@ -26,33 +28,28 @@ body {
     font-family: var(--font-body);
     background-color: var(--background);
     color: var(--text-dark);
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.7;
 }
-h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: 500; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: 700; color: var(--text-dark); }
 p { color: var(--text-light); margin-bottom: 1rem; }
 a { color: var(--accent); transition: var(--transition); }
-a:hover { opacity: 0.85; }
+a:hover { filter: brightness(1.1); }
 
 /* Header */
 header#header {
-    background-color: rgba(var(--surface-rgb), 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(var(--surface-rgb), 1);
     transition: var(--transition);
-    border-bottom: 1px solid transparent;
-}
-header#header.scrolled {
-    background-color: rgba(var(--surface-rgb), 0.9);
     border-bottom: 1px solid var(--border);
 }
+header#header.scrolled { box-shadow: var(--shadow); }
 .nav-link {
     position: relative; padding-bottom: 5px;
-    font-weight: 400; color: var(--text-light);
+    font-weight: 500; color: var(--text-light);
 }
 .nav-link::after {
     content: ''; position: absolute; bottom: 0; left: 0;
-    width: 0; height: 1px; background-color: var(--primary);
+    width: 0; height: 2px; background-color: var(--primary);
     transition: var(--transition);
 }
 .nav-link:hover::after, .nav-link.active::after { width: 100%; }
@@ -67,7 +64,7 @@ header#header.scrolled {
     top: 100%; /* no gap so hover doesn't break */
     left: 0;
     min-width: 12rem;
-    background: rgba(var(--surface-rgb), 0.98);
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -87,7 +84,7 @@ header#header.scrolled {
 
 /* Mobile menu panel (not fullscreen) */
 .mobile-menu-panel {
-    background: rgba(var(--surface-rgb), 0.98);
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 1rem;
     box-shadow: var(--shadow);
@@ -96,12 +93,7 @@ header#header.scrolled {
 }
 
 /* Footer */
-.site-footer {
-    padding: 3rem 0;
-    background-color: var(--background);
-    border-top: 1px solid var(--border);
-    margin-top: 4rem;
-}
+.site-footer { padding: 3rem 0; background-color: var(--surface); border-top: 1px solid var(--border); margin-top: 4rem; }
 .social-link {
     display: inline-flex;
     align-items: center;
@@ -280,9 +272,22 @@ section { padding: 5rem 0; }
     font-weight: 500;
     transition: var(--transition);
 }
-.btn-primary { background: var(--accent); color: #000; }
+.btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
 .btn-secondary { background: var(--surface); color: var(--text-dark); border: 1px solid var(--border); }
+
+/* Content card styles */
+.practice-card, .welcome-card {
+    background: var(--panel-bg);
+}
+.pinned-card { background: var(--pinned-bg); }
+
+/* Hero body text (over hero background image) */
+.hero-body { color: #fff; font-size: 1.125rem; }
+.hero-body a { color: #fff; text-decoration: underline; }
+
+/* Map embed container ensures iframe fits */
+.map-embed iframe { width: 100%; height: 100%; display: block; border: 0; }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
 /* Reveal on scroll (works with main.js IntersectionObserver) */
