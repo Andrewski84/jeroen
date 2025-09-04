@@ -140,7 +140,10 @@ function logMailAttempt(array $entry): void {
         $list = file_exists($file) ? (json_decode(@file_get_contents($file), true) ?: []) : [];
         if (!is_array($list)) { $list = []; }
         $list[] = $entry;
-        @file_put_contents($file, json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        $result = file_put_contents($file, json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        if ($result === false) {
+            error_log('Failed to write mail log file: ' . $file);
+        }
     } catch (\Throwable $e) { /* ignore logging errors */ }
 }
 

@@ -397,7 +397,10 @@ function startUpload(task) {
                                 const order = Array.from(practiceTable.querySelectorAll('tr[data-slug]')).map(tr => tr.dataset.slug);
                                 const fd = new FormData(); fd.append('action','reorder_practice_pages'); order.forEach(s => fd.append('order[]', s));
                                 fd.append('ajax','1');
-                                fetch('save.php', { method: 'POST', body: fd });
+                                fetch('save.php', { method: 'POST', body: fd })
+                                    .then(r => r.json())
+                                    .then(d => { if (d.status !== 'success') showToast(d.message || 'Opslaan mislukt', false); })
+                                    .catch(() => showToast('Netwerkfout', false));
                             }
                         });
                     }
@@ -410,7 +413,10 @@ function startUpload(task) {
                                 const order = Array.from(pinnedList.children).map(b => b.querySelector('input[name="pinned_id[]"]').value);
                                 const fd = new FormData(); fd.append('action','reorder_pinned'); order.forEach(id => fd.append('order[]', id));
                                 fd.append('ajax','1');
-                                fetch('save.php', { method: 'POST', body: fd });
+                                fetch('save.php', { method: 'POST', body: fd })
+                                    .then(r => r.json())
+                                    .then(d => { if (d.status !== 'success') showToast(d.message || 'Opslaan mislukt', false); })
+                                    .catch(() => showToast('Netwerkfout', false));
                             }
                         });
                     }
@@ -423,7 +429,10 @@ function startUpload(task) {
                                 const order = Array.from(linksList.children).map(ch => ch.dataset.id).filter(Boolean);
                                 const fd = new FormData(); fd.append('action','reorder_links'); order.forEach(i => fd.append('order[]', i));
                                 fd.append('ajax','1');
-                                fetch('save.php', { method: 'POST', body: fd });
+                                fetch('save.php', { method: 'POST', body: fd })
+                                    .then(r => r.json())
+                                    .then(d => { if (d.status !== 'success') showToast(d.message || 'Opslaan mislukt', false); })
+                                    .catch(() => showToast('Netwerkfout', false));
                             }
                         });
                     }

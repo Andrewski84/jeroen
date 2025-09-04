@@ -130,7 +130,9 @@ switch ($action) {
             'email' => $email,
             'message' => $message
         ];
-        @file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        if (file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)) === false) {
+            error_log('Failed to write messages file: ' . MESSAGES_FILE);
+        }
 
         // Send email
         $subject = 'Nieuw bericht via website';
@@ -215,7 +217,9 @@ switch ($action) {
             'pricing' => $pricingTitle,
             'message' => $message
         ];
-        @file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        if (file_put_contents(MESSAGES_FILE, json_encode($messages, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)) === false) {
+            error_log('Failed to write messages file: ' . MESSAGES_FILE);
+        }
 
         // Build mail
         $subject = 'Nieuw bericht via website';
@@ -268,7 +272,10 @@ switch ($action) {
         // Prune expired
         $tokens = array_values(array_filter($tokens, function($t){ return isset($t['expires']) && $t['expires'] > time() && empty($t['used']); }));
         $tokens[] = ['hash' => $hash, 'expires' => $expires, 'created' => time(), 'used' => false];
-        @file_put_contents($tokensFile, json_encode($tokens, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        if (file_put_contents($tokensFile, json_encode($tokens, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)) === false) {
+            echo json_encode(['status' => 'error', 'message' => 'Opslaan mislukt']);
+            exit;
+        }
 
         // Build absolute reset link
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -571,8 +578,17 @@ case 'add_theme':
         $page['cards'] = $cards;
         $data['pages'][$slug] = $page;
         @mkdir(dirname($practiceFilePath), 0755, true);
-        saveJsonFile($practiceFilePath, $data);
-        if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','slug'=>$slug,'title'=>$page['title']]); exit; }
+        $ok = saveJsonFile($practiceFilePath, $data);
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            if ($ok) {
+                echo json_encode(['status'=>'success','slug'=>$slug,'title'=>$page['title']]);
+            } else {
+                echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']);
+            }
+            exit;
+        }
+        if (!$ok) { error_log('Failed to save practice page data'); }
         break;
 
     case 'delete_practice_page':
@@ -581,8 +597,13 @@ case 'add_theme':
             $data = loadJsonFile($practiceFilePath);
             if (isset($data['pages'][$slug])) {
                 unset($data['pages'][$slug]);
-                saveJsonFile($practiceFilePath, $data);
-                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','slug'=>$slug]); exit; }
+                $ok = saveJsonFile($practiceFilePath, $data);
+                if ($isAjax) {
+                    header('Content-Type: application/json');
+                    echo json_encode($ok ? ['status'=>'success','slug'=>$slug] : ['status'=>'error','message'=>'Opslaan mislukt']);
+                    exit;
+                }
+                if (!$ok) { error_log('Failed to delete practice page data'); }
             }
         }
         break;
@@ -609,8 +630,13 @@ case 'add_theme':
         }
         $data['items'] = $items;
         @mkdir(dirname($linksFilePath), 0755, true);
-        saveJsonFile($linksFilePath, $data);
-        if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success']); exit; }
+        $ok = saveJsonFile($linksFilePath, $data);
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode($ok ? ['status'=>'success'] : ['status'=>'error','message'=>'Opslaan mislukt']);
+            exit;
+        }
+        if (!$ok) { error_log('Failed to save links data'); }
         break;
 
     case 'save_pinned':
@@ -642,8 +668,13 @@ case 'add_theme':
         }
         if (!isset($content['pinned']) || !is_array($content['pinned'])) $content['pinned'] = [];
         $content['pinned'] = $items;
-        saveJsonFile($contentFilePath, $content);
-        if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success']); exit; }
+        $ok = saveJsonFile($contentFilePath, $content);
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode($ok ? ['status'=>'success'] : ['status'=>'error','message'=>'Opslaan mislukt']);
+            exit;
+        }
+        if (!$ok) { error_log('Failed to save pinned items'); }
         break;
 
     case 'reorder_practice_pages':
@@ -656,8 +687,8 @@ case 'add_theme':
         // add any missing at end
         foreach ($data['pages'] as $slug => $page) { if (!isset($new[$slug])) $new[$slug] = $page; }
         $data['pages'] = $new;
-        saveJsonFile($practiceFilePath, $data);
-        echo json_encode(['status'=>'success']);
+        $ok = saveJsonFile($practiceFilePath, $data);
+        echo json_encode($ok ? ['status'=>'success'] : ['status'=>'error','message'=>'Opslaan mislukt']);
         exit;
 
     case 'reorder_pinned':
@@ -671,8 +702,8 @@ case 'add_theme':
         // add any missing at end
         foreach ($content['pinned'] as $p) { if (!in_array($p['id'] ?? '', $order, true)) $new[] = $p; }
         $content['pinned'] = $new;
-        saveJsonFile($contentFilePath, $content);
-        echo json_encode(['status'=>'success']);
+        $ok = saveJsonFile($contentFilePath, $content);
+        echo json_encode($ok ? ['status'=>'success'] : ['status'=>'error','message'=>'Opslaan mislukt']);
         exit;
 
     case 'reorder_links':
@@ -686,8 +717,8 @@ case 'add_theme':
         foreach ($order as $id) { if (isset($byId[$id])) $new[] = $byId[$id]; }
         foreach ($items as $it) { if (!in_array($it['id'] ?? '', $order, true)) $new[] = $it; }
         $data['items'] = $new;
-        saveJsonFile($linksFilePath, $data);
-        echo json_encode(['status'=>'success']);
+        $ok = saveJsonFile($linksFilePath, $data);
+        echo json_encode($ok ? ['status'=>'success'] : ['status'=>'error','message'=>'Opslaan mislukt']);
         exit;
 
     // --- Algemene instellingen ---
@@ -707,8 +738,13 @@ case 'add_theme':
             if ($l !== '' && $t !== '') { $list[] = ['label' => $l, 'tel' => $t]; }
         }
         $content['settings']['footer_phones'] = $list;
-        saveJsonFile($contentFilePath, $content);
-        if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success']); exit; }
+        $ok = saveJsonFile($contentFilePath, $content);
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode($ok ? ['status'=>'success'] : ['status'=>'error','message'=>'Opslaan mislukt']);
+            exit;
+        }
+        if (!$ok) { error_log('Failed to save settings'); }
         break;
 
     case 'update_portfolio_intro':

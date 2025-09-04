@@ -8,7 +8,12 @@ function loadTokens($file) {
     return file_exists($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
 }
 function saveTokens($file, $tokens) {
-    @file_put_contents($file, json_encode($tokens, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+    $result = file_put_contents($file, json_encode($tokens, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+    if ($result === false) {
+        error_log('Failed to write reset tokens file: ' . $file);
+        return false;
+    }
+    return true;
 }
 
 $token = $_GET['token'] ?? '';
@@ -59,7 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['token'])) {
     if ($ok) {
         // Mark token as used
         $tokens[$idxFound]['used'] = true; $tokens[$idxFound]['used_at'] = time();
-        saveTokens($tokensFile, $tokens);
+        if (!saveTokens($tokensFile, $tokens)) {
+            error_log('Failed to update reset token usage');
+        }
         // Notify admin by email
         $subject = 'Wachtwoord gewijzigd';
         $body = 'Je admin-wachtwoord werd succesvol gewijzigd.';
