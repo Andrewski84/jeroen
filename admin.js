@@ -452,7 +452,11 @@ function startUpload(task) {
                 const fd = new FormData(form);
                 fd.append('ajax', '1');
                 fetch('save.php', { method: 'POST', body: fd })
-                  .then(r => r.text()).then(txt => { let d=null; try{ d=JSON.parse(txt);}catch(e){} if(!d||d.status!=='success'){ showToast(d&&d.message?d.message:'Opslaan mislukt', false); return; }
+                  .then(r => r.text()).then(txt => {
+                    let d = null; try { d = JSON.parse(txt); } catch (e) {}
+                    if (!d) { showToast('Opslaan mislukt', false); return; }
+                    if (d.status === 'error') { showToast(d.message || 'Opslaan mislukt', false); return; }
+                    if (d.status !== 'success') { showToast('Opslaan mislukt', false); return; }
                     showToast('Opgeslagen', true);
                     // Post-save UX tweaks for specific actions
                     const action = actionName;

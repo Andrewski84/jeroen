@@ -490,7 +490,11 @@ case 'add_theme':
             $id = uniqid('tm_', true);
             $data['members'][] = ['id' => $id, 'name' => $name, 'role' => $role, 'appointment_url' => $appt, 'image' => '', 'webp' => ''];
             @mkdir(dirname($teamFilePath), 0755, true);
-            saveJsonFile($teamFilePath, $data);
+            $saved = saveJsonFile($teamFilePath, $data);
+            if ($saved === false) {
+                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
+                exit;
+            }
             if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','member'=>['id'=>$id,'name'=>$name,'role'=>$role,'appointment_url'=>$appt]]); exit; }
         }
         break;
@@ -509,7 +513,11 @@ case 'add_theme':
                 }
             }
             unset($m);
-            saveJsonFile($teamFilePath, $data);
+            $saved = saveJsonFile($teamFilePath, $data);
+            if ($saved === false) {
+                if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
+                exit;
+            }
             if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','id'=>$id]); exit; }
         }
         break;
@@ -532,7 +540,11 @@ case 'add_theme':
                         break;
                     }
                 }
-                saveJsonFile($teamFilePath, $data);
+                $saved = saveJsonFile($teamFilePath, $data);
+                if ($saved === false) {
+                    if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
+                    exit;
+                }
                 if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'success','id'=>$id]); exit; }
             }
         }
