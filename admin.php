@@ -58,7 +58,7 @@ if (!empty($teamData['members']) && is_array($teamData['members'])) {
         if (empty($m['id'])) { $m['id'] = uniqid('tm_', true); $changed = true; }
     }
     unset($m);
-    if ($changed) { @file_put_contents($teamFilePath, json_encode($teamData, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE), LOCK_EX); }
+    if ($changed) { saveJsonFile($teamFilePath, $teamData); }
 }
 $pass_status = $_GET['password_change'] ?? '';
 $mailbox_status = $_GET['mailbox_update'] ?? '';
