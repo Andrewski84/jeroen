@@ -513,7 +513,12 @@ case 'add_theme':
                 }
             }
             unset($m);
-            $saved = saveJsonFile($teamFilePath, $data);
+            @mkdir(dirname($teamFilePath), 0755, true);
+            if (is_dir(dirname($teamFilePath))) {
+                $saved = saveJsonFile($teamFilePath, $data);
+            } else {
+                $saved = false;
+            }
             if ($saved === false) {
                 if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
                 exit;
@@ -540,7 +545,12 @@ case 'add_theme':
                         break;
                     }
                 }
-                $saved = saveJsonFile($teamFilePath, $data);
+                @mkdir(dirname($teamFilePath), 0755, true);
+                if (is_dir(dirname($teamFilePath))) {
+                    $saved = saveJsonFile($teamFilePath, $data);
+                } else {
+                    $saved = false;
+                }
                 if ($saved === false) {
                     if ($isAjax) { header('Content-Type: application/json'); echo json_encode(['status'=>'error','message'=>'Opslaan mislukt']); }
                     exit;
