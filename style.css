@@ -371,13 +371,13 @@ box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 /* Vlakke, glijdende portfolio carousel */
 .portfolio-swiper {
 width: 100%;
-padding: 1rem 0 2rem 0;
+padding: 0.5rem 0 1rem 0;
 overflow: hidden;
 }
 .portfolio-swiper .swiper-slide {
 position: relative;
-width: clamp(240px, 25vw, 380px);
-height: clamp(240px, 25vw, 380px);
+width: clamp(220px, 22vw, 340px);
+height: clamp(220px, 22vw, 340px);
 aspect-ratio: 1 / 1; 
 border-radius: var(--radius-lg);
 overflow: hidden;
@@ -388,3 +388,6 @@ border: 1px solid var(--border);
 .portfolio-swiper .swiper-slide img { width: 100%; height: 100%; object-fit: cover; opacity: .9; transition: transform .6s ease, opacity .3s ease; }
 .portfolio-swiper .swiper-slide:hover img { transform: scale(1.04); opacity: 1; }
 .portfolio-swiper .slide-overlay { position: absolute; inset: auto 0 0 0; padding: .75rem .9rem; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 80%); color: #fff; }
+
+/* Compact section spacing for portfolio carousel */
+#portfolio-page .compact-section { padding: 1.5rem 0; }

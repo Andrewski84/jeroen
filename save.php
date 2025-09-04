@@ -325,6 +325,15 @@ case 'add_theme':
         }
         break;
 
+    case 'update_theme_intro':
+        $themeName = $_POST['theme_name'] ?? '';
+        $intro = $_POST['intro_text'] ?? '';
+        if ($themeName !== '' && isset($portfolioData['themes'][$themeName])) {
+            $portfolioData['themes'][$themeName]['intro_text'] = $intro;
+            saveJsonFile($portfolioFilePath, $portfolioData);
+        }
+        break;
+
     case 'update_photo_order':
         header('Content-Type: application/json');
         $themeName = $_POST['theme'] ?? '';
@@ -601,7 +610,7 @@ case 'add_theme':
 $hash = '#tab-homepage';
 $detailParam = '';
 
-if (in_array($action, ['add_theme', 'delete_theme', 'rename_theme', 'update_photo_details', 'delete_photo', 'update_photo_order', 'update_portfolio_order'])) {
+if (in_array($action, ['add_theme', 'delete_theme', 'rename_theme', 'update_photo_details', 'delete_photo', 'update_photo_order', 'update_portfolio_order', 'update_theme_intro'])) {
     $hash = '#tab-portfolio';
     $themeName = $_POST['theme_name'] ?? $_POST['theme'] ?? $_POST['old_theme_name'] ?? null;
     if ($action === 'rename_theme') {

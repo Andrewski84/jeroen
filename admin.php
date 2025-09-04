@@ -196,10 +196,21 @@ $mailbox_status = $_GET['mailbox_update'] ?? '';
                                     <button type="submit" class="btn btn-secondary">Hernoem</button>
                                 </form>
                             </div>
-                            <div class="card-body">
-                                <label class="form-label">Foto's toevoegen</label>
-                                <div class="dropzone" data-target="portfolio" data-theme="<?php echo htmlspecialchars($themeName); ?>"><span>Sleep hier foto's of klik</span></div>
-                                <div class="photo-list" data-theme="<?php echo htmlspecialchars($themeName); ?>">
+                        <div class="card-body">
+                            <div class="mb-6">
+                                <form action="save.php" method="POST" class="space-y-2">
+                                    <input type="hidden" name="action" value="update_theme_intro">
+                                    <input type="hidden" name="theme_name" value="<?php echo htmlspecialchars($themeName); ?>">
+                                    <label class="form-label" for="intro_text_<?php echo htmlspecialchars($themeName); ?>">Begeleidende tekst (optioneel)</label>
+                                    <textarea class="form-textarea" rows="4" id="intro_text_<?php echo htmlspecialchars($themeName); ?>" name="intro_text" placeholder="Korte beschrijving of begeleidende tekst voor dit portfolio..."><?php echo htmlspecialchars($themeData['intro_text'] ?? ''); ?></textarea>
+                                    <div>
+                                        <button type="submit" class="btn btn-secondary">Tekst opslaan</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <label class="form-label">Foto's toevoegen</label>
+                            <div class="dropzone" data-target="portfolio" data-theme="<?php echo htmlspecialchars($themeName); ?>"><span>Sleep hier foto's of klik</span></div>
+                            <div class="photo-list" data-theme="<?php echo htmlspecialchars($themeName); ?>">
                                     <?php foreach (($themeData['images'] ?? []) as $index => $image): ?>
                                         <div class="photo-list-item" data-id="<?php echo $index; ?>" data-title="<?php echo htmlspecialchars($image['title'] ?? ''); ?>" data-description="<?php echo htmlspecialchars($image['description'] ?? ''); ?>" data-alt="<?php echo htmlspecialchars($image['alt'] ?? ''); ?>" data-featured="<?php echo isset($image['featured']) && $image['featured'] ? 'true' : 'false'; ?>">
                                             <?php if (isset($image['featured']) && $image['featured']): ?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="featured-star"><path fill-rule="evenodd" d="M10.868 2.884c.321-.662 1.215-.662 1.536 0l1.681 3.462 3.818.554c.729.106 1.022.992.494 1.506l-2.764 2.693.654 3.802c.124.723-.635 1.27-1.282.944l-3.415-1.795-3.415 1.795c-.647.326-1.406-.221-1.282-.944l.654-3.802-2.764-2.693c-.528-.514-.235-1.399.494-1.506l3.818-.554 1.681-3.462z" clip-rule="evenodd" /></svg><?php endif; ?>

@@ -82,9 +82,23 @@ require_once 'helpers.php';
             <p class="max-w-2xl mx-auto text-lg reveal">Een collectie van mijn favoriete werk.</p>
         </div>
 
+        <?php if (!empty($themes)): ?>
+        <!-- Filters boven de carousel -->
+        <div id="portfolio-filters" class="stagger-container my-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3 reveal">
+                    <a href="portfolio.php" class="filter-btn <?php echo !$currentThemeName ? 'active' : ''; ?>">Alles</a>
+                    <?php foreach ($themes as $themeName => $themeData): ?>
+                        <a href="portfolio.php?theme=<?php echo urlencode($themeName); ?>" class="filter-btn <?php echo $currentThemeName === $themeName ? 'active' : ''; ?>"><?php echo htmlspecialchars(ucfirst($themeName)); ?></a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Carousel sectie, wordt alleen getoond als er uitgelichte foto's zijn -->
         <?php if (!empty($carouselImages)): ?>
-        <section class="stagger-container">
+        <section class="stagger-container compact-section">
             <div class="portfolio-swiper swiper-container reveal">
                 <div class="swiper-wrapper">
                     <?php foreach ($carouselImages as $image): ?>
@@ -103,18 +117,14 @@ require_once 'helpers.php';
             </div>
         </section>
         <?php endif; ?>
-        
-        <?php if (!empty($themes)): ?>
-        <div id="portfolio-filters" class="stagger-container my-10">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex flex-wrap items-center gap-3 reveal">
-                    <a href="portfolio.php" class="filter-btn <?php echo !$currentThemeName ? 'active' : ''; ?>">Alles</a>
-                    <?php foreach ($themes as $themeName => $themeData): ?>
-                        <a href="portfolio.php?theme=<?php echo urlencode($themeName); ?>" class="filter-btn <?php echo $currentThemeName === $themeName ? 'active' : ''; ?>"><?php echo htmlspecialchars(ucfirst($themeName)); ?></a>
-                    <?php endforeach; ?>
+
+        <!-- Optionele begeleidende tekst onder de carousel en boven de fotogalerij -->
+        <?php if ($currentThemeName && !empty($themes[$currentThemeName]['intro_text'])): ?>
+            <div class="stagger-container">
+                <div class="max-w-3xl mx-auto text-center px-2 reveal">
+                    <p class="text-base md:text-lg leading-relaxed"><?php echo nl2br(htmlspecialchars($themes[$currentThemeName]['intro_text'])); ?></p>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
 
         <?php if (empty($imagesToShow)): ?>
