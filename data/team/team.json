@@ -1,44 +1,68 @@
 {
     "members": [
         {
-            "id": "tm_68ba0179405473.06971017",
-            "name": "qsd",
-            "role": "qsd",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba017ec2a534.65946169.jpg",
-            "webp": "assets\/team\/img_68ba017ec2a534.65946169.webp"
-        },
-        {
             "id": "tm_68ba047c27c385.08980280",
             "name": "Jeroen Jacobs",
             "role": "Dokter",
             "appointment_url": "www.google.com",
             "image": "assets\/team\/img_68ba048224f195.80201194.jpg",
-            "webp": "assets\/team\/img_68ba048224f195.80201194.webp"
-        },
-        {
-            "id": "tm_68ba06e3e80c74.12586126",
-            "name": "sqd",
-            "role": "qsd",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba07ded09542.76462765.jpg",
-            "webp": "assets\/team\/img_68ba07ded09542.76462765.webp"
+            "webp": "assets\/team\/img_68ba048224f195.80201194.webp",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true
         },
         {
             "id": "tm_68ba07e2e3e275.14232139",
-            "name": "qsd",
+            "name": "Persoon 2",
             "role": "qd",
             "appointment_url": "www.google.com",
             "image": "assets\/team\/img_68ba07eb0e0f67.49206558.jpg",
-            "webp": "assets\/team\/img_68ba07eb0e0f67.49206558.webp"
+            "webp": "assets\/team\/img_68ba07eb0e0f67.49206558.webp",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true
+        },
+        {
+            "id": "tm_68ba06e3e80c74.12586126",
+            "name": "Persoon 3",
+            "role": "qsd",
+            "appointment_url": "www.google.com",
+            "image": "assets\/team\/img_68ba07ded09542.76462765.jpg",
+            "webp": "assets\/team\/img_68ba07ded09542.76462765.webp",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true
         },
         {
             "id": "tm_68ba07f01b1c53.00888489",
-            "name": "qsd",
+            "name": "Persoon 1",
             "role": "qsd",
             "appointment_url": "www.google.com",
             "image": "assets\/team\/img_68ba07f53ed9b1.39732740.jpg",
-            "webp": "assets\/team\/img_68ba07f53ed9b1.39732740.webp"
+            "webp": "assets\/team\/img_68ba07f53ed9b1.39732740.webp",
+            "group_id": "grp_68baf0bb668b93.10144295",
+            "visible": true
+        },
+        {
+            "id": "tm_68ba0179405473.06971017",
+            "name": "Persoon 4",
+            "role": "qsd",
+            "appointment_url": "www.google.com",
+            "image": "assets\/team\/img_68ba017ec2a534.65946169.jpg",
+            "webp": "assets\/team\/img_68ba017ec2a534.65946169.webp",
+            "group_id": "grp_68baf0bb668b93.10144295",
+            "visible": true
+        }
+    ],
+    "groups": [
+        {
+            "id": "grp_68baf154a36e92.92728423",
+            "name": "Huisartsen",
+            "description": "Dit zijn de lijst van huisartsen",
+            "visible": true
+        },
+        {
+            "id": "grp_68baf0bb668b93.10144295",
+            "name": "Assistente",
+            "description": "",
+            "visible": true
         }
     ]
 }

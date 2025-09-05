@@ -170,8 +170,9 @@ $save_status = $_GET['save_status'] ?? '';
                     <div class="card-header">
                         <h2 class="card-title">Nieuw Teamlid Toevoegen</h2>
                     </div>
+                    <?php $groups = isset($teamData['groups']) && is_array($teamData['groups']) ? $teamData['groups'] : []; ?>
                     <form action="save.php" method="POST">
-                        <div class="card-body grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div class="card-body grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <input type="hidden" name="action" value="add_team_member">
                             <div>
                                 <label class="form-label">Naam</label>
@@ -182,14 +183,93 @@ $save_status = $_GET['save_status'] ?? '';
                                 <input type="text" name="role" class="form-input" placeholder="Functie" required>
                             </div>
                             <div>
+                                <label class="form-label">Functiegroep</label>
+                                <select name="group_id" class="form-input">
+                                    <option value="">Geen (ongegroepeerd)</option>
+                                    <?php foreach ($groups as $g): ?>
+                                        <option value="<?php echo htmlspecialchars($g['id'] ?? ''); ?>"><?php echo htmlspecialchars($g['name'] ?? ''); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="form-label">Afspraak URL (optioneel)</label>
                                 <input type="text" name="appointment_url" class="form-input" placeholder="https://...">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="inline-flex items-center gap-2">
+                                    <input type="checkbox" name="visible" checked>
+                                    <span>Zichtbaar</span>
+                                </label>
                             </div>
                         </div>
                         <div class="card-footer">
                              <button type="submit" class="btn btn-primary">Toevoegen</button>
                         </div>
                     </form>
+                </div>
+                <div class="card mt-6">
+                    <div class="card-header">
+                        <h2 class="card-title">Functiegroepen</h2>
+                    </div>
+                    <div class="card-body space-y-6">
+                        <form action="save.php" method="POST" class="border border-slate-200 rounded-lg p-4">
+                            <input type="hidden" name="action" value="add_team_group">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                <div>
+                                    <label class="form-label">Naam</label>
+                                    <input type="text" name="name" class="form-input" placeholder="Bijv. Huisartsen" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Beschrijving (optioneel)</label>
+                                    <input type="text" name="description" class="form-input" placeholder="Korte omschrijving">
+                                </div>
+                                <div class="md:col-span-3 flex items-center justify-between">
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="checkbox" name="visible" checked>
+                                        <span>Zichtbaar</span>
+                                    </label>
+                                    <button type="submit" class="btn btn-secondary">Groep toevoegen</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">Bestaande Functiegroepen</h3>
+                            <div id="team-groups" class="space-y-3">
+                                <?php foreach ($groups as $g): $gid = $g['id'] ?? uniqid('grp_', true); ?>
+                                <div class="border border-slate-200 rounded-lg p-4" data-id="<?php echo htmlspecialchars($gid); ?>">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="drag-handle cursor-move text-slate-400" title="Sleep">&#9776;</span>
+                                        <form action="save.php" method="POST" class="delete-form">
+                                            <input type="hidden" name="action" value="delete_team_group">
+                                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($gid); ?>">
+                                            <button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
+                                        </form>
+                                    </div>
+                                    <form action="save.php" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                                        <input type="hidden" name="action" value="update_team_group">
+                                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($gid); ?>">
+                                        <div>
+                                            <label class="form-label">Naam</label>
+                                            <input type="text" class="form-input" name="name" value="<?php echo htmlspecialchars($g['name'] ?? ''); ?>">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="form-label">Beschrijving</label>
+                                            <input type="text" class="form-input" name="description" value="<?php echo htmlspecialchars($g['description'] ?? ''); ?>">
+                                        </div>
+                                        <div class="md:col-span-3 flex items-center justify-between">
+                                            <label class="inline-flex items-center gap-2">
+                                                <input type="checkbox" name="visible" <?php echo !isset($g['visible']) || $g['visible'] ? 'checked' : ''; ?>>
+                                                <span>Zichtbaar</span>
+                                            </label>
+                                            <button type="submit" class="btn btn-secondary">Groep bijwerken</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card mt-6">
                     <div class="card-header">
@@ -216,8 +296,19 @@ $save_status = $_GET['save_status'] ?? '';
                                         <input type="text" name="name" class="form-input" value="<?php echo htmlspecialchars($m['name'] ?? ''); ?>">
                                         <label class="form-label">Functie</label>
                                         <input type="text" name="role" class="form-input" value="<?php echo htmlspecialchars($m['role'] ?? ''); ?>">
+                                        <label class="form-label">Functiegroep</label>
+                                        <select name="group_id" class="form-input">
+                                            <option value="">Geen (ongegroepeerd)</option>
+                                            <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; ?>
+                                                <option value="<?php echo htmlspecialchars($gid); ?>" <?php echo (($m['group_id'] ?? '') === $gid) ? 'selected' : ''; ?>><?php echo htmlspecialchars($g['name'] ?? ''); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
                                         <label class="form-label">Afspraak URL</label>
                                         <input type="text" name="appointment_url" class="form-input" value="<?php echo htmlspecialchars($m['appointment_url'] ?? ''); ?>">
+                                        <label class="inline-flex items-center gap-2 mt-2">
+                                            <input type="checkbox" name="visible" <?php echo !isset($m['visible']) || $m['visible'] ? 'checked' : ''; ?>>
+                                            <span>Zichtbaar</span>
+                                        </label>
                                     </form>
                                     <div class="flex gap-2 pt-2">
                                         <button type="submit" form="update-form-<?php echo htmlspecialchars($mid); ?>" class="btn btn-secondary">Opslaan</button>
@@ -234,6 +325,7 @@ $save_status = $_GET['save_status'] ?? '';
                     </div>
                 </div>
             </div>
+
 
             <div id="tab-practice" class="admin-tab-panel">
                 <div class="card">
@@ -306,6 +398,51 @@ $save_status = $_GET['save_status'] ?? '';
                 </div>
             </div>
 
+            <div id="tab-team-sort-panel" class="admin-tab-panel">
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h2 class="card-title">Sortering Teamleden per Functiegroep</h2>
+                </div>
+                <div class="card-body space-y-6">
+                    <?php
+                        $members = isset($teamData['members']) && is_array($teamData['members']) ? $teamData['members'] : [];
+                        $groups = isset($teamData['groups']) && is_array($teamData['groups']) ? $teamData['groups'] : [];
+                        $membersByGroup = [];
+                        foreach ($members as $mm) { $gid = $mm['group_id'] ?? ''; $membersByGroup[$gid] = $membersByGroup[$gid] ?? []; $membersByGroup[$gid][] = $mm; }
+                    ?>
+                    <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; ?>
+                    <div>
+                        <h3 class="font-semibold mb-2"><?php echo htmlspecialchars($g['name'] ?? ''); ?></h3>
+                        <div class="space-y-2 team-members-list" data-group-id="<?php echo htmlspecialchars($gid); ?>">
+                            <?php foreach (($membersByGroup[$gid] ?? []) as $mm): ?>
+                            <div class="flex items-center justify-between border border-slate-200 rounded-md p-2" data-id="<?php echo htmlspecialchars($mm['id'] ?? ''); ?>">
+                                <div class="flex items-center gap-2">
+                                    <span class="drag-handle cursor-move text-slate-400" title="Sleep">&#9776;</span>
+                                    <span><?php echo htmlspecialchars(($mm['name'] ?? '') . ' - ' . ($mm['role'] ?? '')); ?></span>
+                                </div>
+                                <?php if (isset($mm['visible']) && !$mm['visible']): ?><span class="text-xs text-slate-500">Verborgen</span><?php endif; ?>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                    <?php if (!empty($membersByGroup[''])): ?>
+                    <div>
+                        <h3 class="font-semibold mb-2">Ongegroepeerd</h3>
+                        <div class="space-y-2 team-members-list" data-group-id="">
+                            <?php foreach ($membersByGroup[''] as $mm): ?>
+                            <div class="flex items-center gap-2 border border-slate-200 rounded-md p-2" data-id="<?php echo htmlspecialchars($mm['id'] ?? ''); ?>">
+                                <span class="drag-handle cursor-move text-slate-400" title="Sleep">&#9776;</span>
+                                <span><?php echo htmlspecialchars(($mm['name'] ?? '') . ' - ' . ($mm['role'] ?? '')); ?></span>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            </div>
+
             <div id="tab-links" class="admin-tab-panel">
                 <div class="card">
                     <div class="card-header"><h2 class="card-title">Nuttige links</h2></div>
@@ -326,15 +463,17 @@ $save_status = $_GET['save_status'] ?? '';
                             </div>
                             <div id="links-list" class="space-y-2">
                                 <?php foreach ($items as $it): $iid = $it['id'] ?? uniqid('link_', true); ?>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-center" data-id="<?php echo htmlspecialchars($iid); ?>">
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 items-center" data-id="<?php echo htmlspecialchars($iid); ?>">
                                     <input type="hidden" name="link_id[]" value="<?php echo htmlspecialchars($iid); ?>">
                                     <div class="flex items-center gap-2">
                                         <span class="drag-handle cursor-move" title="Sleep om te verplaatsen">&#9776;</span>
-                                        <input type="text" class="form-input flex-1" name="link_label[]" placeholder="Omschrijving" value="<?php echo htmlspecialchars($it['label'] ?? ''); ?>">
+                                        <input type="text" class="form-input flex-1" name="link_label[]" placeholder="Naam" value="<?php echo htmlspecialchars($it['label'] ?? ''); ?>">
                                     </div>
                                     <input type="text" class="form-input" name="link_url[]" placeholder="https://... of www..." value="<?php echo htmlspecialchars($it['url'] ?? ''); ?>">
+                                    <input type="text" class="form-input" name="link_tel[]" placeholder="Telefoon (optioneel)" value="<?php echo htmlspecialchars($it['tel'] ?? ''); ?>">
+                                    <input type="text" class="form-input" name="link_category[]" placeholder="Categorie (optioneel)" value="<?php echo htmlspecialchars($it['category'] ?? ''); ?>">
                                     <div class="flex gap-2 items-center">
-                                        <input type="text" class="form-input flex-1" name="link_tel[]" placeholder="Telefoon (optioneel)" value="<?php echo htmlspecialchars($it['tel'] ?? ''); ?>">
+                                        <input type="text" class="form-input flex-1" name="link_desc[]" placeholder="Omschrijving (optioneel)" value="<?php echo htmlspecialchars($it['description'] ?? ''); ?>">
                                         <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.grid').remove()">X</button>
                                     </div>
                                 </div>
@@ -381,14 +520,16 @@ $save_status = $_GET['save_status'] ?? '';
                                 </div>
                             </div>
                             <div>
-                                <h3 class="font-semibold mb-2">Nuttige telefoonnummers (in footer)</h3>
+                                <h3 class="font-semibold mb-2">Nuttige telefoonnummers</h3>
                                 <?php $phones = isset($settings['footer_phones']) && is_array($settings['footer_phones']) ? $settings['footer_phones'] : []; ?>
                                 <div id="phones-list" class="space-y-2">
                                     <?php foreach ($phones as $ph): ?>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
-                                        <input type="text" class="form-input" name="phone_label[]" placeholder="Omschrijving" value="<?php echo htmlspecialchars($ph['label'] ?? ''); ?>">
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
+                                        <input type="text" class="form-input" name="phone_label[]" placeholder="Naam" value="<?php echo htmlspecialchars($ph['label'] ?? ''); ?>">
+                                        <input type="text" class="form-input" name="phone_tel[]" placeholder="Telefoon" value="<?php echo htmlspecialchars($ph['tel'] ?? ''); ?>">
+                                        <input type="text" class="form-input" name="phone_desc[]" placeholder="Omschrijving (optioneel)" value="<?php echo htmlspecialchars($ph['desc'] ?? ''); ?>">
                                         <div class="flex gap-2 items-center">
-                                            <input type="text" class="form-input" name="phone_tel[]" placeholder="Telefoon" value="<?php echo htmlspecialchars($ph['tel'] ?? ''); ?>">
+                                            <input type="text" class="form-input flex-1" name="phone_url[]" placeholder="Link (optioneel)" value="<?php echo htmlspecialchars($ph['url'] ?? ''); ?>">
                                             <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.grid').remove()">X</button>
                                         </div>
                                     </div>
@@ -560,16 +701,24 @@ $save_status = $_GET['save_status'] ?? '';
       const list = document.getElementById('links-list'); if(!list) return;
       const id = 'link_' + Math.random().toString(36).substring(2, 9);
       const row = document.createElement('div');
-      row.className = 'grid grid-cols-1 md:grid-cols-3 gap-2 items-center';
+      row.className = 'grid grid-cols-1 md:grid-cols-5 gap-2 items-center';
       row.dataset.id = id;
-      row.innerHTML = '<input type="hidden" name="link_id[]" value="'+id+'"><div class="flex items-center gap-2"><span class="drag-handle cursor-move" title="Sleep">&#9776;</span><input type="text" class="form-input flex-1" name="link_label[]" placeholder="Omschrijving"></div><input type="text" class="form-input" name="link_url[]" placeholder="https://..."><div class="flex gap-2 items-center"><input type="text" class="form-input flex-1" name="link_tel[]" placeholder="Telefoon"><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'.grid\').remove()">X</button></div>';
+      row.innerHTML = '<input type="hidden" name="link_id[]" value="'+id+'">'
+        + '<div class="flex items-center gap-2"><span class="drag-handle cursor-move" title="Sleep">&#9776;</span><input type="text" class="form-input flex-1" name="link_label[]" placeholder="Naam"></div>'
+        + '<input type="text" class="form-input" name="link_url[]" placeholder="https://... of www...">'
+        + '<input type="text" class="form-input" name="link_tel[]" placeholder="Telefoon (optioneel)">'
+        + '<input type="text" class="form-input" name="link_category[]" placeholder="Categorie (optioneel)">'
+        + '<div class="flex gap-2 items-center"><input type="text" class="form-input flex-1" name="link_desc[]" placeholder="Omschrijving (optioneel)"><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'div.grid\').remove()">X</button></div>';
       list.appendChild(row);
     };
     window.addPhoneItem = function(){
       const list = document.getElementById('phones-list'); if(!list) return;
       const row = document.createElement('div');
-      row.className = 'grid grid-cols-1 md:grid-cols-2 gap-2 items-center';
-      row.innerHTML = '<input type="text" class="form-input" name="phone_label[]" placeholder="Omschrijving"><div class="flex gap-2 items-center"><input type="text" class="form-input" name="phone_tel[]" placeholder="Telefoon"><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'.grid\').remove()">X</button></div>';
+      row.className = 'grid grid-cols-1 md:grid-cols-4 gap-2 items-center';
+      row.innerHTML = '<input type="text" class="form-input" name="phone_label[]" placeholder="Naam">'
+        + '<input type="text" class="form-input" name="phone_tel[]" placeholder="Telefoon">'
+        + '<input type="text" class="form-input" name="phone_desc[]" placeholder="Omschrijving (optioneel)">'
+        + '<div class="flex gap-2 items-center"><input type="text" class="form-input flex-1" name="phone_url[]" placeholder="Link (optioneel)"><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'div.grid\').remove()">X</button></div>';
       list.appendChild(row);
     };
     window.addPinnedItem = function(){

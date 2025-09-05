@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Close any submenus when toggling main menu
             document.getElementById('mobile-team-menu')?.classList.add('hidden');
             document.getElementById('mobile-practice-menu')?.classList.add('hidden');
+            document.getElementById('mobile-links-menu')?.classList.add('hidden');
         });
         // Close the menu after clicking a link
         document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => mobileMenu.classList.add('hidden')));
@@ -70,6 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             mobilePracticeMenu.classList.toggle('hidden');
             mobilePracticeToggle.setAttribute('aria-expanded', mobilePracticeMenu.classList.contains('hidden') ? 'false' : 'true');
+        });
+    }
+
+    // Mobile: toggle links dropdown
+    const mobileLinksToggle = document.getElementById('mobile-links-toggle');
+    const mobileLinksMenu = document.getElementById('mobile-links-menu');
+    if (mobileLinksToggle && mobileLinksMenu) {
+        mobileLinksToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            mobileLinksMenu.classList.toggle('hidden');
+            mobileLinksToggle.setAttribute('aria-expanded', mobileLinksMenu.classList.contains('hidden') ? 'false' : 'true');
         });
     }
 

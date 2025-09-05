@@ -39,23 +39,74 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
         <?php if (empty($members)): ?>
           <p class="text-slate-600">Er zijn nog geen teamleden toegevoegd.</p>
         <?php else: ?>
-        <div class="grid gap-8 sm:grid-cols-2">
-          <?php foreach ($members as $m): ?>
-            <?php $anchor = 'm-' . (!empty($m['id']) ? preg_replace('/[^a-zA-Z0-9_-]/','', $m['id']) : substr(md5(($m['name'] ?? '') . ($m['role'] ?? '')),0,8)); ?>
-            <article id="<?php echo htmlspecialchars($anchor); ?>" class="team-card rounded-xl overflow-hidden shadow-md bg-white">
-              <?php if (!empty($m['image'])): ?>
-              <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full">
-              <?php endif; ?>
-              <div class="p-5">
-                <h2 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h2>
-                <p class="text-slate-600 mb-4"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
-            <?php $url = $m['appointment_url'] ?? $appointmentUrl; if (!empty($url)): ?>
-                  <a href="<?php echo htmlspecialchars(safeUrl($url)); ?>" target="_blank" class="btn btn-primary">Maak een afspraak</a>
-            <?php endif; ?>
-              </div>
-            </article>
-          <?php endforeach; ?>
+        <?php
+          // Prepare groups and visible members by group
+          $groups = isset($teamData['groups']) && is_array($teamData['groups']) ? $teamData['groups'] : [];
+          $visibleMembers = array_values(array_filter($members, function($m){ return !isset($m['visible']) || $m['visible']; }));
+          $membersByGroup = [];
+          foreach ($visibleMembers as $mm) { $gid = $mm['group_id'] ?? ''; if (!isset($membersByGroup[$gid])) { $membersByGroup[$gid] = []; } $membersByGroup[$gid][] = $mm; }
+          $rendered = false;
+        ?>
+        <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; if (isset($g['visible']) && !$g['visible']) continue; $list = $membersByGroup[$gid] ?? []; if (empty($list)) continue; $rendered = true; ?>
+          <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">
+              <?php echo htmlspecialchars($g['name'] ?? ''); ?>
+            </h2>
+            <?php if (!empty($g['description'])): ?><p class="text-slate-600 mb-4"><?php echo htmlspecialchars($g['description']); ?></p><?php endif; ?>
+            <div class="team-grid grid gap-6 grid-cols-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+              <?php foreach ($list as $m): ?>
+                <?php $anchor = 'm-' . (!empty($m['id']) ? preg_replace('/[^a-zA-Z0-9_-]/','', $m['id']) : substr(md5(($m['name'] ?? '') . ($m['role'] ?? '')),0,8)); ?>
+                <?php $cardUrl = $m['appointment_url'] ?? $appointmentUrl; ?>
+                <article id="<?php echo htmlspecialchars($anchor); ?>" class="team-card rounded-xl overflow-hidden shadow-md bg-white relative <?php echo !empty($cardUrl) ? 'cursor-pointer md:cursor-default' : ''; ?>">
+                  <?php if (!empty($cardUrl)): ?>
+                    <a href="<?php echo htmlspecialchars(safeUrl($cardUrl)); ?>" target="_blank" class="absolute inset-0 md:hidden z-10" aria-label="Maak een afspraak met <?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>"></a>
+                  <?php endif; ?>
+                  <?php if (!empty($m['image'])): ?>
+                  <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full">
+                  <?php endif; ?>
+                  <div class="p-5">
+                    <h3 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h3>
+                    <p class="text-slate-600 mb-4"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
+                    <?php if (!empty($cardUrl)): ?>
+                      <a href="<?php echo htmlspecialchars(safeUrl($cardUrl)); ?>" target="_blank" class="btn btn-primary hidden md:inline-flex">Maak een afspraak</a>
+                    <?php endif; ?>
+                  </div>
+                </article>
+              <?php endforeach; ?>
+            </div>
+          </section>
+        <?php endforeach; ?>
+        <?php if (!empty($membersByGroup[''])): $rendered = true; ?>
+          <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">Overige</h2>
+            <div class="team-grid grid gap-6 grid-cols-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+              <?php foreach ($membersByGroup[''] as $m): ?>
+                <?php $anchor = 'm-' . (!empty($m['id']) ? preg_replace('/[^a-zA-Z0-9_-]/','', $m['id']) : substr(md5(($m['name'] ?? '') . ($m['role'] ?? '')),0,8)); ?>
+                <?php $cardUrl = $m['appointment_url'] ?? $appointmentUrl; ?>
+                <article id="<?php echo htmlspecialchars($anchor); ?>" class="team-card rounded-xl overflow-hidden shadow-md bg-white relative <?php echo !empty($cardUrl) ? 'cursor-pointer md:cursor-default' : ''; ?>">
+                  <?php if (!empty($cardUrl)): ?>
+                    <a href="<?php echo htmlspecialchars(safeUrl($cardUrl)); ?>" target="_blank" class="absolute inset-0 md:hidden z-10" aria-label="Maak een afspraak met <?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>"></a>
+                  <?php endif; ?>
+                  <?php if (!empty($m['image'])): ?>
+                  <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full">
+                  <?php endif; ?>
+                  <div class="p-5">
+                    <h3 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h3>
+                    <p class="text-slate-600 mb-4"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
+                    <?php if (!empty($cardUrl)): ?>
+                      <a href="<?php echo htmlspecialchars(safeUrl($cardUrl)); ?>" target="_blank" class="btn btn-primary hidden md:inline-flex">Maak een afspraak</a>
+                    <?php endif; ?>
+                  </div>
+                </article>
+              <?php endforeach; ?>
+            </div>
+          </section>
+        <?php endif; ?>
+        <?php if (!empty($appointmentUrl) && $rendered): ?>
+        <div class="mt-10 text-center">
+          <a href="<?php echo htmlspecialchars(safeUrl($appointmentUrl)); ?>" target="_blank" class="btn btn-primary">Maak een afspraak</a>
         </div>
+        <?php endif; ?>
         <?php endif; ?>
       </div>
       <?php

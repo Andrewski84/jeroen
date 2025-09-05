@@ -182,11 +182,22 @@ switch ($action) {
         $name = trim($_POST['name'] ?? '');
         $role = trim($_POST['role'] ?? '');
         $appt = trim($_POST['appointment_url'] ?? '');
+        $groupId = trim($_POST['group_id'] ?? '');
+        $visible = isset($_POST['visible']) ? true : true; // default visible
         if ($name !== '' && $role !== '') {
             $data = loadJsonFile($teamFilePath);
             if (!isset($data['members']) || !is_array($data['members'])) $data['members'] = [];
             $id = uniqid('tm_', true);
-            $data['members'][] = ['id' => $id, 'name' => $name, 'role' => $role, 'appointment_url' => $appt, 'image' => '', 'webp' => ''];
+            $data['members'][] = [
+                'id' => $id,
+                'name' => $name,
+                'role' => $role,
+                'appointment_url' => $appt,
+                'group_id' => $groupId,
+                'visible' => (bool)$visible,
+                'image' => '',
+                'webp' => ''
+            ];
             @mkdir(dirname($teamFilePath), 0755, true);
             saveJsonFile($teamFilePath, $data);
         }
@@ -202,6 +213,8 @@ switch ($action) {
                         $m['name'] = trim($_POST['name'] ?? ($m['name'] ?? ''));
                         $m['role'] = trim($_POST['role'] ?? ($m['role'] ?? ''));
                         $m['appointment_url'] = trim($_POST['appointment_url'] ?? ($m['appointment_url'] ?? ''));
+                        $m['group_id'] = trim($_POST['group_id'] ?? ($m['group_id'] ?? ''));
+                        $m['visible'] = isset($_POST['visible']);
                         break;
                     }
                 }
@@ -238,6 +251,104 @@ switch ($action) {
         }
         break;
 
+    // --- Team Groups management ---
+    case 'add_team_group':
+        $name = trim($_POST['name'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $visible = isset($_POST['visible']);
+        if ($name !== '') {
+            $data = loadJsonFile($teamFilePath);
+            if (!isset($data['groups']) || !is_array($data['groups'])) $data['groups'] = [];
+            $gid = uniqid('grp_', true);
+            $data['groups'][] = [ 'id' => $gid, 'name' => $name, 'description' => $description, 'visible' => $visible ];
+            @mkdir(dirname($teamFilePath), 0755, true);
+            saveJsonFile($teamFilePath, $data);
+        }
+        break;
+
+    case 'update_team_group':
+        $gid = $_POST['id'] ?? '';
+        if ($gid !== '') {
+            $data = loadJsonFile($teamFilePath);
+            if (isset($data['groups']) && is_array($data['groups'])) {
+                foreach ($data['groups'] as &$g) {
+                    if (($g['id'] ?? '') === $gid) {
+                        $g['name'] = trim($_POST['name'] ?? ($g['name'] ?? ''));
+                        $g['description'] = trim($_POST['description'] ?? ($g['description'] ?? ''));
+                        $g['visible'] = isset($_POST['visible']);
+                        break;
+                    }
+                }
+                unset($g);
+                saveJsonFile($teamFilePath, $data);
+            }
+        }
+        break;
+
+    case 'delete_team_group':
+        $gid = $_POST['id'] ?? '';
+        if ($gid !== '') {
+            $data = loadJsonFile($teamFilePath);
+            if (!empty($data['groups'])) {
+                $data['groups'] = array_values(array_filter($data['groups'], fn($g) => ($g['id'] ?? '') !== $gid));
+            }
+            if (!empty($data['members'])) {
+                foreach ($data['members'] as &$m) { if (($m['group_id'] ?? '') === $gid) { $m['group_id'] = ''; } }
+                unset($m);
+            }
+            saveJsonFile($teamFilePath, $data);
+        }
+        break;
+
+    case 'reorder_team_groups':
+        $order = $_POST['order'] ?? [];
+        $data = loadJsonFile($teamFilePath);
+        $groups = $data['groups'] ?? [];
+        if (is_array($groups)) {
+            $byId = [];
+            foreach ($groups as $g) { $byId[$g['id'] ?? ''] = $g; }
+            $new = [];
+            foreach ($order as $id) { if (isset($byId[$id])) $new[] = $byId[$id]; }
+            foreach ($groups as $g) { if (!in_array($g['id'] ?? '', $order, true)) $new[] = $g; }
+            $data['groups'] = $new;
+            saveJsonFile($teamFilePath, $data);
+        }
+        if ($isAjax) { echo json_encode(['status' => 'success']); exit; }
+        break;
+
+    case 'reorder_team_members':
+        $order = $_POST['order'] ?? [];
+        $groupId = $_POST['group_id'] ?? '';
+        $data = loadJsonFile($teamFilePath);
+        $members = $data['members'] ?? [];
+        if (is_array($members)) {
+            // Group current members by group_id
+            $byGroup = [];
+            foreach ($members as $m) { $byGroup[$m['group_id'] ?? ''] = $byGroup[$m['group_id'] ?? ''] ?? []; $byGroup[$m['group_id'] ?? ''][] = $m; }
+            $list = $byGroup[$groupId] ?? [];
+            // Index by id
+            $byId = [];
+            foreach ($list as $m) { $byId[$m['id'] ?? ''] = $m; }
+            // Build new ordered list for this group
+            $newList = [];
+            foreach ($order as $id) { if (isset($byId[$id])) $newList[] = $byId[$id]; }
+            foreach ($list as $m) { if (!in_array($m['id'] ?? '', $order, true)) $newList[] = $m; }
+            $byGroup[$groupId] = $newList;
+            // Rebuild global members by current groups order
+            $groups = $data['groups'] ?? [];
+            $rebuilt = [];
+            // First, groups in defined order
+            foreach ($groups as $g) {
+                $gid = $g['id'] ?? '';
+                if (isset($byGroup[$gid])) { foreach ($byGroup[$gid] as $m) { $rebuilt[] = $m; unset($byGroup[$gid]); } }
+            }
+            // Then any remaining (ungrouped or missing groups)
+            foreach ($byGroup as $gid => $arr) { foreach ($arr as $m) { $rebuilt[] = $m; } }
+            $data['members'] = $rebuilt;
+            saveJsonFile($teamFilePath, $data);
+        }
+        if ($isAjax) { echo json_encode(['status' => 'success']); exit; }
+        break;
     // --- Praktijkinfo management ---
     case 'save_practice_page':
         $slug = trim($_POST['slug'] ?? '');
@@ -280,6 +391,8 @@ switch ($action) {
         $labels = $_POST['link_label'] ?? [];
         $urls   = $_POST['link_url'] ?? [];
         $tels   = $_POST['link_tel'] ?? [];
+        $descs  = $_POST['link_desc'] ?? [];
+        $cats   = $_POST['link_category'] ?? [];
         $ids    = $_POST['link_id'] ?? [];
         $items = [];
         $max = is_array($labels) ? count($labels) : 0;
@@ -287,9 +400,11 @@ switch ($action) {
             $label = trim($labels[$i] ?? '');
             $url = trim($urls[$i] ?? '');
             $tel = trim($tels[$i] ?? '');
+            $desc = trim($descs[$i] ?? '');
+            $cat = trim($cats[$i] ?? '');
             if ($label !== '' && ($url !== '' || $tel !== '')) {
                 $id = $ids[$i] ?? uniqid('link_', true);
-                $items[] = ['id' => $id, 'label' => $label, 'url' => $url, 'tel' => $tel];
+                $items[] = ['id' => $id, 'label' => $label, 'url' => $url, 'tel' => $tel, 'description' => $desc, 'category' => $cat];
             }
         }
         $data['items'] = $items;
@@ -377,11 +492,16 @@ switch ($action) {
         $content['settings']['map_embed'] = $_POST['map_embed'] ?? '';
         $labels = $_POST['phone_label'] ?? [];
         $tels = $_POST['phone_tel'] ?? [];
+        $descs = $_POST['phone_desc'] ?? [];
+        $urls  = $_POST['phone_url'] ?? [];
         $list = [];
         $n = is_array($labels) ? count($labels) : 0;
         for ($i=0; $i<$n; $i++) {
-            $l = trim($labels[$i] ?? ''); $t = trim($tels[$i] ?? '');
-            if ($l !== '' && $t !== '') { $list[] = ['label' => $l, 'tel' => $t]; }
+            $l = trim($labels[$i] ?? '');
+            $t = trim($tels[$i] ?? '');
+            $d = trim($descs[$i] ?? '');
+            $u = trim($urls[$i] ?? '');
+            if ($l !== '' && $t !== '') { $list[] = ['label' => $l, 'tel' => $t, 'desc' => $d, 'url' => $u]; }
         }
         $content['settings']['footer_phones'] = $list;
         saveJsonFile($contentFilePath, $content);
@@ -419,6 +539,8 @@ if (!$isAjax) {
     $hash = '#tab-homepage';
     $tabMap = [
         'add_team_member' => '#tab-team', 'update_team_member' => '#tab-team', 'delete_team_member' => '#tab-team',
+        'add_team_group' => '#tab-team', 'update_team_group' => '#tab-team', 'delete_team_group' => '#tab-team',
+        'reorder_team_groups' => '#tab-team', 'reorder_team_members' => '#tab-team',
         'save_practice_page' => '#tab-practice', 'delete_practice_page' => '#tab-practice',
         'save_links' => '#tab-links', 'save_settings' => '#tab-settings',
         'save_pinned' => '#tab-pinned',

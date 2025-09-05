@@ -33,15 +33,21 @@
         "footer_phones": [
             {
                 "label": "Hulpdiensten",
-                "tel": "112"
+                "tel": "112",
+                "desc": "test",
+                "url": ""
             },
             {
                 "label": "Antigifcentrum",
-                "tel": "070 245 245"
+                "tel": "070 245 245",
+                "desc": "tes",
+                "url": ""
             },
             {
                 "label": "Antigifcentrum",
-                "tel": "070 245 245"
+                "tel": "070 245 245",
+                "desc": "te",
+                "url": ""
             }
         ]
     },

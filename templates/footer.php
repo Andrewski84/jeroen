@@ -27,21 +27,7 @@ $mapEmbed = $settings['map_embed'] ?? '';
         <?php if ($address2): ?><p class="text-slate-700"><?php echo htmlspecialchars($address2); ?></p><?php endif; ?>
         <?php if ($phone): ?><p class="mt-2">Tel: <a class="text-blue-600" href="tel:<?php echo htmlspecialchars($phone); ?>"><?php echo htmlspecialchars($phone); ?></a></p><?php endif; ?>
 
-        <?php if (!empty($usefulPhones)): ?>
-        <div class="mt-6">
-          <h4 class="font-semibold mb-2">Nuttige telefoonnummers</h4>
-          <ul class="space-y-1 text-slate-700">
-            <?php foreach ($usefulPhones as $ph): ?>
-              <li>
-                <?php echo htmlspecialchars($ph['label'] ?? ''); ?>:
-                <?php if (!empty($ph['tel'])): ?>
-                  <a href="tel:<?php echo htmlspecialchars($ph['tel']); ?>" class="text-blue-600"><?php echo htmlspecialchars($ph['tel']); ?></a>
-                <?php endif; ?>
-              </li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-        <?php endif; ?>
+        <!-- Telefoonnummers staan niet langer in de footer; zie aparte pagina -->
       </div>
       <div class="flex-1">
         <?php if (!empty($mapEmbed)): ?>

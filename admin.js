@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!tabId) return;
         tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
         tabPanels.forEach(panel => panel.classList.toggle('active', panel.id === tabId));
+        // Also toggle auxiliary panels linked to main tabs
+        const teamSortPanel = document.getElementById('tab-team-sort-panel');
+        if (teamSortPanel) teamSortPanel.classList.toggle('active', tabId === 'tab-team');
         
         const newHash = '#' + tabId;
         if (history.pushState && window.location.hash !== newHash) {
@@ -208,6 +211,30 @@ document.addEventListener('DOMContentLoaded', function () {
     initSortable('#practice-table tbody', 'reorder_practice_pages');
     initSortable('#pinned-list', 'reorder_pinned');
     initSortable('#links-list', 'reorder_links');
+    initSortable('#team-groups', 'reorder_team_groups');
+
+    // Sort members within each team group
+    function initTeamMembersSort() {
+        document.querySelectorAll('.team-members-list').forEach(list => {
+            if (list._sortableInit || typeof Sortable === 'undefined') return;
+            const groupId = list.dataset.groupId || '';
+            list._sortableInit = true;
+            new Sortable(list, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: (evt) => {
+                    const order = Array.from(evt.target.children).map(item => item.dataset.id);
+                    const fd = new FormData();
+                    fd.append('action', 'reorder_team_members');
+                    fd.append('group_id', groupId);
+                    order.forEach(id => fd.append('order[]', id));
+                    fd.append('ajax', '1');
+                    fetch('save.php', { method: 'POST', body: fd });
+                }
+            });
+        });
+    }
+    initTeamMembersSort();
     
     // --- Global Pop-up System ---
     const toastPopup = document.getElementById('toast-popup');

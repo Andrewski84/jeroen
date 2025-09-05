@@ -146,6 +146,11 @@ section { padding: 5rem 0; }
     object-fit: cover;
 }
 
+/* Team grid breakpoint refinements */
+@media (min-width: 1200px) {
+  .team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
 
 /* Reveal on scroll (works with main.js IntersectionObserver) */
 .stagger-container .reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }

@@ -28,62 +28,57 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
 <?php $page = 'links'; include TEMPLATES_DIR . '/header.php'; ?>
 <div class="main-content">
 <main>
+  <?php if (!empty($hero['image'])): ?>
   <section class="h-80 bg-cover bg-center flex items-center justify-center" style="background-image: url('<?php echo htmlspecialchars($hero['image'] ?? ''); ?>');">
-    <h1 class="text-4xl font-semibold text-white drop-shadow" style="font-family: var(--font-heading);">
-      <?php echo htmlspecialchars($hero['title'] ?? 'Nuttige links'); ?>
-    </h1>
+      <h1 class="text-4xl font-semibold text-white drop-shadow" style="font-family: var(--font-heading);">
+        <?php echo htmlspecialchars($hero['title'] ?? 'Nuttige links'); ?>
+      </h1>
   </section>
+  <?php else: ?>
+  <section class="py-10">
+    <div class="container mx-auto px-6">
+      <h1 class="text-4xl font-semibold" style="font-family: var(--font-heading);">Nuttige links</h1>
+    </div>
+  </section>
+  <?php endif; ?>
   <section class="py-12">
     <div class="container mx-auto px-6">
-      <div class="grid gap-8 lg:grid-cols-3">
-        <div class="lg:col-span-2">
-          <?php if (empty($items)): ?>
-            <p class="text-slate-600">Nog geen links beschikbaar.</p>
-          <?php else: ?>
-          <div class="overflow-x-auto">
-            <table class="min-w-full bg-white rounded-xl overflow-hidden shadow">
-              <thead class="bg-slate-100">
-                <tr>
-                  <th class="text-left px-4 py-3">Naam</th>
-                  <th class="text-left px-4 py-3">Link/Telefoon</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php foreach ($items as $it): ?>
-                  <tr class="border-t border-slate-200">
-                    <td class="px-4 py-3 font-medium"><?php echo htmlspecialchars($it['label'] ?? ''); ?></td>
-                    <td class="px-4 py-3">
+      <?php if (empty($items)): ?>
+        <p class="text-slate-600">Nog geen links beschikbaar.</p>
+      <?php else: ?>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-xl overflow-hidden shadow">
+          <thead class="bg-slate-100">
+            <tr>
+              <th class="text-left px-4 py-3">Naam</th>
+              <th class="text-left px-4 py-3">URL</th>
+              <th class="text-left px-4 py-3">Telefoon</th>
+              <th class="text-left px-4 py-3">Categorie</th>
+              <th class="text-left px-4 py-3">Omschrijving</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($items as $it): ?>
+              <tr class="border-t border-slate-200">
+                <td class="px-4 py-3 font-medium"><?php echo htmlspecialchars($it['label'] ?? ''); ?></td>
+                <td class="px-4 py-3">
                   <?php if (!empty($it['url'])): ?>
-                    <a href="<?php echo htmlspecialchars(safeUrl($it['url'])); ?>" class="text-blue-600" target="_blank"><?php echo htmlspecialchars(safeUrl($it['url'])); ?></a>
-                      <?php elseif (!empty($it['tel'])): ?>
-                        <a href="tel:<?php echo htmlspecialchars($it['tel']); ?>" class="text-blue-600"><?php echo htmlspecialchars($it['tel']); ?></a>
-                      <?php endif; ?>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
-              </tbody>
-            </table>
-          </div>
-          <?php endif; ?>
-        </div>
-        <?php
-        $pinned = ($siteContent['pinned'] ?? []);
-        $pinnedList = [];
-        foreach ($pinned as $pin) {
-          $scope = $pin['scope'] ?? [];
-          if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
-          if (in_array('all',$scope) || in_array('links',$scope)) $pinnedList[] = $pin;
-        }
-        ?>
-        <aside class="space-y-4 lg:col-span-1">
-          <?php foreach ($pinnedList as $pin): ?>
-          <div class="rounded-xl p-5 pinned-card">
-            <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
-            <div class="prose max-w-none"><?php echo $pin['text'] ?? ''; ?></div>
-          </div>
-          <?php endforeach; ?>
-        </aside>
+                    <a href="<?php echo htmlspecialchars(safeUrl($it['url'])); ?>" class="text-blue-600" target="_blank"><?php echo htmlspecialchars($it['url']); ?></a>
+                  <?php endif; ?>
+                </td>
+                <td class="px-4 py-3">
+                  <?php if (!empty($it['tel'])): ?>
+                    <a href="tel:<?php echo htmlspecialchars($it['tel']); ?>" class="text-blue-600"><?php echo htmlspecialchars($it['tel']); ?></a>
+                  <?php endif; ?>
+                </td>
+                <td class="px-4 py-3"><?php echo htmlspecialchars($it['category'] ?? ''); ?></td>
+                <td class="px-4 py-3"><?php echo htmlspecialchars($it['description'] ?? ''); ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
       </div>
+      <?php endif; ?>
     </div>
   </section>
 </main>

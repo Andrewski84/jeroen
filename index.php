@@ -41,6 +41,10 @@ require_once 'helpers.php';
         $teamFile = defined('TEAM_FILE') ? TEAM_FILE : (defined('DATA_DIR') ? DATA_DIR . '/team/team.json' : __DIR__ . '/data/team/team.json');
         $teamData = file_exists($teamFile) ? (json_decode(file_get_contents($teamFile), true) ?: []) : [];
         $teamMembers = $teamData['members'] ?? [];
+        // Respect visibility flags if set
+        if (is_array($teamMembers)) {
+            $teamMembers = array_values(array_filter($teamMembers, function($m){ return !isset($m['visible']) || $m['visible']; }));
+        }
     ?>
 
     <section id="home" class="h-screen min-h-[600px] bg-cover bg-center bg-fixed flex items-center justify-center stagger-container" style="background-image: url('<?php echo htmlspecialchars($content['hero']['image'] ?? ''); ?>');">
