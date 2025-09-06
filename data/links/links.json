@@ -1,14 +1,14 @@
 {
     "hero": {
         "title": "test",
-        "image": "assets\/images\/img_68b9cc50177835.99549984.png",
-        "webp": "assets\/images\/img_68b9cc50177835.99549984.webp"
+        "image": "assets/images/img_68b9cc50177835.99549984.png",
+        "webp": "assets/images/img_68b9cc50177835.99549984.webp"
     },
     "items": [
         {
             "id": "link_68b9fbebc4c788.59285080",
             "label": "Antigifcentrum Antigifcentrum",
-            "url": "https:\/\/www.antigifcentrum.be",
+            "url": "https://www.antigifcentrum.be",
             "tel": "",
             "description": "",
             "category": ""
@@ -16,10 +16,18 @@
         {
             "id": "link_68b9dd8544ed80.39529536",
             "label": "Antigifcentrum",
-            "url": "https:\/\/www.antigifcentrum.be",
+            "url": "https://www.antigifcentrum.be",
             "tel": "070 24 52 45",
             "description": "",
             "category": ""
+        },
+        {
+            "id": "link_q3zul0u",
+            "label": "Antigifcentrum Antigifcentrum",
+            "url": "",
+            "tel": "070 24 52 45",
+            "description": "",
+            "category": "070 24 52 45"
         }
     ]
 }

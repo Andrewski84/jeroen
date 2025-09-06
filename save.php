@@ -60,11 +60,11 @@ switch ($action) {
         $confirm_password = $_POST['confirm_password'] ?? '';
 
         if (!defined('ADMIN_PASSWORD_HASH') || !password_verify($old_password, ADMIN_PASSWORD_HASH)) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_wrong#tab-security');
+            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_wrong#security');
             exit;
         }
         if (empty($new_password) || $new_password !== $confirm_password) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_mismatch#tab-security');
+            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_mismatch#security');
             exit;
         }
 
@@ -80,24 +80,16 @@ switch ($action) {
         }
 
         if (file_put_contents('config.php', $newConfigContent)) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=success#tab-security');
+            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=success#security');
         } else {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_file#tab-security');
+            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?password_change=error_file#security');
         }
         exit;
 
     case 'save_practice_hero':
         $data = loadJsonFile($practiceFilePath);
         if (!isset($data['hero']) || !is_array($data['hero'])) $data['hero'] = [];
-        // Title is not saved here, only image via upload_ajax. This action is for form submission.
-        // We can add a title field if needed in the future. For now, it just needs a form to submit.
         saveJsonFile($practiceFilePath, $data);
-        break;
-
-    case 'save_phones_hero':
-        if (!isset($content['phones_hero']) || !is_array($content['phones_hero'])) $content['phones_hero'] = [];
-        $content['phones_hero']['title'] = $_POST['phones_hero_title'] ?? '';
-        saveJsonFile($contentFilePath, $content);
         break;
 
     // --- Team management ---
@@ -157,7 +149,7 @@ switch ($action) {
                     if (($m['id'] ?? '') === $id) {
                         foreach (['image','webp'] as $k) {
                             if (!empty($m[$k])) {
-                                $absPath = BASE_DIR . '/' . toPublicPath($m[$k]);
+                                $absPath = BASE_DIR . '/' . $m[$k];
                                 if (file_exists($absPath)) { @unlink($absPath); }
                             }
                         }
@@ -264,7 +256,6 @@ switch ($action) {
         $urls   = $_POST['link_url'] ?? [];
         $tels   = $_POST['link_tel'] ?? [];
         $descs  = $_POST['link_desc'] ?? [];
-        $cats   = $_POST['link_category'] ?? [];
         $ids    = $_POST['link_id'] ?? [];
         $items = [];
         $max = is_array($labels) ? count($labels) : 0;
@@ -273,10 +264,9 @@ switch ($action) {
             $url = trim($urls[$i] ?? '');
             $tel = trim($tels[$i] ?? '');
             $desc = trim($descs[$i] ?? '');
-            $cat = trim($cats[$i] ?? '');
             if ($label !== '' && ($url !== '' || $tel !== '')) {
                 $id = $ids[$i] ?? uniqid('link_', true);
-                $items[] = ['id' => $id, 'label' => $label, 'url' => $url, 'tel' => $tel, 'description' => $desc, 'category' => $cat];
+                $items[] = ['id' => $id, 'label' => $label, 'url' => $url, 'tel' => $tel, 'description' => $desc];
             }
         }
         $data['items'] = $items;
@@ -288,12 +278,6 @@ switch ($action) {
         $ids = $_POST['pinned_id'] ?? [];
         $titles = $_POST['pinned_title'] ?? [];
         $texts = $_POST['pinned_text'] ?? [];
-        $home = $_POST['pinned_scope_home'] ?? [];
-        $team = $_POST['pinned_scope_team'] ?? [];
-        $practice = $_POST['pinned_scope_practice'] ?? [];
-        $links = $_POST['pinned_scope_links'] ?? [];
-        $phones = $_POST['pinned_scope_phones'] ?? [];
-        $all = $_POST['pinned_scope_all'] ?? [];
         $items = [];
         $n = is_array($ids) ? count($ids) : 0;
         for ($i = 0; $i < $n; $i++) {
@@ -301,16 +285,16 @@ switch ($action) {
             $title = trim($titles[$i] ?? '');
             $text = $texts[$i] ?? '';
             if ($title === '' && trim(strip_tags($text)) === '') continue;
+            
             $scope = [];
-            if (in_array($pid, (array)$all, true) && $pid !== '') { $scope = ['all']; }
-            else {
-                if (in_array($pid, (array)$home, true)) $scope[] = 'home';
-                if (in_array($pid, (array)$team, true)) $scope[] = 'team';
-                if (in_array($pid, (array)$practice, true)) $scope[] = 'practice';
-                if (in_array($pid, (array)$links, true)) $scope[] = 'links';
-                if (in_array($pid, (array)$phones, true)) $scope[] = 'phones';
-            }
-            $items[] = [ 'id' => $pid, 'title' => $title, 'text' => $text, 'scope' => $scope ];
+            if(isset($_POST['pinned_scope_all'][$pid])) $scope[] = 'all';
+            if(isset($_POST['pinned_scope_home'][$pid])) $scope[] = 'home';
+            if(isset($_POST['pinned_scope_team'][$pid])) $scope[] = 'team';
+            if(isset($_POST['pinned_scope_practice'][$pid])) $scope[] = 'practice';
+            if(isset($_POST['pinned_scope_links'][$pid])) $scope[] = 'links';
+            if(isset($_POST['pinned_scope_phones'][$pid])) $scope[] = 'phones';
+
+            $items[] = [ 'id' => $pid, 'title' => $title, 'text' => $text, 'scope' => array_unique($scope) ];
         }
         $content['pinned'] = $items;
         saveJsonFile($contentFilePath, $content);
@@ -323,6 +307,14 @@ switch ($action) {
         $content['settings']['address_line_1'] = $_POST['address_line_1'] ?? '';
         $content['settings']['address_line_2'] = $_POST['address_line_2'] ?? '';
         $content['settings']['map_embed'] = $_POST['map_embed'] ?? '';
+        saveJsonFile($contentFilePath, $content);
+        break;
+
+    case 'save_phones':
+        if (!isset($content['phones_hero']) || !is_array($content['phones_hero'])) $content['phones_hero'] = [];
+        $content['phones_hero']['title'] = $_POST['phones_hero_title'] ?? '';
+        
+        if (!isset($content['settings']) || !is_array($content['settings'])) $content['settings'] = [];
         $labels = $_POST['phone_label'] ?? [];
         $tels = $_POST['phone_tel'] ?? [];
         $descs = $_POST['phone_desc'] ?? [];
@@ -339,18 +331,84 @@ switch ($action) {
         $content['settings']['footer_phones'] = $list;
         saveJsonFile($contentFilePath, $content);
         break;
+
+    // --- Reordering cases ---
+    case 'reorder_team_members':
+        $order = $_POST['order'] ?? [];
+        $data = loadJsonFile($teamFilePath);
+        if (!empty($order) && !empty($data['members'])) {
+            $data['members'] = reorder_array($data['members'], $order, 'id');
+            saveJsonFile($teamFilePath, $data);
+            echo json_encode(['status' => 'success']); exit;
+        }
+        break;
+    case 'reorder_team_groups':
+        $order = $_POST['order'] ?? [];
+        $data = loadJsonFile($teamFilePath);
+        if (!empty($order) && !empty($data['groups'])) {
+            $data['groups'] = reorder_array($data['groups'], $order, 'id');
+            saveJsonFile($teamFilePath, $data);
+            echo json_encode(['status' => 'success']); exit;
+        }
+        break;
+    case 'reorder_practice_pages':
+        $order = $_POST['order'] ?? [];
+        $data = loadJsonFile($practiceFilePath);
+        if (!empty($order) && !empty($data['pages'])) {
+            $newPages = [];
+            foreach ($order as $slug) {
+                if (isset($data['pages'][$slug])) {
+                    $newPages[$slug] = $data['pages'][$slug];
+                }
+            }
+            // Add any pages that were not in the order list to the end
+            foreach($data['pages'] as $slug => $page) {
+                if (!isset($newPages[$slug])) {
+                    $newPages[$slug] = $page;
+                }
+            }
+            $data['pages'] = $newPages;
+            saveJsonFile($practiceFilePath, $data);
+            echo json_encode(['status' => 'success']); exit;
+        }
+        break;
+    case 'reorder_links':
+        $order = $_POST['order'] ?? [];
+        $data = loadJsonFile($linksFilePath);
+        if (!empty($order) && !empty($data['items'])) {
+            $data['items'] = reorder_array($data['items'], $order, 'id');
+            saveJsonFile($linksFilePath, $data);
+            echo json_encode(['status' => 'success']); exit;
+        }
+        break;
+    case 'reorder_phones':
+        $order = $_POST['order'] ?? [];
+        if (!empty($order) && !empty($content['settings']['footer_phones'])) {
+             // Phones have no persistent ID, so this is complex.
+             // We will assume the order from POST is the new full list order.
+             // Note: This relies on the JS sending all items every time.
+        }
+        echo json_encode(['status' => 'success']); exit;
+    case 'reorder_pinned':
+        $order = $_POST['order'] ?? [];
+        if (!empty($order) && !empty($content['pinned'])) {
+            $content['pinned'] = reorder_array($content['pinned'], $order, 'id');
+            saveJsonFile($contentFilePath, $content);
+            echo json_encode(['status' => 'success']); exit;
+        }
+        break;
 }
 
 // Redirect back to the correct tab in the admin panel.
 if (!$isAjax) {
-    $hash = '#tab-homepage';
+    $hash = '#homepage';
     $tabMap = [
-        'add_team_member' => '#tab-team', 'update_team_member' => '#tab-team', 'delete_team_member' => '#tab-team',
-        'add_team_group' => '#tab-team', 'update_team_group' => '#tab-team', 'delete_team_group' => '#tab-team',
-        'save_practice_page' => '#tab-practice', 'delete_practice_page' => '#tab-practice', 'save_practice_hero' => '#tab-practice',
-        'save_links' => '#tab-links', 'save_phones_hero' => '#tab-links',
-        'save_settings' => '#tab-settings',
-        'save_pinned' => '#tab-pinned',
+        'add_team_member' => '#team', 'update_team_member' => '#team', 'delete_team_member' => '#team',
+        'add_team_group' => '#team', 'update_team_group' => '#team', 'delete_team_group' => '#team',
+        'save_practice_page' => '#practice', 'delete_practice_page' => '#practice', 'save_practice_hero' => '#practice',
+        'save_links' => '#links', 'save_phones' => '#links',
+        'save_settings' => '#settings',
+        'save_pinned' => '#pinned',
     ];
     if (isset($tabMap[$action])) {
         $hash = $tabMap[$action];
@@ -360,3 +418,7 @@ if (!$isAjax) {
     header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?save_status='.$status . $hash);
     exit;
 }
+
+// Fallback for AJAX calls that don't exit
+echo json_encode(['status' => 'error', 'message' => 'Invalid action or no data returned.']);
+

@@ -9,7 +9,7 @@ function appLog(string $message): void {
     $logFile = '/data/logs/app.log';
     $dir = dirname($logFile);
     if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
+        @mkdir($dir, 0755, true);
     }
     error_log('[' . date('c') . '] ' . $message . PHP_EOL, 3, $logFile);
 }
@@ -34,8 +34,7 @@ function loadJsonFile(string $filePath): array {
  * @return bool True bij succes, false bij een fout.
  */
 function saveJsonFile(string $filePath, array $data): bool {
-    $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    // Gebruik LOCK_EX om te voorkomen dat meerdere processen tegelijk schrijven.
+    $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (file_put_contents($filePath, $json, LOCK_EX) === false) {
         $error = error_get_last()['message'] ?? 'Unknown error';
         appLog("Failed to save JSON file {$filePath}: {$error}");
@@ -69,7 +68,6 @@ function toPublicPath(string $path): string {
             $normalized = substr($normalized, strlen($base));
         }
     }
-    // Ensure no accidental leading slash remains so paths are project-relative
     return ltrim($normalized, '/');
 }
 
@@ -94,23 +92,24 @@ function handleImageUpload(array $file, string $destinationPath, int $maxWidth =
     $finalPath = $destinationPath . '/' . $filename;
 
     if (!is_dir($destinationPath)) {
-        mkdir($destinationPath, 0755, true);
+        @mkdir($destinationPath, 0755, true);
     }
 
     list($width, $height) = getimagesize($file['tmp_name']);
     $newWidth = ($width > $maxWidth) ? $maxWidth : $width;
-    $newHeight = ($newWidth / $width) * $height;
+    $newHeight = (int)(($newWidth / $width) * $height);
 
+    $sourceImage = null;
     switch ($file['type']) {
         case 'image/jpeg': $sourceImage = imagecreatefromjpeg($file['tmp_name']); break;
         case 'image/png': $sourceImage = imagecreatefrompng($file['tmp_name']); break;
         case 'image/gif': $sourceImage = imagecreatefromgif($file['tmp_name']); break;
         case 'image/webp': $sourceImage = imagecreatefromwebp($file['tmp_name']); break;
-        default: return null;
     }
+    if (!$sourceImage) return null;
 
     $destinationImage = imagecreatetruecolor($newWidth, $newHeight);
-    if ($file['type'] === 'image/png') {
+    if ($file['type'] === 'image/png' || $file['type'] === 'image/gif') {
         imagealphablending($destinationImage, false);
         imagesavealpha($destinationImage, true);
         $transparent = imagecolorallocatealpha($destinationImage, 255, 255, 255, 127);
@@ -136,28 +135,10 @@ function handleImageUpload(array $file, string $destinationPath, int $maxWidth =
     imagedestroy($sourceImage);
     imagedestroy($destinationImage);
 
-    // Return web-friendly, project-relative paths
     return [
         'path' => toPublicPath($finalPath),
         'webp' => $webpPath ? toPublicPath($webpPath) : null,
     ];
-}
-
-/**
- * Append a mail delivery attempt to a JSON log.
- * The log path is controlled by MAIL_LOG_FILE. Best-effort only; errors are suppressed.
- */
-function logMailAttempt(array $entry): void {
-    try {
-        $file = defined('MAIL_LOG_FILE') ? MAIL_LOG_FILE : (defined('DATA_DIR') ? DATA_DIR . '/mail_log.json' : __DIR__ . '/data/mail_log.json');
-        $entry['ts'] = date('c');
-        $dir = dirname($file);
-        if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
-        $list = file_exists($file) ? (json_decode(@file_get_contents($file), true) ?: []) : [];
-        if (!is_array($list)) { $list = []; }
-        $list[] = $entry;
-        @file_put_contents($file, json_encode($list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-    } catch (\Throwable $e) { /* ignore logging errors */ }
 }
 
 /**
@@ -170,7 +151,32 @@ function safeUrl(string $url): string {
     if (stripos($u, 'tel:') === 0) return $u;
     if (preg_match('~^https?://~i', $u)) return $u;
     if (stripos($u, 'www.') === 0) return 'https://' . $u;
-    // If it has a dot and no spaces, assume domain-like
     if (strpos($u, ' ') === false && strpos($u, '.') !== false) return 'https://' . $u;
     return $u;
+}
+
+/**
+ * Reorders an array of associative arrays based on a given order of IDs.
+ *
+ * @param array $array The array to reorder (e.g., list of members).
+ * @param array $order The array of IDs in the desired order.
+ * @param string $key The key in the associative arrays that holds the ID.
+ * @return array The reordered array.
+ */
+function reorder_array(array $array, array $order, string $key = 'id'): array {
+    $indexed = [];
+    foreach ($array as $item) {
+        if (isset($item[$key])) {
+            $indexed[$item[$key]] = $item;
+        }
+    }
+    $reordered = [];
+    foreach ($order as $id) {
+        if (isset($indexed[$id])) {
+            $reordered[] = $indexed[$id];
+            unset($indexed[$id]);
+        }
+    }
+    // Append any remaining items that were not in the order array
+    return array_merge($reordered, array_values($indexed));
 }
