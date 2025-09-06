@@ -36,44 +36,90 @@ $metaDescription = $siteContent['meta_description'] ?? '';
 
   <section class="py-16">
     <div class="container mx-auto px-6">
-        <?php if (empty($hero['image'])): ?>
-             <h1 class="text-4xl font-semibold mb-8" style="font-family: var(--font-heading);">Nuttige telefoonnummers</h1>
-        <?php endif; ?>
+        <?php
+          $pinned = ($siteContent['pinned'] ?? []);
+          $pinnedList = array_filter($pinned, function($pin) {
+              $scope = $pin['scope'] ?? [];
+              if (!is_array($scope)) $scope = ($scope === 'all') ? ['all'] : [];
+              return in_array('all', $scope) || in_array('phones', $scope);
+          });
+          $hasPinned = !empty($pinnedList);
+        ?>
+        <div class="grid gap-8 <?php echo $hasPinned ? 'lg:grid-cols-3' : 'lg:grid-cols-1'; ?> items-start">
+            <div class="<?php echo $hasPinned ? 'lg:col-span-2' : ''; ?>">
+                <?php if (empty($hero['image'])): ?>
+                     <h1 class="text-4xl font-semibold mb-8" style="font-family: var(--font-heading);">Nuttige telefoonnummers</h1>
+                <?php endif; ?>
 
-        <?php if (empty($phones)): ?>
-          <p class="text-slate-600">Nog geen telefoonnummers beschikbaar.</p>
-        <?php else: ?>
-        <div class="overflow-x-auto">
-          <table id="phones-table" class="min-w-full bg-white rounded-xl overflow-hidden shadow-lg">
-            <thead class="bg-slate-100">
-              <tr>
-                <th class="text-left px-6 py-4 font-semibold cursor-pointer" data-sort="label">Naam</th>
-                <th class="text-left px-6 py-4 font-semibold cursor-pointer" data-sort="tel">Telefoon</th>
-                <th class="text-left px-6 py-4 font-semibold">Omschrijving</th>
-                <th class="text-left px-6 py-4 font-semibold">Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($phones as $ph): ?>
-              <tr class="border-t border-slate-200 hover:bg-slate-50">
-                <td class="px-6 py-4 font-medium" data-key="label"><?php echo htmlspecialchars($ph['label'] ?? ''); ?></td>
-                <td class="px-6 py-4" data-key="tel">
-                  <?php if (!empty($ph['tel'])): ?>
-                    <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $ph['tel'])); ?>" class="text-blue-600 font-semibold"><?php echo htmlspecialchars($ph['tel']); ?></a>
-                  <?php endif; ?>
-                </td>
-                <td class="px-6 py-4 text-slate-600"><?php echo htmlspecialchars($ph['desc'] ?? ''); ?></td>
-                <td class="px-6 py-4">
-                  <?php if (!empty($ph['url'])): ?>
-                    <a href="<?php echo htmlspecialchars(safeUrl($ph['url'])); ?>" class="text-blue-600" target="_blank" rel="noopener">Bezoek website</a>
-                  <?php endif; ?>
-                </td>
-              </tr>
+                <?php if (empty($phones)): ?>
+                  <p class="text-slate-600">Nog geen telefoonnummers beschikbaar.</p>
+                <?php else: ?>
+                <!-- Desktop/tablet: tabelweergave -->
+                <div class="hidden md:block overflow-x-auto">
+                  <table id="phones-table" class="min-w-full bg-white rounded-xl overflow-hidden shadow-lg">
+                    <thead class="bg-slate-100">
+                      <tr>
+                        <th class="text-left px-6 py-4 font-semibold cursor-pointer" data-sort="label">Naam</th>
+                        <th class="text-left px-6 py-4 font-semibold cursor-pointer" data-sort="tel">Telefoon</th>
+                        <th class="text-left px-6 py-4 font-semibold">Omschrijving</th>
+                        <th class="text-left px-6 py-4 font-semibold">Link</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php foreach ($phones as $ph): ?>
+                      <tr class="border-t border-slate-200 hover:bg-slate-50">
+                        <td class="px-6 py-4 font-medium" data-key="label"><?php echo htmlspecialchars($ph['label'] ?? ''); ?></td>
+                        <td class="px-6 py-4" data-key="tel">
+                          <?php if (!empty($ph['tel'])): ?>
+                            <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $ph['tel'])); ?>" class="text-blue-600 font-semibold"><?php echo htmlspecialchars($ph['tel']); ?></a>
+                          <?php endif; ?>
+                        </td>
+                        <td class="px-6 py-4 text-slate-600"><?php echo htmlspecialchars($ph['desc'] ?? ''); ?></td>
+                        <td class="px-6 py-4">
+                          <?php if (!empty($ph['url'])): ?>
+                            <a href="<?php echo htmlspecialchars(safeUrl($ph['url'])); ?>" class="text-blue-600" target="_blank" rel="noopener">Bezoek website</a>
+                          <?php endif; ?>
+                        </td>
+                      </tr>
+                      <?php endforeach; ?>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Mobiel: kaartweergave -->
+                <div class="grid gap-4 md:hidden">
+                  <?php foreach ($phones as $ph): ?>
+                    <div class="mobile-table-card p-4">
+                      <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($ph['label'] ?? ''); ?></h3>
+                      <?php if (!empty($ph['tel'])): ?>
+                        <p class="mb-1">
+                          <span class="text-slate-600">Telefoon: </span>
+                          <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $ph['tel'])); ?>" class="text-blue-600 font-semibold"><?php echo htmlspecialchars($ph['tel']); ?></a>
+                        </p>
+                      <?php endif; ?>
+                      <?php if (!empty($ph['desc'])): ?>
+                        <p class="text-slate-600 mb-2"><?php echo htmlspecialchars($ph['desc']); ?></p>
+                      <?php endif; ?>
+                      <?php if (!empty($ph['url'])): ?>
+                        <a href="<?php echo htmlspecialchars(safeUrl($ph['url'])); ?>" class="btn btn-secondary mt-2" target="_blank" rel="noopener">Bezoek website</a>
+                      <?php endif; ?>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+            <?php if ($hasPinned): ?>
+            <aside class="space-y-6 lg:col-span-1 sticky top-32">
+              <h3 class="text-2xl font-semibold">Belangrijke mededelingen</h3>
+              <?php foreach ($pinnedList as $pin): ?>
+              <div class="p-6 pinned-card">
+                <h4 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h4>
+                <div class="prose max-w-none text-sm"><?php echo $pin['text'] ?? ''; ?></div>
+              </div>
               <?php endforeach; ?>
-            </tbody>
-          </table>
+            </aside>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
   </section>
 </main>

@@ -69,9 +69,14 @@ if (defined('PRACTICE_FILE') && file_exists(PRACTICE_FILE)) {
         <nav class="p-4 flex flex-col gap-2">
             <a href="team.php" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-slate-50">Team</a>
             <div class="w-full">
-                <a href="practice.php" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-slate-50">Praktijkinfo</a>
+                <a href="practice.php" id="mobile-practice-toggle" aria-expanded="false" aria-controls="mobile-practice-menu" class="mobile-nav-link flex items-center justify-between text-lg px-4 py-3 rounded-lg hover:bg-slate-50">
+                    <span>Praktijkinfo</span>
+                    <svg class="w-4 h-4 transition-transform duration-200 chev" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/>
+                    </svg>
+                </a>
                 <?php if (!empty($practicePages)): ?>
-                <div id="mobile-practice-menu" class="grid gap-2 px-2 pt-2">
+                <div id="mobile-practice-menu" class="grid gap-2 px-2 pt-2 hidden">
                     <?php foreach ($practicePages as $slug => $pd): ?>
                         <a href="practice.php?slug=<?php echo urlencode($slug); ?>" class="mobile-nav-link block text-base py-2 border border-[var(--border)] rounded-full text-center" style="background: var(--surface);">
                             <?php echo htmlspecialchars($pd['title'] ?? $slug); ?>
@@ -83,7 +88,7 @@ if (defined('PRACTICE_FILE') && file_exists(PRACTICE_FILE)) {
             <a href="phones.php" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-slate-50">Nuttige telefoonnummers</a>
             <a href="links.php" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-slate-50">Nuttige links</a>
             <?php if (!empty($appointmentUrl)): ?>
-            <a href="<?php echo htmlspecialchars($appointmentUrl); ?>" target="_blank" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-slate-50">Maak afspraak</a>
+            <a href="<?php echo htmlspecialchars(safeUrl($appointmentUrl)); ?>" target="_blank" class="mobile-nav-link btn btn-primary w-full text-center">Maak een afspraak</a>
             <?php endif; ?>
             <?php if (!empty($phoneNumber)): ?>
             <a href="tel:<?php echo htmlspecialchars(trim($phoneNumber)); ?>" class="mobile-nav-link block text-lg px-4 py-3 rounded-lg hover:bg-slate-50">Tel: <?php echo htmlspecialchars(trim($phoneNumber)); ?></a>

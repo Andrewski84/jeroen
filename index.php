@@ -41,21 +41,30 @@ require_once 'helpers.php';
         if (is_array($teamMembers)) {
             $teamMembers = array_values(array_filter($teamMembers, function($m){ return !isset($m['visible']) || $m['visible']; }));
         }
+        // Appointment URL for CTA button on mobile
+        $appointmentUrl = $siteContent['settings']['appointment_url'] ?? '';
     ?>
 
     <section id="home" class="bg-cover bg-center bg-fixed flex items-center justify-center stagger-container" style="background-image: url('<?php echo htmlspecialchars($content['hero']['image'] ?? ''); ?>');">
         <div class="w-full h-full bg-black/20 flex items-center justify-center p-4">
-            <div class="hero-text-box reveal">
-                <div class="text-center max-w-4xl">
-                  <h1 style="font-family: var(--font-heading);">
-                    <?php echo htmlspecialchars($content['hero']['title'] ?? ''); ?>
-                  </h1>
-                  <?php if (!empty($content['hero']['body'])): ?>
-                  <div class="mt-6 leading-relaxed hero-body mx-auto">
-                    <?php echo $content['hero']['body']; ?>
-                  </div>
-                  <?php endif; ?>
+            <div class="flex flex-col items-center">
+                <div class="hero-text-box reveal">
+                    <div class="text-center max-w-4xl">
+                      <h1 style="font-family: var(--font-heading);">
+                        <?php echo htmlspecialchars($content['hero']['title'] ?? ''); ?>
+                      </h1>
+                      <?php if (!empty($content['hero']['body'])): ?>
+                      <div class="mt-6 leading-relaxed hero-body mx-auto">
+                        <?php echo $content['hero']['body']; ?>
+                      </div>
+                      <?php endif; ?>
+                    </div>
                 </div>
+                <?php if (!empty($appointmentUrl)): ?>
+                <a href="<?php echo htmlspecialchars(safeUrl($appointmentUrl)); ?>" target="_blank" class="btn btn-primary mt-4 w-full max-w-xs text-center md:hidden" aria-label="Maak een afspraak">
+                    Maak een afspraak
+                </a>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -92,7 +101,7 @@ require_once 'helpers.php';
                     <?php endif; ?>
                 </div>
                 <?php if ($hasPinned): ?>
-                <aside class="space-y-6 reveal lg:col-span-1">
+                <aside class="space-y-6 reveal lg:col-span-1 sticky top-32">
                     <h3 class="text-2xl font-semibold">Belangrijke mededelingen</h3>
                     <?php foreach ($pinnedList as $pin): ?>
                     <div class="p-6 pinned-card">
@@ -112,21 +121,73 @@ require_once 'helpers.php';
                 <h2 class="text-4xl md:text-5xl mb-12">Ons Team</h2>
             </div>
             <?php if (!empty($teamMembers)): ?>
-            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center">
-                <?php foreach (array_slice($teamMembers, 0, 4) as $m): // Toon maximaal 4 op de homepage ?>
-                <article class="team-card reveal">
-                    <?php if (!empty($m['image'])): ?>
-                    <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? ''); ?>" class="w-full">
-                    <?php endif; ?>
-                    <div class="p-5 text-center">
-                        <h3 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h3>
-                        <p class="text-slate-600 mb-4"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
+            <?php
+                $groups = isset($teamData['groups']) && is_array($teamData['groups']) ? $teamData['groups'] : [];
+                $visibleMembers = array_values(array_filter($teamMembers, function($m){ return !isset($m['visible']) || $m['visible']; }));
+                $membersByGroup = [];
+                foreach ($visibleMembers as $mm) {
+                    $gid = $mm['group_id'] ?? '';
+                    if (!isset($membersByGroup[$gid])) $membersByGroup[$gid] = [];
+                    $membersByGroup[$gid][] = $mm;
+                }
+            ?>
+            <div class="space-y-3">
+                <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; if (isset($g['visible']) && !$g['visible']) continue; $list = $membersByGroup[$gid] ?? []; if (empty($list)) continue; ?>
+                <section class="team-group reveal">
+                    <h3 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">
+                        <?php echo htmlspecialchars($g['name'] ?? ''); ?>
+                    </h3>
+                    <?php if (!empty($g['description'])): ?><p class="text-slate-600 mb-4 max-w-2xl mx-auto md:mx-0"><?php echo htmlspecialchars($g['description']); ?></p><?php endif; ?>
+                    <div class="team-grid grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        <?php foreach ($list as $m): ?>
+                        <?php $cardUrl = $m['appointment_url'] ?? $appointmentUrl; ?>
+                        <article class="team-card group">
+                            <div class="relative overflow-hidden rounded-t-lg">
+                                <?php if (!empty($m['image'])): ?>
+                                <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full aspect-[4/5] object-cover">
+                                <?php endif; ?>
+                                <?php if (!empty($cardUrl)): ?>
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <a href="<?php echo htmlspecialchars(safeUrl($cardUrl)); ?>" target="_blank" class="btn btn-primary">Maak afspraak</a>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="p-5 text-center">
+                                <h4 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h4>
+                                <p class="text-slate-600"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
+                            </div>
+                        </article>
+                        <?php endforeach; ?>
                     </div>
-                </article>
+                </section>
                 <?php endforeach; ?>
-            </div>
-            <div class="text-center mt-12 reveal">
-                <a href="team.php" class="btn btn-primary">Ontmoet het hele team</a>
+
+                <?php if (!empty($membersByGroup[''])): ?>
+                <section class="team-group reveal">
+                    <h3 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">Overige</h3>
+                    <div class="team-grid grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        <?php foreach ($membersByGroup[''] as $m): ?>
+                        <?php $cardUrl = $m['appointment_url'] ?? $appointmentUrl; ?>
+                        <article class="team-card group">
+                            <div class="relative overflow-hidden rounded-t-lg">
+                                <?php if (!empty($m['image'])): ?>
+                                <img src="<?php echo htmlspecialchars($m['image']); ?>" alt="<?php echo htmlspecialchars($m['name'] ?? 'Teamlid'); ?>" class="w-full aspect-[4/5] object-cover">
+                                <?php endif; ?>
+                                <?php if (!empty($cardUrl)): ?>
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <a href="<?php echo htmlspecialchars(safeUrl($cardUrl)); ?>" target="_blank" class="btn btn-primary">Maak afspraak</a>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="p-5 text-center">
+                                <h4 class="text-xl font-semibold mb-1"><?php echo htmlspecialchars($m['name'] ?? ''); ?></h4>
+                                <p class="text-slate-600"><?php echo htmlspecialchars($m['role'] ?? ''); ?></p>
+                            </div>
+                        </article>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
+                <?php endif; ?>
             </div>
             <?php else: ?>
                 <p class="text-center text-slate-600 reveal">Team wordt binnenkort toegevoegd.</p>
@@ -135,7 +196,6 @@ require_once 'helpers.php';
     </section>
 
 </div>
-    <?php include TEMPLATES_DIR . '/footer.php'; ?>
-<script src="main.js"></script>
+<?php include TEMPLATES_DIR . '/footer.php'; ?>
 </body>
 </html>
