@@ -1,64 +1,84 @@
 {
     "members": [
         {
-            "id": "tm_68ba047c27c385.08980280",
-            "name": "Jeroen Jacobs",
-            "role": "Dokter",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba048224f195.80201194.jpg",
-            "webp": "assets\/team\/img_68ba048224f195.80201194.webp",
-            "group_id": "grp_68baf154a36e92.92728423",
-            "visible": true
-        },
-        {
-            "id": "tm_68ba07e2e3e275.14232139",
-            "name": "Persoon 2",
-            "role": "qd",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba07eb0e0f67.49206558.jpg",
-            "webp": "assets\/team\/img_68ba07eb0e0f67.49206558.webp",
-            "group_id": "grp_68baf154a36e92.92728423",
-            "visible": true
-        },
-        {
-            "id": "tm_68ba06e3e80c74.12586126",
-            "name": "Persoon 3",
-            "role": "qsd",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba07ded09542.76462765.jpg",
-            "webp": "assets\/team\/img_68ba07ded09542.76462765.webp",
-            "group_id": "grp_68baf154a36e92.92728423",
-            "visible": true
-        },
-        {
-            "id": "tm_68ba07f01b1c53.00888489",
-            "name": "Persoon 1",
-            "role": "qsd",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba07f53ed9b1.39732740.jpg",
-            "webp": "assets\/team\/img_68ba07f53ed9b1.39732740.webp",
-            "group_id": "grp_68baf0bb668b93.10144295",
-            "visible": true
-        },
-        {
-            "id": "tm_68ba0179405473.06971017",
-            "name": "Persoon 4",
-            "role": "qsd",
-            "appointment_url": "www.google.com",
-            "image": "assets\/team\/img_68ba017ec2a534.65946169.jpg",
-            "webp": "assets\/team\/img_68ba017ec2a534.65946169.webp",
-            "group_id": "grp_68baf0bb668b93.10144295",
-            "visible": true
-        },
-        {
-            "id": "tm_68bb037506d930.62284547",
-            "name": "qq",
-            "role": "qq",
-            "appointment_url": "",
+            "id": "tm_68bc01152d26f7.59612684",
+            "name": "Dr. Jeroen Jacobs",
+            "role": "Huisarts",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
             "group_id": "grp_68baf154a36e92.92728423",
             "visible": true,
-            "image": "assets\/team\/img_68bb037c6cded0.94611933.png",
-            "webp": "assets\/team\/img_68bb037c6cded0.94611933.webp"
+            "image": "assets/team/img_68bc015531a5f6.38921523.jpg",
+            "webp": "assets/team/img_68bc015531a5f6.38921523.webp"
+        },
+        {
+            "id": "tm_68bc01656b94e4.41947874",
+            "name": "Dr. Günther Lauwers",
+            "role": "Huisarts",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true,
+            "image": "assets/team/img_68bc01e7eca016.51825393.jpg",
+            "webp": "assets/team/img_68bc01e7eca016.51825393.webp"
+        },
+        {
+            "id": "tm_68bc0173c8a988.95602814",
+            "name": "Dr. Caroline Lingier",
+            "role": "Huisarts",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true,
+            "image": "assets/team/img_68bc01ee0e7345.35016625.jpg",
+            "webp": "assets/team/img_68bc01ee0e7345.35016625.webp"
+        },
+        {
+            "id": "tm_68bc017e97f523.17724510",
+            "name": "Dr. Marleen Thys",
+            "role": "Huisarts",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true,
+            "image": "assets/team/img_68bc01f5b839c9.80834173.jpg",
+            "webp": "assets/team/img_68bc01f5b839c9.80834173.webp"
+        },
+        {
+            "id": "tm_68bc018b5c4ca2.19731156",
+            "name": "Dr. Alexander Meyvis",
+            "role": "Huisarts",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
+            "group_id": "grp_68baf154a36e92.92728423",
+            "visible": true,
+            "image": "assets/team/img_68bc01fced61d8.77904763.jpg",
+            "webp": "assets/team/img_68bc01fced61d8.77904763.webp"
+        },
+        {
+            "id": "tm_68bc01a7966f02.01213196",
+            "name": "Nathan Schaltin",
+            "role": "Kinesist",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
+            "group_id": "grp_68bc00f57ba364.25714295",
+            "visible": true,
+            "image": "assets/team/img_68bc020ff32b81.47277522.jpeg",
+            "webp": "assets/team/img_68bc020ff32b81.47277522.webp"
+        },
+        {
+            "id": "tm_68bc01d0287cb4.98874122",
+            "name": "Sofie Eyletten",
+            "role": "Huisarts in Opleiding (HAIO)",
+            "appointment_url": "https://agenda.mya-agenda.be/e/tc/ZXZNNFo5QnBPMGJYQ3JrZndDRlEzblBrbGpwNTd4VnZMR2Z3QUZCQWNZUW16QXBkc2dwc1MxUitxalMrb3p5ckdjcHE1SzJWZ0pnPQ%3D%3D",
+            "group_id": "grp_68bc01c3134661.51181280",
+            "visible": true,
+            "image": "",
+            "webp": ""
+        },
+        {
+            "id": "tm_68bc01dc5bedf2.42432405",
+            "name": "Kristel De Smedt",
+            "role": "Praktijkassistente",
+            "appointment_url": "",
+            "group_id": "grp_68baf0bb668b93.10144295",
+            "visible": true,
+            "image": "assets/team/img_68bc021ad64b47.41772237.jpg",
+            "webp": "assets/team/img_68bc021ad64b47.41772237.webp"
         }
     ],
     "groups": [
@@ -71,6 +91,18 @@
         {
             "id": "grp_68baf0bb668b93.10144295",
             "name": "Assistente",
+            "description": "",
+            "visible": true
+        },
+        {
+            "id": "grp_68bc00f57ba364.25714295",
+            "name": "Kinesist",
+            "description": "",
+            "visible": true
+        },
+        {
+            "id": "grp_68bc01c3134661.51181280",
+            "name": "Huisarts in Opleiding",
             "description": "",
             "visible": true
         }

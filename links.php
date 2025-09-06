@@ -64,7 +64,6 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
                   <th class="text-left px-6 py-4 font-semibold">Naam</th>
                   <th class="text-left px-6 py-4 font-semibold">Website</th>
                   <th class="text-left px-6 py-4 font-semibold">Telefoon</th>
-                  <th class="text-left px-6 py-4 font-semibold">Categorie</th>
                   <th class="text-left px-6 py-4 font-semibold">Omschrijving</th>
                 </tr>
               </thead>
@@ -82,7 +81,6 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
                         <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $it['tel'])); ?>" class="text-blue-600 font-semibold"><?php echo htmlspecialchars($it['tel']); ?></a>
                       <?php endif; ?>
                     </td>
-                    <td class="px-6 py-4 text-slate-600"><?php echo htmlspecialchars($it['category'] ?? ''); ?></td>
                     <td class="px-6 py-4 text-slate-600"><?php echo htmlspecialchars($it['description'] ?? ''); ?></td>
                   </tr>
                 <?php endforeach; ?>
@@ -95,9 +93,6 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
             <?php foreach ($items as $it): ?>
             <div class="mobile-table-card p-4">
               <h3 class="text-lg font-semibold mb-1"><?php echo htmlspecialchars($it['label'] ?? ''); ?></h3>
-              <?php if (!empty($it['category'])): ?>
-                <p class="text-slate-600 mb-2"><?php echo htmlspecialchars($it['category']); ?></p>
-              <?php endif; ?>
               <?php if (!empty($it['description'])): ?>
                 <p class="text-slate-600 mb-2"><?php echo htmlspecialchars($it['description']); ?></p>
               <?php endif; ?>
@@ -106,7 +101,7 @@ $items = isset($linksData['items']) && is_array($linksData['items']) ? $linksDat
                   <a href="<?php echo htmlspecialchars(safeUrl($it['url'])); ?>" class="btn btn-secondary w-full text-center" target="_blank" rel="noopener">Bezoek website</a>
                 <?php endif; ?>
                 <?php if (!empty($it['tel'])): ?>
-                  <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $it['tel'])); ?>" class="text-blue-600 font-semibold"><?php echo htmlspecialchars($it['tel']); ?></a>
+                  <a href="tel:<?php echo htmlspecialchars(preg_replace('/[^0-9+]/', '', $it['tel'])); ?>" class="text-blue-600 font-semibold text-center block"><?php echo htmlspecialchars($it['tel']); ?></a>
                 <?php endif; ?>
               </div>
             </div>
