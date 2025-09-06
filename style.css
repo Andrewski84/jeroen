@@ -151,6 +151,10 @@ section { padding: 5rem 0; }
   .team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
+/* Team page spacing tweaks */
+.team-group { padding: 0 !important; }
+.team-group h2 { margin-top: 0; }
+
 
 /* Reveal on scroll (works with main.js IntersectionObserver) */
 .stagger-container .reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }

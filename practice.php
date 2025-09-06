@@ -42,12 +42,23 @@ $metaDescription = $siteContent['meta_description'] ?? '';
       </ul>
     <?php else: ?>
       <?php $cards = isset($pageData['cards']) && is_array($pageData['cards']) ? $pageData['cards'] : []; ?>
-      <div class="grid gap-8 lg:grid-cols-3 items-start">
-        <div class="lg:col-span-2">
+      <?php
+        // Determine pinned items for this page up-front to drive layout
+        $pinned = ($siteContent['pinned'] ?? []);
+        $pinnedList = [];
+        foreach ($pinned as $pin) {
+          $scope = $pin['scope'] ?? [];
+          if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
+          if (in_array('all',$scope) || in_array('practice',$scope)) $pinnedList[] = $pin;
+        }
+        $hasPinned = !empty($pinnedList);
+      ?>
+      <div class="grid gap-8 <?php echo $hasPinned ? 'lg:grid-cols-3' : 'lg:grid-cols-1'; ?> items-start">
+        <div class="<?php echo $hasPinned ? 'lg:col-span-2' : ''; ?>">
           <?php if (empty($cards)): ?>
             <p class="text-slate-600">Nog geen inhoud beschikbaar.</p>
           <?php else: ?>
-          <div class="grid gap-6 md:grid-cols-2">
+          <div class="grid gap-6">
             <?php foreach ($cards as $card): ?>
               <div class="rounded-xl p-6 practice-card">
                 <div class="prose max-w-none">
@@ -58,15 +69,7 @@ $metaDescription = $siteContent['meta_description'] ?? '';
           </div>
           <?php endif; ?>
         </div>
-        <?php
-        $pinned = ($siteContent['pinned'] ?? []);
-        $pinnedList = [];
-        foreach ($pinned as $pin) {
-          $scope = $pin['scope'] ?? [];
-          if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
-          if (in_array('all',$scope) || in_array('practice',$scope)) $pinnedList[] = $pin;
-        }
-        ?>
+        <?php if ($hasPinned): ?>
         <aside class="space-y-4 lg:col-span-1">
           <?php foreach ($pinnedList as $pin): ?>
           <div class="rounded-xl p-5 pinned-card">
@@ -75,6 +78,7 @@ $metaDescription = $siteContent['meta_description'] ?? '';
           </div>
           <?php endforeach; ?>
         </aside>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
   </div>

@@ -7,15 +7,19 @@
     "items": [
         {
             "id": "link_68b9fbebc4c788.59285080",
-            "label": "qsdq",
+            "label": "Antigifcentrum Antigifcentrum",
             "url": "https:\/\/www.antigifcentrum.be",
-            "tel": ""
+            "tel": "",
+            "description": "",
+            "category": ""
         },
         {
             "id": "link_68b9dd8544ed80.39529536",
             "label": "Antigifcentrum",
             "url": "https:\/\/www.antigifcentrum.be",
-            "tel": "070 24 52 45"
+            "tel": "070 24 52 45",
+            "description": "",
+            "category": ""
         }
     ]
 }

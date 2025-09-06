@@ -4,10 +4,10 @@
             "title": "test",
             "cards": [
                 {
-                    "html": "<p>test test<\/p>"
+                    "html": "<p>5) Footer aanpassingen<\/p><p>Adresinfo<\/p><p>Extra veld E-mail naast adres, tel, openingsuren.<\/p><p>E-mail is mailto:-klikbaar.<\/p><p>Verwijdering telefoonnummers uit footer<\/p><p>Zie §3. Geen dubbele content.<\/p><p>Acceptatiecriteria<\/p><p>Footer valide HTML, links werken.<\/p><p>E-mailadres kan leeg blijven zonder layoutbreuk.<\/p><p>6) Praktijkinfo en Gepinde berichten layout<\/p><p>Gridverhouding<\/p><p>Op desktop neemt Praktijkinfo 2\/3 breedte, Gepinde berichten 1\/3.<\/p><p>Leegteafhandeling<\/p><p>Als er geen gepinde berichten zijn, neemt Praktijkinfo 100% breedte.<\/p><p>Responsief<\/p><p>Onder tabletbreedte stapelen secties onder elkaar, Praktijkinfo eerst.<\/p><p>Acceptatiecriteria<\/p><p>2\/3–1\/3 layout op ≥ 1024 px.<\/p><p>Geen “gaten” in layout als gepind leeg is.<\/p><p>Visuele consistentie met bestaande kaartstijlen.<\/p>"
                 },
                 {
-                    "html": "<h2><strong>test test<\/strong><\/h2>"
+                    "html": "<h2>5) Footer aanpassingen<\/h2><p><strong>Adresinfo<\/strong><\/p><p>Extra veld <strong>E-mail<\/strong> naast adres, tel, openingsuren.<\/p><p>E-mail is mailto:-klikbaar.<\/p><p><strong>Verwijdering telefoonnummers uit footer<\/strong><\/p><p>Zie §3. Geen dubbele content.<\/p><p><strong>Acceptatiecriteria<\/strong><\/p><p>Footer valide HTML, links werken.<\/p><p>E-mailadres kan leeg blijven zonder layoutbreuk.<\/p><h2>6) Praktijkinfo en Gepinde berichten layout<\/h2><p><strong>Gridverhouding<\/strong><\/p><p>Op desktop neemt <strong>Praktijkinfo<\/strong> 2\/3 breedte, <strong>Gepinde berichten<\/strong> 1\/3.<\/p><p><strong>Leegteafhandeling<\/strong><\/p><p>Als er <strong>geen gepinde berichten<\/strong> zijn, neemt Praktijkinfo <strong>100%<\/strong> breedte.<\/p><p><strong>Responsief<\/strong><\/p><p>Onder tabletbreedte stapelen secties onder elkaar, Praktijkinfo eerst.<\/p><p><strong>Acceptatiecriteria<\/strong><\/p><p>2\/3–1\/3 layout op ≥ 1024 px.<\/p><p>Geen “gaten” in layout als gepind leeg is.<\/p><p>Visuele consistentie met bestaande kaartstijlen.<\/p>"
                 }
             ]
         },
@@ -15,7 +15,7 @@
             "title": "kaart 1",
             "cards": [
                 {
-                    "html": "<p>te<\/p>"
+                    "html": "<h2>5) Footer aanpassingen<\/h2><p><strong>Adresinfo<\/strong><\/p><p>Extra veld <strong>E-mail<\/strong> naast adres, tel, openingsuren.<\/p><p>E-mail is mailto:-klikbaar.<\/p><p><strong>Verwijdering telefoonnummers uit footer<\/strong><\/p><p>Zie §3. Geen dubbele content.<\/p><p><strong>Acceptatiecriteria<\/strong><\/p><p>Footer valide HTML, links werken.<\/p><p>E-mailadres kan leeg blijven zonder layoutbreuk.<\/p><h2>6) Praktijkinfo en Gepinde berichten layout<\/h2><p><strong>Gridverhouding<\/strong><\/p><p>Op desktop neemt <strong>Praktijkinfo<\/strong> 2\/3 breedte, <strong>Gepinde berichten<\/strong> 1\/3.<\/p><p><strong>Leegteafhandeling<\/strong><\/p><p>Als er <strong>geen gepinde berichten<\/strong> zijn, neemt Praktijkinfo <strong>100%<\/strong> breedte.<\/p><p><strong>Responsief<\/strong><\/p><p>Onder tabletbreedte stapelen secties onder elkaar, Praktijkinfo eerst.<\/p><p><strong>Acceptatiecriteria<\/strong><\/p><p>2\/3–1\/3 layout op ≥ 1024 px.<\/p><p>Geen “gaten” in layout als gepind leeg is.<\/p><p>Visuele consistentie met bestaande kaartstijlen.<\/p>"
                 },
                 {
                     "html": "<p>tes<\/p>"

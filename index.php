@@ -64,8 +64,18 @@ require_once 'helpers.php';
 
     <section id="welkom" style="background-color: var(--surface);">
         <div class="container mx-auto px-6 stagger-container">
-            <div class="grid gap-8 lg:grid-cols-3 items-start">
-                <div class="lg:col-span-2">
+            <?php
+                $pinned = ($siteContent['pinned'] ?? []);
+                $pinnedList = [];
+                foreach ($pinned as $pin) {
+                  $scope = $pin['scope'] ?? [];
+                  if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
+                  if (in_array('all',$scope) || in_array('home',$scope)) $pinnedList[] = $pin;
+                }
+                $hasPinned = !empty($pinnedList);
+            ?>
+            <div class="grid gap-8 <?php echo $hasPinned ? 'lg:grid-cols-3' : 'lg:grid-cols-1'; ?> items-start">
+                <div class="<?php echo $hasPinned ? 'lg:col-span-2' : ''; ?>">
                     <div class="text-center md:text-left reveal">
                         <h2 class="text-4xl md:text-5xl mb-6"><?php echo htmlspecialchars($content['welcome']['title'] ?? 'Welkom'); ?></h2>
                         <?php if (!empty($content['welcome']['text'])): ?>
@@ -83,15 +93,7 @@ require_once 'helpers.php';
                     </div>
                     <?php endif; ?>
                 </div>
-                <?php
-                $pinned = ($siteContent['pinned'] ?? []);
-                $pinnedList = [];
-                foreach ($pinned as $pin) {
-                  $scope = $pin['scope'] ?? [];
-                  if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
-                  if (in_array('all',$scope) || in_array('home',$scope)) $pinnedList[] = $pin;
-                }
-                ?>
+                <?php if ($hasPinned): ?>
                 <aside class="space-y-4 reveal lg:col-span-1">
                     <?php foreach ($pinnedList as $pin): ?>
                     <div class="rounded-xl p-5 pinned-card">
@@ -100,6 +102,7 @@ require_once 'helpers.php';
                     </div>
                     <?php endforeach; ?>
                 </aside>
+                <?php endif; ?>
             </div>
         </div>
     </section>

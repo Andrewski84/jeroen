@@ -210,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     initSortable('#practice-table tbody', 'reorder_practice_pages');
     initSortable('#pinned-list', 'reorder_pinned');
+    initSortable('#pinned-table-body', 'reorder_pinned');
     initSortable('#links-list', 'reorder_links');
     initSortable('#team-groups', 'reorder_team_groups');
 

@@ -552,31 +552,55 @@ $save_status = $_GET['save_status'] ?? '';
                     <form action="save.php" method="POST">
                         <div class="card-body">
                             <input type="hidden" name="action" value="save_pinned">
+                            <div class="admin-table-container mb-4">
+                                <table class="admin-table" id="pinned-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:2rem;"></th>
+                                            <th>Titel</th>
+                                            <th>Home</th>
+                                            <th>Team</th>
+                                            <th>Praktijk</th>
+                                            <th>Links</th>
+                                            <th>Telefoon</th>
+                                            <th>Alle</th>
+                                            <th>Acties</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pinned-table-body">
+                                        <?php foreach ($pinned as $pin): $pid = $pin['id'] ?? uniqid('pin_', true); $scope = $pin['scope'] ?? []; if (!is_array($scope)) { $scope = ($scope==='all') ? ['all'] : []; } ?>
+                                        <tr data-id="<?php echo htmlspecialchars($pid); ?>">
+                                            <td class="text-slate-400"><span class="drag-handle" title="Sleep">&#9776;</span></td>
+                                            <td class="font-medium"><button type="button" class="btn btn-secondary btn-sm" onclick="document.querySelector('.pinned-item-editor[data-id=\'<?php echo htmlspecialchars($pid); ?>\']')?.classList.toggle('hidden')">Bewerk</button> <?php echo htmlspecialchars($pin['title'] ?? '(zonder titel)'); ?></td>
+                                            <td><input type="checkbox" name="pinned_scope_home[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('all',$scope)||in_array('home',$scope)?'checked':''; ?>></td>
+                                            <td><input type="checkbox" name="pinned_scope_team[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('all',$scope)||in_array('team',$scope)?'checked':''; ?>></td>
+                                            <td><input type="checkbox" name="pinned_scope_practice[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('all',$scope)||in_array('practice',$scope)?'checked':''; ?>></td>
+                                            <td><input type="checkbox" name="pinned_scope_links[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('all',$scope)||in_array('links',$scope)?'checked':''; ?>></td>
+                                            <td><input type="checkbox" name="pinned_scope_phones[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('all',$scope)||in_array('phones',$scope)?'checked':''; ?>></td>
+                                            <td>
+                                                <input type="hidden" name="pinned_scope_all[]" value="<?php echo in_array('all',$scope)?htmlspecialchars($pid):''; ?>">
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="window.togglePinnedAll(this)"><?php echo in_array('all',$scope)?'Wis':'Alle'; ?></button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="(function(btn){ const id='<?php echo htmlspecialchars($pid); ?>'; const box=document.querySelector('.pinned-item-editor[data-id=\''+id+'\']'); if(box){ box.remove(); } const row=btn.closest('tr'); row?.remove(); })(this)">Verwijder</button>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                             <div id="pinned-list" class="space-y-4">
                                 <?php foreach ($pinned as $pin): $pid = $pin['id'] ?? uniqid('pin_', true); ?>
-                                <div class="border border-slate-200 rounded-lg p-4" data-id="<?php echo htmlspecialchars($pid); ?>">
+                                <div class="border border-slate-200 rounded-lg p-4 pinned-item-editor hidden" data-id="<?php echo htmlspecialchars($pid); ?>">
                                     <input type="hidden" name="pinned_id[]" value="<?php echo htmlspecialchars($pid); ?>">
                                     <div class="flex items-center justify-between mb-2">
                                         <label class="form-label mb-0">Titel</label>
-                                        <div class="flex items-center gap-2">
-                                            <span class="drag-handle cursor-move text-slate-400" title="Sleep om te verplaatsen">&#9776;</span>
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.border').remove()">Verwijder Bericht</button>
-                                        </div>
+                                        <span class="drag-handle cursor-move text-slate-400" title="Sleep om te verplaatsen">&#9776;</span>
                                     </div>
                                     <input type="text" class="form-input" name="pinned_title[]" value="<?php echo htmlspecialchars($pin['title'] ?? ''); ?>">
                                     <label class="form-label mt-2">Tekst</label>
                                     <textarea class="form-textarea richtext" name="pinned_text[]" rows="4"><?php echo htmlspecialchars($pin['text'] ?? ''); ?></textarea>
-                                    <?php $scope = $pin['scope'] ?? []; if (!is_array($scope)) { $scope = ($scope==='all') ? ['all'] : []; } ?>
-                                    <div class="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2 items-center">
-                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_home[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('home',$scope)?'checked':''; ?>> Home</label>
-                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_team[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('team',$scope)?'checked':''; ?>> Team</label>
-                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_practice[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('practice',$scope)?'checked':''; ?>> Praktijkinfo</label>
-                                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_links[]" value="<?php echo htmlspecialchars($pid); ?>" <?php echo in_array('links',$scope)?'checked':''; ?>> Nuttige links</label>
-                                        <div class="flex items-center gap-2">
-                                            <input type="hidden" name="pinned_scope_all[]" value="<?php echo in_array('all',$scope)?htmlspecialchars($pid):''; ?>">
-                                            <button type="button" class="btn btn-secondary btn-sm" onclick="window.togglePinnedAll(this)"><?php echo in_array('all',$scope)?'Selectie wissen':"Alle pagina's"; ?></button>
-                                        </div>
-                                    </div>
+                                    <p class="text-xs text-slate-500 mt-2">Scopes aanpassen via de tabel hierboven. Verwijderen kan in de tabel.</p>
                                 </div>
                                 <?php endforeach; ?>
                             </div>
@@ -680,13 +704,27 @@ $save_status = $_GET['save_status'] ?? '';
       window.initRichtext(d.querySelector('textarea.richtext'));
     };
     window.togglePinnedAll = function(btn){
-      const box = btn.closest('.border'); if(!box) return;
-      const id = box.dataset.id;
-      const checkboxes = box.querySelectorAll('input[type=checkbox]');
-      const allInput = box.querySelector('input[name="pinned_scope_all[]"]');
-      const turnOn = allInput.value === '';
+      // Try row-based (table) first
+      let container = btn.closest('tr[data-id]');
+      if (container) {
+        const id = container.dataset.id;
+        const checks = container.querySelectorAll('input[type=checkbox]');
+        const allInput = container.querySelector('input[name="pinned_scope_all[]"]');
+        const turnOn = !allInput || allInput.value === '';
+        checks.forEach(cb => cb.checked = turnOn);
+        if (allInput) allInput.value = turnOn ? id : '';
+        btn.textContent = turnOn ? 'Wis' : "Alle";
+        return;
+      }
+      // Fallback: old editor box
+      container = btn.closest('.border[data-id]');
+      if (!container) return;
+      const id = container.dataset.id;
+      const checkboxes = container.querySelectorAll('input[type=checkbox]');
+      const allInput = container.querySelector('input[name="pinned_scope_all[]"]');
+      const turnOn = allInput && allInput.value === '';
       checkboxes.forEach(cb => cb.checked = turnOn);
-      allInput.value = turnOn ? id : '';
+      if (allInput) allInput.value = turnOn ? id : '';
       btn.textContent = turnOn ? 'Selectie wissen' : "Alle pagina's";
     };
     window.addPracticeCard = function(containerId){
@@ -738,16 +776,7 @@ $save_status = $_GET['save_status'] ?? '';
         <input type="text" class="form-input" name="pinned_title[]" value="">
         <label class="form-label mt-2">Tekst</label>
         <textarea class="form-textarea richtext" name="pinned_text[]" rows="4"></textarea>
-        <div class="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2 items-center">
-            <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_home[]" value="${id}"> Home</label>
-            <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_team[]" value="${id}"> Team</label>
-            <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_practice[]" value="${id}"> Praktijkinfo</label>
-            <label class="inline-flex items-center gap-2"><input type="checkbox" name="pinned_scope_links[]" value="${id}"> Nuttige links</label>
-            <div class="flex items-center gap-2">
-                <input type="hidden" name="pinned_scope_all[]" value="">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="window.togglePinnedAll(this)">Alle pagina's</button>
-            </div>
-        </div>`;
+        <p class="text-xs text-slate-500 mt-2">Scopes instellen na opslaan in de tabel hierboven.</p>`;
       list.appendChild(box);
       window.initRichtext(box.querySelector('textarea.richtext'));
     };

@@ -34,8 +34,19 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
 <main class="py-16">
   <div class="container mx-auto px-6">
     <h1 class="text-4xl font-semibold mb-8" style="font-family: var(--font-heading);">Team</h1>
-    <div class="grid gap-8 lg:grid-cols-3">
-      <div class="lg:col-span-2">
+    <?php
+      // Determine pinned items for this page up-front to drive layout
+      $pinned = ($siteContent['pinned'] ?? []);
+      $pinnedList = [];
+      foreach ($pinned as $pin) {
+        $scope = $pin['scope'] ?? [];
+        if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
+        if (in_array('all',$scope) || in_array('team',$scope)) $pinnedList[] = $pin;
+      }
+      $hasPinned = !empty($pinnedList);
+    ?>
+    <div class="grid gap-6 <?php echo $hasPinned ? 'lg:grid-cols-3' : 'lg:grid-cols-1'; ?>">
+      <div class="<?php echo $hasPinned ? 'lg:col-span-2' : ''; ?>">
         <?php if (empty($members)): ?>
           <p class="text-slate-600">Er zijn nog geen teamleden toegevoegd.</p>
         <?php else: ?>
@@ -48,7 +59,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
           $rendered = false;
         ?>
         <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; if (isset($g['visible']) && !$g['visible']) continue; $list = $membersByGroup[$gid] ?? []; if (empty($list)) continue; $rendered = true; ?>
-          <section class="mb-8">
+          <section class="team-group mb-6">
             <h2 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">
               <?php echo htmlspecialchars($g['name'] ?? ''); ?>
             </h2>
@@ -77,7 +88,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
           </section>
         <?php endforeach; ?>
         <?php if (!empty($membersByGroup[''])): $rendered = true; ?>
-          <section class="mb-8">
+          <section class="team-group mb-6">
             <h2 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">Overige</h2>
             <div class="team-grid grid gap-6 grid-cols-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               <?php foreach ($membersByGroup[''] as $m): ?>
@@ -109,23 +120,16 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
         <?php endif; ?>
         <?php endif; ?>
       </div>
-      <?php
-      $pinned = ($siteContent['pinned'] ?? []);
-      $pinnedList = [];
-      foreach ($pinned as $pin) {
-        $scope = $pin['scope'] ?? [];
-        if (!is_array($scope)) $scope = ($scope==='all') ? ['all'] : [];
-        if (in_array('all',$scope) || in_array('team',$scope)) $pinnedList[] = $pin;
-      }
-      ?>
-      <aside class="space-y-4 lg:col-span-1">
-        <?php foreach ($pinnedList as $pin): ?>
-        <div class="rounded-xl p-5 pinned-card">
-          <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
-          <div class="prose max-w-none"><?php echo $pin['text'] ?? ''; ?></div>
-        </div>
-        <?php endforeach; ?>
-      </aside>
+      <?php if ($hasPinned): ?>
+        <aside class="space-y-4 lg:col-span-1">
+          <?php foreach ($pinnedList as $pin): ?>
+          <div class="rounded-xl p-5 pinned-card">
+            <h3 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h3>
+            <div class="prose max-w-none"><?php echo $pin['text'] ?? ''; ?></div>
+          </div>
+          <?php endforeach; ?>
+        </aside>
+      <?php endif; ?>
     </div>
   </div>
 </main>
