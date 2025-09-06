@@ -40,3 +40,4 @@ $mapEmbed = $settings['map_embed'] ?? '';
     <p class="text-center text-sm text-slate-500 mt-8">&copy; <?php echo date('Y'); ?> Groepspraktijk Elewijt</p>
   </div>
 </footer>
+<script src="main.js"></script>

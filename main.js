@@ -45,9 +45,17 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('mobile-team-menu')?.classList.add('hidden');
             document.getElementById('mobile-practice-menu')?.classList.add('hidden');
             document.getElementById('mobile-links-menu')?.classList.add('hidden');
+            // Reset any rotated chevrons
+            document.querySelectorAll('#mobile-menu .chev').forEach(ic => ic.classList.remove('rotate-180'));
         });
-        // Close the menu after clicking a link
-        document.querySelectorAll('.mobile-nav-link').forEach(l => l.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+        // Close the menu after clicking a regular link (not submenu toggles)
+        document.querySelectorAll('.mobile-nav-link').forEach(l => {
+            const id = l.id || '';
+            const isToggle = id === 'mobile-practice-toggle' || id === 'mobile-team-toggle' || id === 'mobile-links-toggle';
+            if (!isToggle) {
+                l.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+            }
+        });
     }
 
     // Mobile: toggle team dropdown
@@ -71,6 +79,10 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             mobilePracticeMenu.classList.toggle('hidden');
             mobilePracticeToggle.setAttribute('aria-expanded', mobilePracticeMenu.classList.contains('hidden') ? 'false' : 'true');
+            const icon = mobilePracticeToggle.querySelector('.chev');
+            if (icon) {
+                icon.classList.toggle('rotate-180', !mobilePracticeMenu.classList.contains('hidden'));
+            }
         });
     }
 

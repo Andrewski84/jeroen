@@ -45,11 +45,11 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
 
     <div class="grid gap-x-8 lg:grid-cols-3">
         <div class="lg:col-span-2">
-            <h1 class="text-4xl font-semibold mb-8" style="font-family: var(--font-heading);">Ons Team</h1>
+            <h1 class="text-4xl font-semibold mb-4" style="font-family: var(--font-heading);">Ons Team</h1>
         </div>
         <?php if ($hasPinned): ?>
         <div class="lg:col-span-1">
-            <h2 class="text-3xl font-semibold mb-8" style="font-family: var(--font-heading);">Belangrijke mededelingen</h2>
+            <h2 class="text-3xl font-semibold mb-4 hidden lg:block" style="font-family: var(--font-heading);">Belangrijke mededelingen</h2>
         </div>
         <?php endif; ?>
     </div>
@@ -69,14 +69,14 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
               $membersByGroup[$gid][] = $mm;
           }
         ?>
-        <div class="space-y-8">
+        <div class="space-y-3">
             <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; if (isset($g['visible']) && !$g['visible']) continue; $list = $membersByGroup[$gid] ?? []; if (empty($list)) continue; ?>
               <section class="team-group">
                 <h3 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">
                   <?php echo htmlspecialchars($g['name'] ?? ''); ?>
                 </h3>
                 <?php if (!empty($g['description'])): ?><p class="text-slate-600 mb-4 max-w-2xl"><?php echo htmlspecialchars($g['description']); ?></p><?php endif; ?>
-                <div class="team-grid grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="team-grid grid gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
                   <?php foreach ($list as $m): ?>
                     <?php $cardUrl = $m['appointment_url'] ?? $appointmentUrl; ?>
                     <article class="team-card group">
@@ -103,7 +103,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
             <?php if (!empty($membersByGroup[''])): ?>
               <section class="team-group">
                 <h3 class="text-2xl font-semibold mb-2" style="font-family: var(--font-heading);">Overige</h3>
-                <div class="team-grid grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="team-grid grid gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
                   <?php foreach ($membersByGroup[''] as $m): ?>
                     <?php $cardUrl = $m['appointment_url'] ?? $appointmentUrl; ?>
                     <article class="team-card group">
@@ -131,6 +131,7 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
       </div>
       <?php if ($hasPinned): ?>
         <aside class="space-y-6 lg:col-span-1 sticky top-32">
+          <h2 class="text-3xl font-semibold mb-4 lg:hidden" style="font-family: var(--font-heading);">Belangrijke mededelingen</h2>
           <?php foreach ($pinnedList as $pin): ?>
           <div class="p-6 pinned-card">
             <h4 class="text-lg font-semibold mb-2"><?php echo htmlspecialchars($pin['title'] ?? ''); ?></h4>
@@ -146,4 +147,3 @@ $members = isset($teamData['members']) && is_array($teamData['members']) ? $team
 <?php include TEMPLATES_DIR . '/footer.php'; ?>
 </body>
 </html>
-
