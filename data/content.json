@@ -61,7 +61,9 @@
             "id": "pin_0kqjjrl",
             "title": "bericht",
             "text": "<p>bericht<\/p>",
-            "scope": []
+            "scope": [
+                "all"
+            ]
         },
         {
             "id": "pin_drjagxw8b3",
@@ -83,5 +85,9 @@
                 "home"
             ]
         }
-    ]
+    ],
+    "phones_hero": {
+        "image": "assets\/images\/img_68bbefa267be18.28638737.png",
+        "webp": "assets\/images\/img_68bbefa267be18.28638737.webp"
+    }
 }

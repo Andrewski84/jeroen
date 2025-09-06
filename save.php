@@ -86,96 +86,19 @@ switch ($action) {
         }
         exit;
 
-    
-    case 'contact_form':
-        $hp = trim($_POST['address2'] ?? '');
-        if ($hp !== '') { header('Location: index.php?sent=0'); exit; }
-        $name = trim($_POST['name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $message = trim($_POST['message'] ?? '');
+    case 'save_practice_hero':
+        $data = loadJsonFile($practiceFilePath);
+        if (!isset($data['hero']) || !is_array($data['hero'])) $data['hero'] = [];
+        // Title is not saved here, only image via upload_ajax. This action is for form submission.
+        // We can add a title field if needed in the future. For now, it just needs a form to submit.
+        saveJsonFile($practiceFilePath, $data);
+        break;
 
-        if ($name === '' || $message === '' || ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL))) {
-            header('Location: index.php?sent=0');
-            exit;
-        }
-
-        $messages = file_exists(MESSAGES_FILE) ? (json_decode(file_get_contents(MESSAGES_FILE), true) ?: []) : [];
-        $messages[] = [ 'ts' => date('c'), 'ip' => $_SERVER['REMOTE_ADDR'] ?? '', 'ua' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'name' => $name, 'email' => $email, 'message' => $message ];
-        saveJsonFile(MESSAGES_FILE, $messages);
-
-        $subject = 'Nieuw bericht via website';
-        $body = "Naam: {$name}\nEmail: {$email}\nIP: ".($_SERVER['REMOTE_ADDR'] ?? '')."\n---\n{$message}\n";
-        $sent = false;
-        $transport = 'mail';
-
-        if (defined('SMTP_ENABLED') && SMTP_ENABLED) {
-            if (file_exists(__DIR__ . '/vendor/autoload.php')) { require_once __DIR__ . '/vendor/autoload.php'; }
-            if (class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
-                $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
-                try {
-                    $mailer->isSMTP(); $mailer->Host = SMTP_HOST; $mailer->Port = SMTP_PORT; $mailer->SMTPAuth = true;
-                    if (defined('SMTP_SECURE') && SMTP_SECURE) { $mailer->SMTPSecure = SMTP_SECURE; }
-                    $mailer->Username = SMTP_USERNAME; $mailer->Password = SMTP_PASSWORD; $mailer->CharSet = 'UTF-8';
-                    $mailer->setFrom(MAIL_FROM, MAIL_FROM_NAME); $mailer->addAddress(MAIL_TO);
-                    if ($email) { $mailer->addReplyTo($email, $name ?: $email); }
-                    $mailer->Subject = $subject; $mailer->Body = $body;
-                    $sent = $mailer->send(); $transport = 'smtp-phpmailer';
-                } catch (\Throwable $e) { $sent = false; }
-            }
-        }
-        if (!$sent) {
-            $headers = "From: " . (defined('MAIL_FROM_NAME') ? MAIL_FROM_NAME : 'Website') . " <" . (defined('MAIL_FROM') ? MAIL_FROM : 'no-reply@localhost') . ">\r\n";
-            if ($email) { $headers .= "Reply-To: {$email}\r\n"; }
-            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-            $sent = @mail(defined('MAIL_TO') ? MAIL_TO : (defined('MAIL_FROM') ? MAIL_FROM : ''), $subject, $body, $headers);
-        }
-
-        logMailAttempt([ 'type' => 'contact_form', 'sent' => $sent, 'transport' => $transport ]);
-        header('Location: index.php?sent=' . ($sent ? '1' : '0'));
-        exit;
-
-    case 'request_password_reset':
-        header('Content-Type: application/json');
-        $token = bin2hex(random_bytes(32));
-        $hash = hash('sha256', $token);
-        $expires = time() + 3600; // 1 hour
-        $tokensFile = DATA_DIR . '/reset_tokens.json';
-        $tokens = file_exists($tokensFile) ? (json_decode(file_get_contents($tokensFile), true) ?: []) : [];
-        $tokens = array_values(array_filter($tokens, function($t){ return isset($t['expires']) && $t['expires'] > time() && empty($t['used']); }));
-        $tokens[] = ['hash' => $hash, 'expires' => $expires, 'created' => time(), 'used' => false];
-        saveJsonFile($tokensFile, $tokens);
-
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $basePath = rtrim(dirname($_SERVER['REQUEST_URI'] ?? '/'), '/\\');
-        $resetLink = $scheme . '://' . $host . $basePath . '/reset.php?token=' . $token;
-
-        $subject = 'Wachtwoord resetten';
-        $body = "Er werd een reset van je wachtwoord aangevraagd. Was jij dit niet? Dan mag je deze mail negeren.\nWens je je wachtwoord te resetten, klik op deze link:\n{$resetLink}";
-        $sent = false;
-        $transport = 'mail';
-        if (defined('SMTP_ENABLED') && SMTP_ENABLED) {
-            if (file_exists(__DIR__ . '/vendor/autoload.php')) { require_once __DIR__ . '/vendor/autoload.php'; }
-            if (class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
-                $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
-                try {
-                    $mailer->isSMTP(); $mailer->Host = SMTP_HOST; $mailer->Port = SMTP_PORT; $mailer->SMTPAuth = true;
-                    if (defined('SMTP_SECURE') && SMTP_SECURE) { $mailer->SMTPSecure = SMTP_SECURE; }
-                    $mailer->Username = SMTP_USERNAME; $mailer->Password = SMTP_PASSWORD; $mailer->CharSet = 'UTF-8';
-                    $mailer->setFrom(MAIL_FROM, MAIL_FROM_NAME); $mailer->addAddress(MAIL_TO);
-                    $mailer->Subject = $subject; $mailer->Body = $body;
-                    $sent = $mailer->send(); $transport = 'smtp-phpmailer';
-                } catch (\Throwable $e) { $sent = false; }
-            }
-        }
-        if (!$sent) {
-            $headers = "From: " . (defined('MAIL_FROM_NAME') ? MAIL_FROM_NAME : 'Website') . " <" . (defined('MAIL_FROM') ? MAIL_FROM : 'no-reply@localhost') . ">\r\n";
-            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-            $sent = @mail(defined('MAIL_TO') ? MAIL_TO : (defined('MAIL_FROM') ? MAIL_FROM : ''), $subject, $body, $headers);
-        }
-        logMailAttempt([ 'type' => 'password_reset', 'sent' => $sent, 'transport' => $transport ]);
-        echo json_encode(['status' => $sent ? 'success' : 'error']);
-        exit;
+    case 'save_phones_hero':
+        if (!isset($content['phones_hero']) || !is_array($content['phones_hero'])) $content['phones_hero'] = [];
+        $content['phones_hero']['title'] = $_POST['phones_hero_title'] ?? '';
+        saveJsonFile($contentFilePath, $content);
+        break;
 
     // --- Team management ---
     case 'add_team_member':
@@ -183,7 +106,7 @@ switch ($action) {
         $role = trim($_POST['role'] ?? '');
         $appt = trim($_POST['appointment_url'] ?? '');
         $groupId = trim($_POST['group_id'] ?? '');
-        $visible = isset($_POST['visible']) ? true : true; // default visible
+        $visible = isset($_POST['visible']);
         if ($name !== '' && $role !== '') {
             $data = loadJsonFile($teamFilePath);
             if (!isset($data['members']) || !is_array($data['members'])) $data['members'] = [];
@@ -232,18 +155,16 @@ switch ($action) {
                 $initialCount = count($data['members']);
                 $data['members'] = array_values(array_filter($data['members'], function($m) use ($id) {
                     if (($m['id'] ?? '') === $id) {
-                         // Delete associated images
                         foreach (['image','webp'] as $k) {
                             if (!empty($m[$k])) {
                                 $absPath = BASE_DIR . '/' . toPublicPath($m[$k]);
                                 if (file_exists($absPath)) { @unlink($absPath); }
                             }
                         }
-                        return false; // Remove item from array
+                        return false;
                     }
-                    return true; // Keep item
+                    return true;
                 }));
-
                 if (count($data['members']) < $initialCount) {
                     saveJsonFile($teamFilePath, $data);
                 }
@@ -299,56 +220,7 @@ switch ($action) {
             saveJsonFile($teamFilePath, $data);
         }
         break;
-
-    case 'reorder_team_groups':
-        $order = $_POST['order'] ?? [];
-        $data = loadJsonFile($teamFilePath);
-        $groups = $data['groups'] ?? [];
-        if (is_array($groups)) {
-            $byId = [];
-            foreach ($groups as $g) { $byId[$g['id'] ?? ''] = $g; }
-            $new = [];
-            foreach ($order as $id) { if (isset($byId[$id])) $new[] = $byId[$id]; }
-            foreach ($groups as $g) { if (!in_array($g['id'] ?? '', $order, true)) $new[] = $g; }
-            $data['groups'] = $new;
-            saveJsonFile($teamFilePath, $data);
-        }
-        if ($isAjax) { echo json_encode(['status' => 'success']); exit; }
-        break;
-
-    case 'reorder_team_members':
-        $order = $_POST['order'] ?? [];
-        $groupId = $_POST['group_id'] ?? '';
-        $data = loadJsonFile($teamFilePath);
-        $members = $data['members'] ?? [];
-        if (is_array($members)) {
-            // Group current members by group_id
-            $byGroup = [];
-            foreach ($members as $m) { $byGroup[$m['group_id'] ?? ''] = $byGroup[$m['group_id'] ?? ''] ?? []; $byGroup[$m['group_id'] ?? ''][] = $m; }
-            $list = $byGroup[$groupId] ?? [];
-            // Index by id
-            $byId = [];
-            foreach ($list as $m) { $byId[$m['id'] ?? ''] = $m; }
-            // Build new ordered list for this group
-            $newList = [];
-            foreach ($order as $id) { if (isset($byId[$id])) $newList[] = $byId[$id]; }
-            foreach ($list as $m) { if (!in_array($m['id'] ?? '', $order, true)) $newList[] = $m; }
-            $byGroup[$groupId] = $newList;
-            // Rebuild global members by current groups order
-            $groups = $data['groups'] ?? [];
-            $rebuilt = [];
-            // First, groups in defined order
-            foreach ($groups as $g) {
-                $gid = $g['id'] ?? '';
-                if (isset($byGroup[$gid])) { foreach ($byGroup[$gid] as $m) { $rebuilt[] = $m; unset($byGroup[$gid]); } }
-            }
-            // Then any remaining (ungrouped or missing groups)
-            foreach ($byGroup as $gid => $arr) { foreach ($arr as $m) { $rebuilt[] = $m; } }
-            $data['members'] = $rebuilt;
-            saveJsonFile($teamFilePath, $data);
-        }
-        if ($isAjax) { echo json_encode(['status' => 'success']); exit; }
-        break;
+    
     // --- Praktijkinfo management ---
     case 'save_practice_page':
         $slug = trim($_POST['slug'] ?? '');
@@ -420,6 +292,7 @@ switch ($action) {
         $team = $_POST['pinned_scope_team'] ?? [];
         $practice = $_POST['pinned_scope_practice'] ?? [];
         $links = $_POST['pinned_scope_links'] ?? [];
+        $phones = $_POST['pinned_scope_phones'] ?? [];
         $all = $_POST['pinned_scope_all'] ?? [];
         $items = [];
         $n = is_array($ids) ? count($ids) : 0;
@@ -429,60 +302,20 @@ switch ($action) {
             $text = $texts[$i] ?? '';
             if ($title === '' && trim(strip_tags($text)) === '') continue;
             $scope = [];
-            if (in_array($pid, (array)$all, true)) { $scope = ['all']; }
+            if (in_array($pid, (array)$all, true) && $pid !== '') { $scope = ['all']; }
             else {
                 if (in_array($pid, (array)$home, true)) $scope[] = 'home';
                 if (in_array($pid, (array)$team, true)) $scope[] = 'team';
                 if (in_array($pid, (array)$practice, true)) $scope[] = 'practice';
                 if (in_array($pid, (array)$links, true)) $scope[] = 'links';
+                if (in_array($pid, (array)$phones, true)) $scope[] = 'phones';
             }
             $items[] = [ 'id' => $pid, 'title' => $title, 'text' => $text, 'scope' => $scope ];
         }
         $content['pinned'] = $items;
         saveJsonFile($contentFilePath, $content);
         break;
-
-    case 'reorder_practice_pages':
-        $order = $_POST['order'] ?? [];
-        $data = loadJsonFile($practiceFilePath);
-        if (isset($data['pages']) && is_array($data['pages'])) {
-            $new = [];
-            foreach ($order as $slug) { if (isset($data['pages'][$slug])) $new[$slug] = $data['pages'][$slug]; }
-            foreach ($data['pages'] as $slug => $page) { if (!isset($new[$slug])) $new[$slug] = $page; }
-            $data['pages'] = $new;
-            saveJsonFile($practiceFilePath, $data);
-        }
-        if ($isAjax) { echo json_encode(['status'=>'success']); exit; }
-        break;
-
-    case 'reorder_pinned':
-        $order = $_POST['order'] ?? [];
-        if (isset($content['pinned']) && is_array($content['pinned'])) {
-            $byId = array_column($content['pinned'], null, 'id');
-            $new = [];
-            foreach ($order as $id) { if (isset($byId[$id])) $new[] = $byId[$id]; }
-            foreach ($content['pinned'] as $p) { if (!in_array($p['id'] ?? '', $order, true)) $new[] = $p; }
-            $content['pinned'] = $new;
-            saveJsonFile($contentFilePath, $content);
-        }
-        if ($isAjax) { echo json_encode(['status'=>'success']); exit; }
-        break;
-
-    case 'reorder_links':
-        $order = $_POST['order'] ?? [];
-        $data = loadJsonFile($linksFilePath);
-        $items = $data['items'] ?? [];
-        if (is_array($items)) {
-            $byId = array_column($items, null, 'id');
-            $new = [];
-            foreach ($order as $id) { if (isset($byId[$id])) $new[] = $byId[$id]; }
-            foreach ($items as $it) { if (!in_array($it['id'] ?? '', $order, true)) $new[] = $it; }
-            $data['items'] = $new;
-            saveJsonFile($linksFilePath, $data);
-        }
-        if ($isAjax) { echo json_encode(['status'=>'success']); exit; }
-        break;
-
+    
     case 'save_settings':
         if (!isset($content['settings']) || !is_array($content['settings'])) $content['settings'] = [];
         $content['settings']['appointment_url'] = $_POST['appointment_url'] ?? '';
@@ -506,32 +339,6 @@ switch ($action) {
         $content['settings']['footer_phones'] = $list;
         saveJsonFile($contentFilePath, $content);
         break;
-
-    case 'update_mailbox':
-        $newEmail = trim($_POST['mail_address'] ?? '');
-        $newPass = $_POST['mail_password'] ?? '';
-        if ($newEmail === '') { break; }
-        $configLines = file('config.php');
-        $output = '';
-        foreach ($configLines as $line) {
-            if (str_starts_with(trim($line), "define('SMTP_USERNAME'")) {
-                $output .= "define('SMTP_USERNAME', '" . addslashes($newEmail) . "');\n";
-            } elseif (str_starts_with(trim($line), "define('MAIL_FROM'")) {
-                $output .= "define('MAIL_FROM', '" . addslashes($newEmail) . "');\n";
-            } elseif (str_starts_with(trim($line), "define('MAIL_TO'")) {
-                $output .= "define('MAIL_TO', '" . addslashes($newEmail) . "');\n";
-            } elseif ($newPass !== '' && str_starts_with(trim($line), "define('SMTP_PASSWORD'")) {
-                $output .= "define('SMTP_PASSWORD', '" . addslashes($newPass) . "');\n";
-            } else {
-                $output .= $line;
-            }
-        }
-        if (file_put_contents('config.php', $output) !== false) {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?mailbox_update=success#tab-mailbox');
-        } else {
-            header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?mailbox_update=error_file#tab-mailbox');
-        }
-        exit;
 }
 
 // Redirect back to the correct tab in the admin panel.
@@ -540,16 +347,16 @@ if (!$isAjax) {
     $tabMap = [
         'add_team_member' => '#tab-team', 'update_team_member' => '#tab-team', 'delete_team_member' => '#tab-team',
         'add_team_group' => '#tab-team', 'update_team_group' => '#tab-team', 'delete_team_group' => '#tab-team',
-        'reorder_team_groups' => '#tab-team', 'reorder_team_members' => '#tab-team',
-        'save_practice_page' => '#tab-practice', 'delete_practice_page' => '#tab-practice',
-        'save_links' => '#tab-links', 'save_settings' => '#tab-settings',
+        'save_practice_page' => '#tab-practice', 'delete_practice_page' => '#tab-practice', 'save_practice_hero' => '#tab-practice',
+        'save_links' => '#tab-links', 'save_phones_hero' => '#tab-links',
+        'save_settings' => '#tab-settings',
         'save_pinned' => '#tab-pinned',
     ];
     if (isset($tabMap[$action])) {
         $hash = $tabMap[$action];
     }
     
-    header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . $hash);
+    $status = (strpos($action, 'delete') !== false || strpos($action, 'add') !== false || strpos($action, 'save') !== false) ? 'success' : '';
+    header('Location: ' . (defined('ADMIN_PANEL_FILE') ? ADMIN_PANEL_FILE : 'beheer-gpe-a4x7.php') . '?save_status='.$status . $hash);
     exit;
 }
-

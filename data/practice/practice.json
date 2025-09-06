@@ -25,5 +25,9 @@
                 }
             ]
         }
+    },
+    "hero": {
+        "image": "assets\/images\/img_68bbef7b213105.04804318.png",
+        "webp": "assets\/images\/img_68bbef7b213105.04804318.webp"
     }
 }
