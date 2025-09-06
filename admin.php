@@ -94,9 +94,9 @@ $save_status = $_GET['save_status'] ?? '';
             <button class="admin-tab-button active" data-tab="tab-homepage"><span>Homepage</span></button>
             <button class="admin-tab-button" data-tab="tab-team"><span>Team</span></button>
             <button class="admin-tab-button" data-tab="tab-practice"><span>Praktijkinfo</span></button>
-            <button class="admin-tab-button" data-tab="tab-links"><span>Nuttige Links</span></button>
+            <button class="admin-tab-button" data-tab="tab-links"><span>Nuttige Links & Nummers</span></button>
             <button class="admin-tab-button" data-tab="tab-pinned"><span>Gepinde berichten</span></button>
-            <button class="admin-tab-button" data-tab="tab-settings"><span>Algemene Instellingen</span></button>
+            <button class="admin-tab-button" data-tab="tab-settings"><span>Contact & Adres</span></button>
             <button class="admin-tab-button" data-tab="tab-security"><span>Beveiliging</span></button>
         </nav>
 
@@ -326,11 +326,31 @@ $save_status = $_GET['save_status'] ?? '';
                 </div>
             </div>
 
-
             <div id="tab-practice" class="admin-tab-panel">
+                <div class="card mb-6">
+                    <div class="card-header"><h2 class="card-title">Praktijkinfo - Hero Sectie</h2></div>
+                     <form action="save.php" method="POST">
+                        <div class="card-body space-y-4">
+                            <input type="hidden" name="action" value="save_practice_hero">
+                             <?php $practiceHero = $practiceData['hero'] ?? []; ?>
+                             <div>
+                                <label class="form-label">Hero Afbeelding</label>
+                                <div class="relative group w-full aspect-[16/6] bg-slate-100 rounded-md overflow-hidden">
+                                    <img src="<?php echo htmlspecialchars($practiceHero['image'] ?? 'https://placehold.co/1200x400?text=Hero+Afbeelding'); ?>" alt="Hero afbeelding voor praktijkinfo" class="w-full h-full object-cover">
+                                    <div class="dropzone absolute inset-0" data-target="practice_hero"><span>Sleep foto of klik</span></div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Deze afbeelding wordt bovenaan alle 'Praktijkinfo' pagina's getoond. De titel op de afbeelding is de titel van de specifieke pagina.</p>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                             <button type="submit" class="btn btn-primary">Opslaan</button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Praktijkinfo</h2>
+                        <h2 class="card-title">Praktijkinfo - Pagina's</h2>
                         <form action="save.php" method="POST" class="flex items-center gap-2">
                             <input type="hidden" name="action" value="save_practice_page">
                             <input type="text" class="form-input" name="title" placeholder="Titel nieuwe pagina" required>
@@ -398,61 +418,16 @@ $save_status = $_GET['save_status'] ?? '';
                 </div>
             </div>
 
-            <div id="tab-team-sort-panel" class="admin-tab-panel">
-            <div class="card mt-6">
-                <div class="card-header">
-                    <h2 class="card-title">Sortering Teamleden per Functiegroep</h2>
-                </div>
-                <div class="card-body space-y-6">
-                    <?php
-                        $members = isset($teamData['members']) && is_array($teamData['members']) ? $teamData['members'] : [];
-                        $groups = isset($teamData['groups']) && is_array($teamData['groups']) ? $teamData['groups'] : [];
-                        $membersByGroup = [];
-                        foreach ($members as $mm) { $gid = $mm['group_id'] ?? ''; $membersByGroup[$gid] = $membersByGroup[$gid] ?? []; $membersByGroup[$gid][] = $mm; }
-                    ?>
-                    <?php foreach ($groups as $g): $gid = $g['id'] ?? ''; ?>
-                    <div>
-                        <h3 class="font-semibold mb-2"><?php echo htmlspecialchars($g['name'] ?? ''); ?></h3>
-                        <div class="space-y-2 team-members-list" data-group-id="<?php echo htmlspecialchars($gid); ?>">
-                            <?php foreach (($membersByGroup[$gid] ?? []) as $mm): ?>
-                            <div class="flex items-center justify-between border border-slate-200 rounded-md p-2" data-id="<?php echo htmlspecialchars($mm['id'] ?? ''); ?>">
-                                <div class="flex items-center gap-2">
-                                    <span class="drag-handle cursor-move text-slate-400" title="Sleep">&#9776;</span>
-                                    <span><?php echo htmlspecialchars(($mm['name'] ?? '') . ' - ' . ($mm['role'] ?? '')); ?></span>
-                                </div>
-                                <?php if (isset($mm['visible']) && !$mm['visible']): ?><span class="text-xs text-slate-500">Verborgen</span><?php endif; ?>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                    <?php if (!empty($membersByGroup[''])): ?>
-                    <div>
-                        <h3 class="font-semibold mb-2">Ongegroepeerd</h3>
-                        <div class="space-y-2 team-members-list" data-group-id="">
-                            <?php foreach ($membersByGroup[''] as $mm): ?>
-                            <div class="flex items-center gap-2 border border-slate-200 rounded-md p-2" data-id="<?php echo htmlspecialchars($mm['id'] ?? ''); ?>">
-                                <span class="drag-handle cursor-move text-slate-400" title="Sleep">&#9776;</span>
-                                <span><?php echo htmlspecialchars(($mm['name'] ?? '') . ' - ' . ($mm['role'] ?? '')); ?></span>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            </div>
-
             <div id="tab-links" class="admin-tab-panel">
                 <div class="card">
                     <div class="card-header"><h2 class="card-title">Nuttige links</h2></div>
-                    <?php $hero = $linksData['hero'] ?? ['title' => '', 'image' => '']; $items = $linksData['items'] ?? []; ?>
+                    <?php $hero = $linksData['hero'] ?? ['title' => '', 'image' => '']; ?>
                      <form action="save.php" method="POST">
                         <div class="card-body space-y-4">
                             <input type="hidden" name="action" value="save_links">
                             <div>
                                 <label class="form-label">Hero Titel</label>
-                                <input type="text" class="form-input" name="hero_title" value="<?php echo htmlspecialchars($hero['title'] ?? ''); ?>">
+                                <input type="text" class="form-input" name="hero_title" value="<?php echo htmlspecialchars($hero['title'] ?? 'Nuttige links'); ?>">
                             </div>
                             <div>
                                 <label class="form-label">Hero Afbeelding</label>
@@ -462,7 +437,7 @@ $save_status = $_GET['save_status'] ?? '';
                                 </div>
                             </div>
                             <div id="links-list" class="space-y-2">
-                                <?php foreach ($items as $it): $iid = $it['id'] ?? uniqid('link_', true); ?>
+                                <?php $items = $linksData['items'] ?? []; foreach ($items as $it): $iid = $it['id'] ?? uniqid('link_', true); ?>
                                 <div class="grid grid-cols-1 md:grid-cols-5 gap-2 items-center" data-id="<?php echo htmlspecialchars($iid); ?>">
                                     <input type="hidden" name="link_id[]" value="<?php echo htmlspecialchars($iid); ?>">
                                     <div class="flex items-center gap-2">
@@ -488,11 +463,34 @@ $save_status = $_GET['save_status'] ?? '';
                         </div>
                     </form>
                 </div>
+                <div class="card mt-6">
+                    <div class="card-header"><h2 class="card-title">Nuttige Telefoonnummers</h2></div>
+                    <?php $phonesHero = $content['phones_hero'] ?? []; ?>
+                     <form action="save.php" method="POST">
+                        <div class="card-body space-y-4">
+                            <input type="hidden" name="action" value="save_phones_hero">
+                            <div>
+                                <label class="form-label">Hero Titel</label>
+                                <input type="text" class="form-input" name="phones_hero_title" value="<?php echo htmlspecialchars($phonesHero['title'] ?? 'Nuttige telefoonnummers'); ?>">
+                            </div>
+                            <div>
+                                <label class="form-label">Hero Afbeelding</label>
+                                <div class="relative group w-full aspect-[16/6] bg-slate-100 rounded-md overflow-hidden">
+                                    <img src="<?php echo htmlspecialchars($phonesHero['image'] ?? 'https://placehold.co/1200x400?text=Hero+Afbeelding'); ?>" alt="Hero afbeelding" class="w-full h-full object-cover">
+                                    <div class="dropzone absolute inset-0" data-target="phones_hero"><span>Sleep foto of klik</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                             <button type="submit" class="btn btn-primary">Hero Opslaan</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div id="tab-settings" class="admin-tab-panel">
                 <div class="card">
-                    <div class="card-header"><h2 class="card-title">Algemene instellingen</h2></div>
+                    <div class="card-header"><h2 class="card-title">Contact & Adres</h2></div>
                     <?php $settings = $content['settings'] ?? []; ?>
                     <form action="save.php" method="POST">
                         <div class="card-body space-y-4">
@@ -520,7 +518,7 @@ $save_status = $_GET['save_status'] ?? '';
                                 </div>
                             </div>
                             <div>
-                                <h3 class="font-semibold mb-2">Nuttige telefoonnummers</h3>
+                                <h3 class="font-semibold mb-2 mt-4">Nuttige telefoonnummers (voor de aparte pagina)</h3>
                                 <?php $phones = isset($settings['footer_phones']) && is_array($settings['footer_phones']) ? $settings['footer_phones'] : []; ?>
                                 <div id="phones-list" class="space-y-2">
                                     <?php foreach ($phones as $ph): ?>
@@ -632,33 +630,6 @@ $save_status = $_GET['save_status'] ?? '';
                     </form>
                 </div>
             </div>
-
-            <div id="tab-mailbox" class="admin-tab-panel">
-                <div class="card">
-                    <div class="card-header"><h2 class="card-title">Mailbox instellingen</h2></div>
-                    <form action="save.php" method="POST">
-                        <div class="card-body">
-                            <?php if ($mailbox_status === 'success'): ?><div class="alert alert-success">Mailbox-instellingen opgeslagen.</div><?php elseif ($mailbox_status === 'error_file'): ?><div class="alert alert-danger">Kon config niet wegschrijven.</div><?php endif; ?>
-                            <div class="space-y-4 max-w-md">
-                                <input type="hidden" name="action" value="update_mailbox">
-                                <div>
-                                    <label class="form-label" for="mail_address">Mailadres</label>
-                                    <input class="form-input" type="email" name="mail_address" id="mail_address" value="<?php echo htmlspecialchars(defined('SMTP_USERNAME') ? SMTP_USERNAME : (defined('MAIL_FROM') ? MAIL_FROM : '')); ?>" required>
-                                </div>
-                                <div>
-                                    <label class="form-label" for="mail_password">Mailbox wachtwoord</label>
-                                    <input class="form-input" type="password" name="mail_password" id="mail_password" placeholder="••••••••">
-                                    <p class="text-xs text-slate-500 mt-1">Laat leeg om ongewijzigd te laten.</p>
-                                </div>
-                                <p class="text-sm text-slate-500 pt-2">Dit adres en wachtwoord wordt gebruikt voor contactformulier mails en voor resetlinks bij "Wachtwoord vergeten".</p>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                             <button type="submit" class="btn btn-primary">Opslaan</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -683,7 +654,6 @@ $save_status = $_GET['save_status'] ?? '';
     </div>
     
     <script>
-    // Initialize CKEditor on any .richtext textarea
     window.initRichtext = function(el){
       if (!window.ClassicEditor || !el || el._ck_inited) return;
       ClassicEditor.create(el, { toolbar: ['heading','bold','italic','link','bulletedList','numberedList','undo','redo'] })
@@ -694,7 +664,6 @@ $save_status = $_GET['save_status'] ?? '';
       document.querySelectorAll('textarea.richtext').forEach(window.initRichtext);
     });
 
-    // Helpers to add dynamic fields
     window.addWelcomeCard = function(){
       const c = document.getElementById('welcome-cards'); if(!c) return;
       const d = document.createElement('div');
@@ -704,28 +673,15 @@ $save_status = $_GET['save_status'] ?? '';
       window.initRichtext(d.querySelector('textarea.richtext'));
     };
     window.togglePinnedAll = function(btn){
-      // Try row-based (table) first
       let container = btn.closest('tr[data-id]');
-      if (container) {
-        const id = container.dataset.id;
-        const checks = container.querySelectorAll('input[type=checkbox]');
-        const allInput = container.querySelector('input[name="pinned_scope_all[]"]');
-        const turnOn = !allInput || allInput.value === '';
-        checks.forEach(cb => cb.checked = turnOn);
-        if (allInput) allInput.value = turnOn ? id : '';
-        btn.textContent = turnOn ? 'Wis' : "Alle";
-        return;
-      }
-      // Fallback: old editor box
-      container = btn.closest('.border[data-id]');
       if (!container) return;
       const id = container.dataset.id;
-      const checkboxes = container.querySelectorAll('input[type=checkbox]');
+      const checks = container.querySelectorAll('input[type=checkbox]');
       const allInput = container.querySelector('input[name="pinned_scope_all[]"]');
-      const turnOn = allInput && allInput.value === '';
-      checkboxes.forEach(cb => cb.checked = turnOn);
+      const turnOn = !allInput || allInput.value === '';
+      checks.forEach(cb => cb.checked = turnOn);
       if (allInput) allInput.value = turnOn ? id : '';
-      btn.textContent = turnOn ? 'Selectie wissen' : "Alle pagina's";
+      btn.textContent = turnOn ? 'Wis' : "Alle";
     };
     window.addPracticeCard = function(containerId){
       const c = document.getElementById(containerId); if(!c) return;
@@ -786,4 +742,3 @@ $save_status = $_GET['save_status'] ?? '';
     <script src="admin.js?v=<?php echo $adminJsVersion; ?>"></script>
 </body>
 </html>
-
