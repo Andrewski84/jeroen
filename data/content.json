@@ -34,7 +34,7 @@
             {
                 "label": "Hulpdiensten",
                 "tel": "112",
-                "desc": "test",
+                "desc": "",
                 "url": ""
             },
             {
@@ -44,16 +44,40 @@
                 "url": ""
             },
             {
-                "label": "Antigifcentrum",
-                "tel": "070 245 245",
-                "desc": "te",
+                "label": "Dokter van wacht",
+                "tel": "1733",
+                "desc": "",
                 "url": ""
             },
             {
-                "label": "Antigifcentrum",
-                "tel": "Antigifcentrum",
+                "label": "Apotheek van wacht",
+                "tel": "0903 99 000",
                 "desc": "",
                 "url": ""
+            },
+            {
+                "label": "Zelfmoordlijn",
+                "tel": "1813",
+                "desc": "",
+                "url": ""
+            },
+            {
+                "label": "Vragen over geweld",
+                "tel": "1712",
+                "desc": "",
+                "url": ""
+            },
+            {
+                "label": "Vertrouwenscentrum kindermishandeling",
+                "tel": "0800 970 79",
+                "desc": "",
+                "url": ""
+            },
+            {
+                "label": "De Druglijn",
+                "tel": "078 15 10 20",
+                "desc": "Voor alle vragen over drank, drugs, pillen, gamen en gokken",
+                "url": "www.druglijn.be"
             }
         ]
     },
